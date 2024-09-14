@@ -7,6 +7,8 @@ import { AppService } from './app.service';
 import { validate as validateEnvs } from '@config/envs/env.validation';
 import configuration from '@config/envs/configuration';
 import { Environment } from './config/envs/types';
+import { seconds, ThrottlerModule } from '@nestjs/throttler';
+import { HealthModule } from '@modules/health/health.module';
 
 @Module({
   imports: [
@@ -31,6 +33,24 @@ import { Environment } from './config/envs/types';
           configService.get<Environment>('nodeEnv') !== Environment.Production,
       }),
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: seconds(1),
+        limit: 3,
+      },
+      {
+        name: 'medium',
+        ttl: seconds(10),
+        limit: 20,
+      },
+      {
+        name: 'long',
+        ttl: seconds(60),
+        limit: 100,
+      },
+    ]),
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
