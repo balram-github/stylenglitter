@@ -2,13 +2,14 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { validate as validateEnvs } from '@config/envs/env.validation';
 import configuration from '@config/envs/configuration';
 import { Environment } from './config/envs/types';
 import { seconds, ThrottlerModule } from '@nestjs/throttler';
 import { HealthModule } from '@modules/health/health.module';
+import { UserModule } from '@modules/user/user.module';
+import { AuthModule } from '@modules/auth/auth.module';
+import { TokenModule } from '@modules/token/token.module';
 
 @Module({
   imports: [
@@ -51,8 +52,11 @@ import { HealthModule } from '@modules/health/health.module';
       },
     ]),
     HealthModule,
+    UserModule,
+    AuthModule,
+    TokenModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
