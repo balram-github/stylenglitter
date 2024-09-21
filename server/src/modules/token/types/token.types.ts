@@ -1,6 +1,6 @@
 import { JwtSignOptions } from '@nestjs/jwt';
 
 export interface TokenSignOptions extends JwtSignOptions {
-  expiresIn: number;
+  expiresIn?: number;
   persistInDB?: boolean;
 }

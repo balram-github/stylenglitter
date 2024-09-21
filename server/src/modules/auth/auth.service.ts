@@ -1,5 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserService } from '@modules/user/user.service';
 import { TokenService } from '../token/token.service';
 import { LoginDto } from './dto/login.dto';
@@ -23,7 +27,7 @@ export class AuthService {
       },
       {
         secret: this.configService.get('auth.accessJwtTokenSecret'),
-        expiresIn: this.configService.get('auth.accessJwtTokenExpiry')!,
+        expiresIn: this.configService.get<number>('auth.accessJwtTokenExpiry')!,
       },
     );
   }
@@ -39,7 +43,9 @@ export class AuthService {
       {
         jwtid,
         secret: this.configService.get('auth.refreshJwtTokenSecret'),
-        expiresIn: this.configService.get('auth.refreshJwtTokenExpiry')!,
+        expiresIn: this.configService.get<number>(
+          'auth.refreshJwtTokenExpiry',
+        )!,
         persistInDB: true,
       },
     );
@@ -88,8 +94,18 @@ export class AuthService {
   }
 
   async register(payload: CreateUserDto) {
+    const existingEmail = await this.userService.getUser({
+      where: { email: payload.email },
+    });
+
+    if (existingEmail) {
+      throw new BadRequestException('A user with this email already exists');
+    }
+
     const newUser = await this.userService.create(payload);
 
-    return this.generateAuthTokenPair({ userId: newUser.id });
+    return this.generateAuthTokenPair({
+      userId: newUser.id,
+    });
   }
 }

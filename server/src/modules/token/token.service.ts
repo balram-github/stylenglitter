@@ -4,6 +4,7 @@ import { TokenSignOptions } from './types/token.types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Token } from './token.entity';
 import { Repository } from 'typeorm';
+import { addSeconds } from 'date-fns';
 
 @Injectable()
 export class TokenService {
@@ -17,13 +18,19 @@ export class TokenService {
     return this.tokenRepository.findOne({ where: { tokenId } });
   }
 
-  async create(payload: object | Buffer, options?: TokenSignOptions) {
+  async create(
+    payload: object | Buffer,
+    { persistInDB, ...options }: TokenSignOptions = {},
+  ) {
     const jwtToken = await this.jwtService.signAsync(payload, options);
 
-    if (options?.persistInDB && options?.jwtid) {
+    if (persistInDB && options?.jwtid) {
+      const expiresAt = options?.expiresIn
+        ? addSeconds(new Date(), options.expiresIn)
+        : null;
       const newToken = this.tokenRepository.create({
         tokenId: options.jwtid,
-        expiresAt: options?.expiresIn,
+        expiresAt,
       });
 
       await this.tokenRepository.save(newToken);

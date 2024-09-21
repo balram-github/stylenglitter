@@ -13,7 +13,7 @@ export class Token {
   id: string;
 
   @Column({ type: 'timestamp', nullable: true, name: 'expires_at' })
-  expiresAt: Date;
+  expiresAt: Date | null;
 
   @Column({ type: 'uuid', name: 'token_id', unique: true })
   tokenId: string;
