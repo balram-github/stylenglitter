@@ -18,7 +18,7 @@ export class AuthController {
 
     const [accessToken, refreshToken] = await Promise.all([
       this.authService.generateAccessToken(tokenPayload),
-      this.authService.rotateRefreshToken(tokenPayload, auth.jwtid),
+      this.authService.rotateRefreshToken(tokenPayload, auth.jti),
     ]);
 
     return {

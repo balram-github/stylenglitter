@@ -27,6 +27,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? errorMessage
         : (errorMessage as any).message || 'Internal server error';
 
+    console.error(exception);
+
     response.status(status).json({
       success: false,
       code: -1,

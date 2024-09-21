@@ -1,5 +1,11 @@
-import { createParamDecorator } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { Request } from 'express';
 
-export const Auth = createParamDecorator((data, req) => {
-  return req.auth;
+interface PopulatedRequest extends Request {
+  auth: any;
+}
+
+export const Auth = createParamDecorator((data, context: ExecutionContext) => {
+  const request = context.switchToHttp().getRequest<PopulatedRequest>();
+  return request.auth;
 });
