@@ -12,7 +12,7 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
@@ -22,7 +22,8 @@
       "@config/*": ["src/config/*"],
       "@lib/*": ["src/lib/*"],
       "@loader/*": ["src/loader/*"],
-      "@modules/*": ["src/modules/*"]
+      "@modules/*": ["src/modules/*"],
+      "@decorators/*": ["src/decorators/*"]
     }
   }
 }

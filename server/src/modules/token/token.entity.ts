@@ -15,6 +15,9 @@ export class Token {
   @Column({ type: 'timestamp', nullable: true, name: 'expires_at' })
   expiresAt: Date;
 
+  @Column({ type: 'uuid', name: 'token_id', unique: true })
+  tokenId: string;
+
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date;
 

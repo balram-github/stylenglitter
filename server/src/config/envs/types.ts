@@ -42,4 +42,18 @@ export class EnvironmentVariables {
   @IsBoolean()
   @IsOptional()
   DATABASE_SYNC?: boolean = false;
+
+  @IsString()
+  ACCESS_JWT_TOKEN_SECRET: string;
+
+  @IsString()
+  REFRESH_JWT_TOKEN_SECRET: string;
+
+  @IsNumber()
+  @IsOptional()
+  ACCESS_JWT_TOKEN_EXPIRY?: number;
+
+  @IsNumber()
+  @IsOptional()
+  REFRESH_JWT_TOKEN_EXPIRY?: number;
 }
