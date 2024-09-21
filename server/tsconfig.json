@@ -23,7 +23,9 @@
       "@lib/*": ["src/lib/*"],
       "@loader/*": ["src/loader/*"],
       "@modules/*": ["src/modules/*"],
-      "@decorators/*": ["src/decorators/*"]
+      "@decorators/*": ["src/decorators/*"],
+      "@guards/*": ["src/guards/*"],
+      "@utils/*": ["src/utils/*"],
     }
   }
 }

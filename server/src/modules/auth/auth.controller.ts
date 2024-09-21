@@ -1,15 +1,17 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '@modules/user/dto/create-user.dto';
 import { Auth } from '@decorators/auth';
+import { RefreshGuard } from '@guards/refresh-guard';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @UseGuards(RefreshGuard)
   @Get('/refresh-token')
   async refreshToken(@Auth() auth) {
     const tokenPayload = { userId: auth.userId };

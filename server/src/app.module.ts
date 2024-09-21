@@ -10,6 +10,7 @@ import { HealthModule } from '@modules/health/health.module';
 import { UserModule } from '@modules/user/user.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { TokenModule } from '@modules/token/token.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -18,6 +19,9 @@ import { TokenModule } from '@modules/token/token.module';
       validate: validateEnvs,
       load: [configuration],
       cache: true,
+    }),
+    JwtModule.register({
+      global: true,
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],

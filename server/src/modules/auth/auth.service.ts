@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserService } from '@modules/user/user.service';
 import { TokenService } from '../token/token.service';
@@ -28,12 +29,15 @@ export class AuthService {
   }
 
   async generateRefreshToken(payload: AuthTokenPayload) {
+    const jwtid = uuidv4();
+
     return this.tokenService.create(
       {
         ...payload,
         purpose: 'refresh',
       },
       {
+        jwtid,
         secret: this.configService.get('auth.refreshJwtTokenSecret'),
         expiresIn: this.configService.get('auth.refreshJwtTokenExpiry')!,
         persistInDB: true,

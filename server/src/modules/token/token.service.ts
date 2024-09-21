@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { v4 as uuidv4 } from 'uuid';
 import { TokenSignOptions } from './types/token.types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Token } from './token.entity';
@@ -19,15 +18,11 @@ export class TokenService {
   }
 
   async create(payload: object | Buffer, options?: TokenSignOptions) {
-    const jwtid = uuidv4();
-    const jwtToken = await this.jwtService.signAsync(payload, {
-      ...options,
-      jwtid,
-    });
+    const jwtToken = await this.jwtService.signAsync(payload, options);
 
-    if (options?.persistInDB) {
+    if (options?.persistInDB && options?.jwtid) {
       const newToken = this.tokenRepository.create({
-        tokenId: jwtid,
+        tokenId: options.jwtid,
         expiresAt: options?.expiresIn,
       });
 
