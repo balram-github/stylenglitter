@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { AuthGuard } from '@/guards/auth-guard';
 import { Auth } from '@decorators/auth';
 import { ApiTags } from '@nestjs/swagger';
+import { GetUserDto } from './dto/get-user.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -18,6 +19,6 @@ export class UserController {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    return new GetUserDto(user);
   }
 }

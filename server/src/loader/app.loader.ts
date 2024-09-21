@@ -1,5 +1,6 @@
 import helmet from 'helmet';
 import {
+  ClassSerializerInterceptor,
   INestApplication,
   ValidationPipe,
   VersioningType,
@@ -8,6 +9,7 @@ import {
 import swagger from './swagger.loader';
 import { ResponseInterceptor } from '@lib/interceptors/response.interceptor';
 import { AllExceptionsFilter } from '@/lib/filters/exception.filter';
+import { Reflector } from '@nestjs/core';
 
 export default function loader(app: INestApplication<any>) {
   // Enable versioning
@@ -27,6 +29,7 @@ export default function loader(app: INestApplication<any>) {
 
   // Interceptors
   app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   // Filters
   app.useGlobalFilters(new AllExceptionsFilter());
