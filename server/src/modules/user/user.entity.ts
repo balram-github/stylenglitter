@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
+  Index,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
@@ -17,11 +18,16 @@ export class User {
   @Column()
   name: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', length: 320 })
+  @Index({ unique: true })
   email: string;
 
   @Column()
   password: string;
+
+  @Column({ type: 'varchar', length: 15, nullable: false })
+  @Index()
+  phoneNumber: string;
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;
