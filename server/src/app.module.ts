@@ -11,6 +11,8 @@ import { UserModule } from '@modules/user/user.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { TokenModule } from '@modules/token/token.module';
 import { JwtModule } from '@nestjs/jwt';
+import { ProductModule } from './modules/product/product.module';
+import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -59,6 +61,8 @@ import { JwtModule } from '@nestjs/jwt';
     UserModule,
     AuthModule,
     TokenModule,
+    ProductModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [],
