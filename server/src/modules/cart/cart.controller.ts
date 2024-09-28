@@ -12,7 +12,9 @@ import { AuthGuard } from '@guards/auth-guard';
 import { Auth } from '@decorators/auth';
 import { UpsertCartItemsDto } from './dtos/upsert-cart-items.dto';
 import { RemoveCartItemsDto } from './dtos/remove-cart-items.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Card')
 @Controller('cart')
 export class CartController {
   constructor(private cartService: CartService) {}
