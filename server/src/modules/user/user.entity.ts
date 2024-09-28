@@ -11,7 +11,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Cart } from './cart.entity';
+import { Cart } from '../cart/entities/cart.entity';
 
 @Entity('users')
 export class User {
@@ -36,7 +36,6 @@ export class User {
   cartId: number;
 
   @OneToOne(() => Cart, (cart) => cart.user, {
-    eager: true,
     cascade: true,
   })
   @JoinColumn({ name: 'cart_id' })

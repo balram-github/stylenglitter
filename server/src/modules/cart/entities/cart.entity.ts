@@ -6,8 +6,10 @@ import {
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../../user/user.entity';
+import { CartItem } from './cart-item.entity';
 
 @Entity('carts')
 export class Cart {
@@ -22,6 +24,10 @@ export class Cart {
   })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  // One cart can have multiple cart items
+  @OneToMany(() => CartItem, (cartItem) => cartItem.cart, { cascade: true })
+  cartItems: CartItem[];
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;

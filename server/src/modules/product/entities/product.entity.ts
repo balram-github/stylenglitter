@@ -11,9 +11,11 @@ import {
   OneToOne,
   JoinColumn,
   BeforeInsert,
+  OneToMany,
 } from 'typeorm';
 import { Category } from '@modules/category/category.entity';
 import { ProductAmount } from './product-amount.entity';
+import { CartItem } from '@modules/cart/entities/cart-item.entity';
 
 @Entity('products')
 export class Product {
@@ -51,6 +53,10 @@ export class Product {
   @ManyToOne(() => Category, (category) => category.products)
   @JoinColumn({ name: 'category_id' })
   category: Category;
+
+  // One product can be part of multiple cart items
+  @OneToMany(() => CartItem, (cartItem) => cartItem.product, { cascade: true })
+  cartItems: CartItem[];
 
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date;
