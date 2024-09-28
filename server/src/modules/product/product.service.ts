@@ -82,4 +82,18 @@ export class ProductService {
       await entityManager.save(product);
     });
   }
+
+  delete(productId: number) {
+    return this.dataSource.manager.transaction(async (entityManager) => {
+      const product = await entityManager.findOne(Product, {
+        where: { id: productId },
+      });
+
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+
+      await entityManager.softDelete(Product, { id: productId });
+    });
+  }
 }

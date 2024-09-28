@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -49,5 +50,13 @@ export class ProductController {
     @Body() payload: EditProductDto,
   ) {
     return this.productService.edit(productId, payload);
+  }
+
+  /**
+   * Delete a product
+   */
+  @Delete('/:productId')
+  async deleteProduct(@Param('productId') productId: number) {
+    return this.productService.delete(productId);
   }
 }
