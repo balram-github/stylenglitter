@@ -7,20 +7,13 @@ import {
   Min,
 } from 'class-validator';
 
-export class CreateProductDto {
+export class CreateOrderDto {
   @IsString()
   @IsNotEmpty({ message: 'Field "$property" is required.' })
   @MaxLength(255, {
     message: 'Field "$property" maximum length is $constraint1',
   })
   name: string;
-
-  @IsString()
-  @IsNotEmpty({ message: 'Field "$property" is required.' })
-  @MaxLength(255, {
-    message: 'Field "$property" maximum length is $constraint1',
-  })
-  code: string;
 
   @IsString()
   @IsNotEmpty({ message: 'Field "$property" is required.' })

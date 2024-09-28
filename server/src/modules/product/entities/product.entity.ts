@@ -1,3 +1,5 @@
+import slugify from 'slugify';
+
 import {
   Entity,
   Column,
@@ -12,7 +14,6 @@ import {
 } from 'typeorm';
 import { Category } from '@modules/category/category.entity';
 import { ProductAmount } from './product-amount.entity';
-import slugify from 'slugify';
 
 @Entity('products')
 export class Product {
@@ -21,6 +22,9 @@ export class Product {
 
   @Column({ type: 'varchar', length: 255 })
   name: string;
+
+  @Column({ type: 'varchar', length: 255, unique: true })
+  code: string;
 
   @Column({ type: 'varchar', length: 255, unique: true })
   slug: string;

@@ -13,6 +13,7 @@ import { TokenModule } from '@modules/token/token.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ProductModule } from './modules/product/product.module';
 import { CategoryModule } from './modules/category/category.module';
+import { OrderModule } from './modules/order/order.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { CategoryModule } from './modules/category/category.module';
     TokenModule,
     ProductModule,
     CategoryModule,
+    OrderModule,
   ],
   controllers: [],
   providers: [],

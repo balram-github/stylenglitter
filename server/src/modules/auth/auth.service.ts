@@ -90,7 +90,7 @@ export class AuthService {
       throw new NotFoundException('User or password not found');
     }
 
-    return this.generateAuthTokenPair({ userId: user.id });
+    return this.generateAuthTokenPair({ userId: user.id, cartId: user.cartId });
   }
 
   async register(payload: CreateUserDto) {
@@ -106,6 +106,7 @@ export class AuthService {
 
     return this.generateAuthTokenPair({
       userId: newUser.id,
+      cartId: newUser.cartId,
     });
   }
 }

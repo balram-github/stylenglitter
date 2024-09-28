@@ -29,6 +29,7 @@ export class ProductService {
         description: payload.description,
         name: payload.name,
         qty: payload.qty,
+        code: payload.code,
       });
 
       const savedProductEntity = await entityManager.save(product);

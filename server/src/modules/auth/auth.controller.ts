@@ -14,7 +14,7 @@ export class AuthController {
   @UseGuards(RefreshGuard)
   @Get('/refresh-token')
   async refreshToken(@Auth() auth) {
-    const tokenPayload = { userId: auth.userId };
+    const tokenPayload = { userId: auth.userId, cartId: auth.cartId };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.authService.generateAccessToken(tokenPayload),

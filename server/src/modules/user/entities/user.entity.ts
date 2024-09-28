@@ -7,8 +7,11 @@ import {
   BeforeInsert,
   BeforeUpdate,
   Index,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Cart } from './cart.entity';
 
 @Entity('users')
 export class User {
@@ -28,6 +31,16 @@ export class User {
   @Column({ type: 'varchar', length: 15, nullable: false })
   @Index()
   phoneNumber: string;
+
+  @Column({ name: 'cart_id', type: 'int', nullable: false })
+  cartId: number;
+
+  @OneToOne(() => Cart, (cart) => cart.user, {
+    eager: true,
+    cascade: true,
+  })
+  @JoinColumn({ name: 'cart_id' })
+  cart: Cart;
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;
