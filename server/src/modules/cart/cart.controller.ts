@@ -14,7 +14,7 @@ import { UpsertCartItemsDto } from './dtos/upsert-cart-items.dto';
 import { RemoveCartItemsDto } from './dtos/remove-cart-items.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Card')
+@ApiTags('Cart')
 @Controller('cart')
 export class CartController {
   constructor(private cartService: CartService) {}
@@ -23,7 +23,7 @@ export class CartController {
    * Get cart with all the products
    */
   @UseGuards(AuthGuard)
-  @Get('/')
+  @Get('/items')
   async getCartItems(@Auth() auth) {
     const cartId = auth.cartId;
 
@@ -36,7 +36,7 @@ export class CartController {
       throw new NotFoundException('Cart not found');
     }
 
-    return cart;
+    return cart.cartItems;
   }
 
   /**
