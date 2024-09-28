@@ -25,7 +25,12 @@ export default function loader(app: INestApplication<any>) {
   app.use(helmet());
 
   // Validator
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }),
+  );
 
   // Interceptors
   app.useGlobalInterceptors(new ResponseInterceptor());

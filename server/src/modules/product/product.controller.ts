@@ -4,12 +4,14 @@ import {
   Get,
   NotFoundException,
   Param,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { Product } from './entities/product.entity';
+import { EditProductDto } from './dtos/edit-product.dto';
 
 @ApiTags('Product')
 @Controller('product')
@@ -36,5 +38,16 @@ export class ProductController {
   @Post('/')
   async createProduct(@Body() payload: CreateProductDto): Promise<Product> {
     return this.productService.create(payload);
+  }
+
+  /**
+   * Edit a product
+   */
+  @Patch('/:productId')
+  async editProduct(
+    @Param('productId') productId: number,
+    @Body() payload: EditProductDto,
+  ) {
+    return this.productService.edit(productId, payload);
   }
 }
