@@ -5,8 +5,8 @@ import { Auth } from '@decorators/auth';
 import { ApiTags } from '@nestjs/swagger';
 import { GetUserDto } from './dto/get-user.dto';
 
-@ApiTags('User')
-@Controller('user')
+@ApiTags('Users')
+@Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 

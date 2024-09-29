@@ -12,8 +12,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@guards/auth-guard';
 import { Auth } from '@decorators/auth';
 
-@ApiTags('Order')
-@Controller('order')
+@ApiTags('Orders')
+@Controller('orders')
 export class OrderController {
   constructor(private orderService: OrderService) {}
 

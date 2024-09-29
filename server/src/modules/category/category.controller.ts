@@ -13,8 +13,8 @@ import { CreateCategoryDto } from './dtos/create-category.dto';
 import { Category } from './category.entity';
 import { Product } from '../product/entities/product.entity';
 
-@ApiTags('Category')
-@Controller('category')
+@ApiTags('Categories')
+@Controller('categories')
 export class CategoryController {
   constructor(private categoryService: CategoryService) {}
 
