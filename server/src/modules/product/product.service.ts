@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import {
   DataSource,
+  EntityManager,
   FindManyOptions,
   FindOneOptions,
   Repository,
@@ -25,7 +26,9 @@ export class ProductService {
     return this.productRepository.find(findOptions);
   }
 
-  getOne(findOptions: FindOneOptions<Product>) {
+  getOne(findOptions: FindOneOptions<Product>, entityManager?: EntityManager) {
+    if (entityManager) return entityManager.findOne(Product, findOptions);
+
     return this.productRepository.findOne(findOptions);
   }
 
@@ -54,32 +57,48 @@ export class ProductService {
     });
   }
 
-  edit(productId: number, payload: EditProductDto) {
-    return this.dataSource.manager.transaction(async (entityManager) => {
-      const product = await entityManager.findOne(Product, {
-        where: { id: productId },
+  private async editProduct(
+    productId: number,
+    payload: EditProductDto,
+    entityManager: EntityManager,
+  ) {
+    const product = await entityManager.findOne(Product, {
+      where: { id: productId },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    const { amount, ...fields } = payload;
+
+    Object.assign(product, fields);
+
+    if (amount && Number(amount) !== Number(product.amount.price)) {
+      await entityManager.softDelete(ProductAmount, { id: product.amountId });
+
+      const newProductAmount = this.productAmountRepository.create({
+        price: amount,
+        product,
       });
 
-      if (!product) {
-        throw new NotFoundException('Product not found');
-      }
+      product.amount = await entityManager.save(newProductAmount);
+    }
 
-      const { amount, ...fields } = payload;
+    await entityManager.save(product);
+  }
 
-      Object.assign(product, fields);
+  edit(
+    productId: number,
+    payload: EditProductDto,
+    entityManager?: EntityManager,
+  ) {
+    if (entityManager) {
+      return this.editProduct(productId, payload, entityManager);
+    }
 
-      if (amount && Number(amount) !== Number(product.amount.price)) {
-        await entityManager.softDelete(ProductAmount, { id: product.amountId });
-
-        const newProductAmount = this.productAmountRepository.create({
-          price: amount,
-          product,
-        });
-
-        product.amount = await entityManager.save(newProductAmount);
-      }
-
-      await entityManager.save(product);
+    return this.dataSource.manager.transaction(async (entityManager) => {
+      return this.editProduct(productId, payload, entityManager);
     });
   }
 

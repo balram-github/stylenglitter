@@ -18,7 +18,10 @@ export class Order {
   user: User;
 
   // One order can have multiple order items
-  @OneToMany(() => OrderItem, (orderItem) => orderItem.order, { cascade: true })
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order, {
+    cascade: true,
+    eager: true,
+  })
   orderItems: OrderItem[];
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })

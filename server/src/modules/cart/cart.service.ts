@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cart } from './entities/cart.entity';
-import { FindOneOptions, In, Repository } from 'typeorm';
+import { EntityManager, FindOneOptions, In, Repository } from 'typeorm';
 import { CartItem } from './entities/cart-item.entity';
 import { ProductService } from '@modules/product/product.service';
 
@@ -19,7 +19,12 @@ export class CartService {
     private productService: ProductService,
   ) {}
 
-  async getCart(findOptions: FindOneOptions<Cart>) {
+  async getCart(
+    findOptions: FindOneOptions<Cart>,
+    entityManager?: EntityManager,
+  ) {
+    if (entityManager) return entityManager.findOne(Cart, findOptions);
+
     return this.cartRepository.findOne(findOptions);
   }
 
@@ -71,10 +76,60 @@ export class CartService {
     await this.cartItemRepository.save(cartItem);
   }
 
-  async removeCartItems(cartId: number, productIds: number[]) {
-    await this.cartItemRepository.delete({
-      cart: { id: cartId },
-      product: { id: In(productIds) },
+  async getLockedCartItems(cartId: number, entityManager: EntityManager) {
+    const cartItems = await entityManager.find(CartItem, {
+      where: { cart: { id: cartId } },
+      lock: { mode: 'pessimistic_write' },
     });
+
+    const promisesToRun = cartItems.map(async (cartItem) => {
+      const product = await this.productService.getOne(
+        {
+          where: { id: cartItem.productId },
+          lock: { mode: 'pessimistic_write' },
+        },
+        entityManager,
+      );
+
+      if (!product) {
+        throw new BadRequestException(
+          'One of the products in your cart do not exist',
+        );
+      }
+
+      if (cartItem.qty > product.qty) {
+        throw new BadRequestException(
+          `Product "${product.name}" does not have enough required quantity available`,
+        );
+      }
+
+      return {
+        ...cartItem,
+        product,
+        totalPrice: cartItem.qty * product.amount.price,
+      };
+    });
+
+    return Promise.all(promisesToRun);
+  }
+
+  async removeCartItems(
+    cartId: number,
+    productIds: number[],
+    entityManager?: EntityManager,
+  ) {
+    const criteria: Record<string, unknown> = {
+      cart: { id: cartId },
+    };
+
+    if (productIds.length > 0) {
+      criteria.product = { id: In(productIds) };
+    }
+
+    if (entityManager) {
+      return entityManager.delete(CartItem, criteria);
+    }
+
+    await this.cartItemRepository.delete(criteria);
   }
 }
