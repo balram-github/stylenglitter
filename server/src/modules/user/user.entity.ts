@@ -9,9 +9,11 @@ import {
   Index,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Cart } from '../cart/entities/cart.entity';
+import { Order } from '@modules/order/entities/order.entity';
 
 @Entity('users')
 export class User {
@@ -40,6 +42,9 @@ export class User {
   })
   @JoinColumn({ name: 'cart_id' })
   cart: Cart;
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;

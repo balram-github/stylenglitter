@@ -16,6 +16,7 @@ import {
 import { Category } from '@modules/category/category.entity';
 import { ProductAmount } from './product-amount.entity';
 import { CartItem } from '@modules/cart/entities/cart-item.entity';
+import { OrderItem } from '@modules/order/entities/order-item.entity';
 
 @Entity('products')
 export class Product {
@@ -57,6 +58,10 @@ export class Product {
   // One product can be part of multiple cart items
   @OneToMany(() => CartItem, (cartItem) => cartItem.product, { cascade: true })
   cartItems: CartItem[];
+
+  // One product can be part of multiple order items
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
+  orderItems: OrderItem[];
 
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date;

@@ -6,8 +6,10 @@ import {
   DeleteDateColumn,
   Column,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { Product } from './product.entity';
+import { OrderItem } from '@/modules/order/entities/order-item.entity';
 
 @Entity('product_amounts')
 export class ProductAmount {
@@ -21,6 +23,10 @@ export class ProductAmount {
     onDelete: 'CASCADE',
   })
   product: Product;
+
+  // One product can be part of multiple order items
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.productAmount)
+  orderItems: OrderItem[];
 
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date;
