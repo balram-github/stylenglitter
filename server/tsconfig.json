@@ -26,6 +26,7 @@
       "@decorators/*": ["src/decorators/*"],
       "@guards/*": ["src/guards/*"],
       "@utils/*": ["src/utils/*"],
+      "@jobs/*": ["src/jobs/*"],
     }
   }
 }

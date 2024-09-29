@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { JwtService } from '@nestjs/jwt';
 import { TokenSignOptions } from './types/token.types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Token } from './token.entity';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { addSeconds } from 'date-fns';
+import { Jobs } from '@jobs/jobs';
 
 @Injectable()
 export class TokenService {
@@ -47,5 +49,14 @@ export class TokenService {
     }
 
     return this.tokenRepository.softDelete({ tokenId });
+  }
+
+  // Scheduled jobs
+  @Cron(Jobs.REMOVED_EXPIRED_TOKENS.cronTime, {
+    name: Jobs.REMOVED_EXPIRED_TOKENS.name,
+  })
+  removeExpiredTokens() {
+    console.log('Running remove expired tokens scheduled job');
+    return this.tokenRepository.delete({ expiresAt: LessThan(new Date()) });
   }
 }

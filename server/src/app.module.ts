@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { validate as validateEnvs } from '@config/envs/env.validation';
@@ -18,6 +19,7 @@ import { CartModule } from './modules/cart/cart.module';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       validate: validateEnvs,
