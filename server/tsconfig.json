@@ -21,7 +21,7 @@
       "@/*": ["src/*"],
       "@config/*": ["src/config/*"],
       "@lib/*": ["src/lib/*"],
-      "@loader/*": ["src/loader/*"],
+      "@loader/*": ["src/loaders/*"],
       "@modules/*": ["src/modules/*"],
       "@decorators/*": ["src/decorators/*"],
       "@guards/*": ["src/guards/*"],
