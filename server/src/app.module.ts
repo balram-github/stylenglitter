@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
-
+import { MulterModule } from '@nestjs/platform-express';
+import * as multer from 'multer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { validate as validateEnvs } from '@config/envs/env.validation';
 import configuration from '@config/envs/configuration';
@@ -28,6 +29,9 @@ import { CartModule } from './modules/cart/cart.module';
     }),
     JwtModule.register({
       global: true,
+    }),
+    MulterModule.register({
+      storage: multer.memoryStorage(), // Use in-memory storage
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],

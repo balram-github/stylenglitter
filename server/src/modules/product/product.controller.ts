@@ -2,22 +2,35 @@ import {
   Body,
   Controller,
   Delete,
+  forwardRef,
   Get,
+  Inject,
   NotFoundException,
   Param,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { Express } from 'express';
+import * as XLSX from 'xlsx';
+import { parseSheetDataToProductData } from './utils/xlsx-parser';
 import { ProductService } from './product.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { Product } from './entities/product.entity';
 import { EditProductDto } from './dtos/edit-product.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CategoryService } from '../category/category.service';
 
 @ApiTags('Products')
 @Controller('products')
 export class ProductController {
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService,
+    @Inject(forwardRef(() => CategoryService))
+    private categoryService: CategoryService,
+  ) {}
 
   /**
    * Get a product
@@ -39,6 +52,53 @@ export class ProductController {
   @Post('/')
   async createProduct(@Body() payload: CreateProductDto): Promise<Product> {
     return this.productService.create(payload);
+  }
+
+  /**
+   * Create products in bulk via xlsx
+   */
+  @Post('upload')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Upload a .xlsx file',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadDocx(@UploadedFile() file: Express.Multer.File) {
+    const workbook = XLSX.read(file.buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+
+    const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][]; // Array of rows
+
+    const productsData = parseSheetDataToProductData(sheetData);
+
+    for (const data of productsData) {
+      const category = await this.categoryService.upsert(
+        { where: { name: data.categoryName } },
+        { name: data.categoryName, coverImgUrl: data.images[0] || '' },
+      );
+
+      await this.productService.create({
+        amount: data.price,
+        categoryId: category.id,
+        code: data.code,
+        description: data.description,
+        name: data.name,
+        productImages: data.images,
+        qty: data.qty,
+      });
+    }
+
+    return { message: 'Products created successfully' };
   }
 
   /**
