@@ -11,12 +11,15 @@ import { Product } from './entities/product.entity';
 import { ProductAmount } from './entities/product-amount.entity';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { EditProductDto } from './dtos/edit-product.dto';
+import { ProductImage } from './entities/product-image.entity';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(ProductImage)
+    private productImageRepository: Repository<ProductImage>,
     @InjectRepository(ProductAmount)
     private productAmountRepository: Repository<ProductAmount>,
     @InjectDataSource() private readonly dataSource: DataSource,
@@ -34,12 +37,20 @@ export class ProductService {
 
   create(payload: CreateProductDto) {
     return this.dataSource.manager.transaction(async (entityManager) => {
+      // Create ProductImage entities for each URL
+      const images = payload.productImages.map((imageUrl) => {
+        return this.productImageRepository.create({
+          url: imageUrl,
+        });
+      });
+
       const product = this.productRepository.create({
         categoryId: payload.categoryId,
         description: payload.description,
         name: payload.name,
         qty: payload.qty,
         code: payload.code,
+        images,
       });
 
       const savedProductEntity = await entityManager.save(product);

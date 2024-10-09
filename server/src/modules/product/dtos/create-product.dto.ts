@@ -1,8 +1,11 @@
 import {
+  ArrayNotEmpty,
+  IsArray,
   IsInt,
   IsNotEmpty,
   IsNumber,
   IsString,
+  IsUrl,
   MaxLength,
   Min,
 } from 'class-validator';
@@ -40,4 +43,9 @@ export class CreateProductDto {
   @IsNumber({}, { message: 'Field "$property" must be a number.' })
   @IsNotEmpty({ message: 'Field "$property" is required.' })
   categoryId: number;
+
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsUrl({}, { each: true }) // Validate each item in the array as a URL
+  productImages: string[];
 }

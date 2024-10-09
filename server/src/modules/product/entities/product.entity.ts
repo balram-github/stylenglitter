@@ -17,6 +17,7 @@ import { Category } from '@modules/category/category.entity';
 import { ProductAmount } from './product-amount.entity';
 import { CartItem } from '@modules/cart/entities/cart-item.entity';
 import { OrderItem } from '@modules/order/entities/order-item.entity';
+import { ProductImage } from './product-image.entity';
 
 @Entity('products')
 export class Product {
@@ -54,6 +55,12 @@ export class Product {
   @ManyToOne(() => Category, (category) => category.products)
   @JoinColumn({ name: 'category_id' })
   category: Category;
+
+  @OneToMany(() => ProductImage, (productImage) => productImage.product, {
+    cascade: true,
+    eager: true,
+  })
+  images: ProductImage[];
 
   // One product can be part of multiple cart items
   @OneToMany(() => CartItem, (cartItem) => cartItem.product, { cascade: true })
