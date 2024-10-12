@@ -9,6 +9,8 @@ import {
 
 import { CategoryProductListProps } from "./category-product-list.types";
 import { ProductCard } from "@/components/product-card/product-card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const CategoryProductList = ({ data }: CategoryProductListProps) => {
   return (
@@ -23,10 +25,13 @@ export const CategoryProductList = ({ data }: CategoryProductListProps) => {
         }}
         className="my-4 md:my-8 w-full"
       >
-        <CarouselContent className="-ml-4">
+        <CarouselContent>
           {data.products.map((product) => {
             return (
-              <CarouselItem className="basis-[150px] md:basis-[300px] pl-4" key={product.id}>
+              <CarouselItem
+                className="basis-[150px] md:basis-[300px]"
+                key={product.id}
+              >
                 <ProductCard data={product} />
               </CarouselItem>
             );
@@ -35,6 +40,13 @@ export const CategoryProductList = ({ data }: CategoryProductListProps) => {
         <CarouselPrevious className="hidden md:inline-flex" />
         <CarouselNext className="hidden md:inline-flex" />
       </Carousel>
+      <div className="my-6 text-center">
+        <Link href={`/categories/${data.slug}`}>
+          <Button className="uppercase rounded-full bg-rose-400 text-white w-full md:w-64">
+            View All
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };
