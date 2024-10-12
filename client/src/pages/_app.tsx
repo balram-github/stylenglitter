@@ -17,7 +17,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <header>
         <AppBar />
       </header>
-      <div className="flex-1">
+      <div className="flex-1 mt-16">
         <Component {...pageProps} />
       </div>
     </div>
