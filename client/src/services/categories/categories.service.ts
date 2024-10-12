@@ -1,10 +1,44 @@
 import { request } from "@/lib/request";
-import { GetCategoriesResponse } from "./categories.types";
+import {
+  Category,
+  GetCategoriesResponse,
+  GetProductsOfCategoryResponse,
+} from "./categories.types";
+
+export const getProductsOfCategory = async (
+  slug: string,
+  pagination: { page: number; limit: number }
+) => {
+  const {
+    data: { data },
+  } = await request.get<GetProductsOfCategoryResponse>(
+    `/categories/${slug}/products`,
+    {
+      params: {
+        ...pagination,
+      },
+    }
+  );
+
+  return data;
+};
 
 export const getCategories = async () => {
   const {
     data: { data },
   } = await request.get<GetCategoriesResponse>("/categories");
 
-  return data;
+  const promisesToRun = data.map(async (category) => {
+    const { products } = await getProductsOfCategory(category.slug, {
+      page: 1,
+      limit: 5,
+    });
+
+    return {
+      ...category,
+      products,
+    };
+  });
+
+  return Promise.all<Promise<Category>[]>(promisesToRun);
 };
