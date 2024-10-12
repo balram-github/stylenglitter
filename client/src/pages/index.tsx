@@ -1,3 +1,5 @@
+import { Banners } from "@/modules/home/components/banners/banners";
+import { CategoriesList } from "@/modules/home/components/categories-list/categories-list";
 import { CategorySlider } from "@/modules/home/components/category-slider/category-slider";
 import { REVALIDATE_HOME_PAGE } from "@/modules/home/constants/constants";
 import { getCategories } from "@/services/categories/categories.service";
@@ -22,8 +24,12 @@ export default function Home({
         <title>Style N Glitter</title>
       </Head>
       <main>
-        <div className="py-6">
+        <div className="py-6 md:py-10">
           <CategorySlider categories={categories} />
+          <Banners />
+          <div className="container sm:px-2 mx-auto">
+            <CategoriesList categories={categories} />
+          </div>
         </div>
       </main>
     </>
