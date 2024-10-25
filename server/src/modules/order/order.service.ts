@@ -9,6 +9,7 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CartService } from '../cart/cart.service';
+import { PaymentService } from '../payment/payment.service';
 
 @Injectable()
 export class OrderService {
@@ -20,6 +21,7 @@ export class OrderService {
     private orderItemRepository: Repository<OrderItem>,
     private productService: ProductService,
     private cartService: CartService,
+    private paymentService: PaymentService,
   ) {}
 
   async createOrder(userId: number) {
@@ -48,6 +50,11 @@ export class OrderService {
 
       const savedOrder = await entityManager.save(order);
 
+      const totalOrderValue = cartItems.reduce(
+        (acc, item) => acc + item.totalPrice,
+        0,
+      );
+
       const promisesToRun = cartItems.map(async (cartItem) => {
         const orderItem = this.orderItemRepository.create({
           order: savedOrder,
@@ -71,6 +78,17 @@ export class OrderService {
       await Promise.all(promisesToRun);
 
       await this.cartService.removeCartItems(cart.id, [], entityManager);
+
+      const { paymentGatewayResponse } =
+        await this.paymentService.createPayment(
+          savedOrder.id,
+          {
+            amount: totalOrderValue * 100,
+          },
+          entityManager,
+        );
+
+      return { paymentGatewayResponse };
     });
   }
 

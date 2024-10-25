@@ -16,4 +16,8 @@ export default () => ({
     refreshJwtTokenExpiry:
       process.env.REFRESH_JWT_TOKEN_EXPIRY || 60 * 60 * 24 * 7, // 7 days
   },
+  payment: {
+    razorPayKeyId: process.env.RAZORPAY_KEY_ID,
+    razorPaySecretKey: process.env.RAZORPAY_KEY_SECRET,
+  },
 });

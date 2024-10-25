@@ -56,4 +56,10 @@ export class EnvironmentVariables {
   @IsNumber()
   @IsOptional()
   REFRESH_JWT_TOKEN_EXPIRY?: number;
+
+  @IsString()
+  RAZORPAY_KEY_ID: string;
+
+  @IsString()
+  RAZORPAY_KEY_SECRET: string;
 }
