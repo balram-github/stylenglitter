@@ -37,23 +37,25 @@ export class ProductService {
 
   create(payload: CreateProductDto) {
     return this.dataSource.manager.transaction(async (entityManager) => {
-      // Create ProductImage entities for each URL
-      const images = payload.productImages.map((imageUrl) => {
-        return this.productImageRepository.create({
-          url: imageUrl,
-        });
-      });
-
       const product = this.productRepository.create({
         categoryId: payload.categoryId,
         description: payload.description,
         name: payload.name,
         qty: payload.qty,
         code: payload.code,
-        images,
       });
 
       const savedProductEntity = await entityManager.save(product);
+
+      // Create ProductImage entities for each URL
+      const promisesToRun = payload.productImages.map((imageUrl) => {
+        const image = this.productImageRepository.create({
+          url: imageUrl,
+          product: savedProductEntity,
+        });
+
+        return entityManager.save(image);
+      });
 
       const productAmount = this.productAmountRepository.create({
         price: payload.amount,
@@ -63,6 +65,8 @@ export class ProductService {
       const savedProductAmountEntity = await entityManager.save(productAmount);
 
       savedProductEntity.amountId = savedProductAmountEntity.id;
+
+      await Promise.all(promisesToRun);
 
       return entityManager.save(savedProductEntity);
     });

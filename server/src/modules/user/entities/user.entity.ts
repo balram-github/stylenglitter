@@ -12,8 +12,9 @@ import {
   OneToMany,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Cart } from '../cart/entities/cart.entity';
+import { Cart } from '../../cart/entities/cart.entity';
 import { Order } from '@modules/order/entities/order.entity';
+import { UserAddress } from './user-address.entity';
 
 @Entity('users')
 export class User {
@@ -30,7 +31,12 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ type: 'varchar', length: 15, nullable: false })
+  @Column({
+    name: 'phone_number',
+    type: 'varchar',
+    length: 15,
+    nullable: false,
+  })
   @Index()
   phoneNumber: string;
 
@@ -45,6 +51,12 @@ export class User {
 
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];
+
+  @OneToMany(() => UserAddress, (address) => address.user, {
+    cascade: true,
+    eager: true,
+  })
+  addresses: UserAddress[];
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;

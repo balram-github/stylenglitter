@@ -21,7 +21,7 @@ export class Category {
   @Column({ type: 'varchar', length: 255, unique: true })
   slug: string;
 
-  @Column()
+  @Column({ name: 'cover_img_url', type: 'varchar' })
   coverImgUrl: string;
 
   @OneToMany(() => Product, (product) => product.category)

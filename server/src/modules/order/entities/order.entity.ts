@@ -11,7 +11,7 @@ import {
   BeforeInsert,
   Index,
 } from 'typeorm';
-import { User } from '@modules/user/user.entity';
+import { User } from '@modules/user/entities/user.entity';
 import { OrderItem } from './order-item.entity';
 import { Payment } from '@/modules/payment/entities/payment.entity';
 import { createOrderNo } from '../helpers/create-order-no';
@@ -28,7 +28,12 @@ export class Order {
   @Column({ name: 'payment_id', type: 'int', nullable: false })
   paymentId: number;
 
+  @Column({ name: 'user_id', type: 'int', nullable: false })
+  @Index('idx_user_id')
+  userId: number;
+
   @ManyToOne(() => User, (user) => user.orders)
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   // One order can have multiple order items

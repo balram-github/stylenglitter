@@ -19,6 +19,9 @@ export class ProductAmount {
   @Column('decimal')
   price: number;
 
+  @Column({ name: 'product_id', type: 'int', nullable: false })
+  productId: number;
+
   @OneToOne(() => Product, (product) => product.amount, {
     onDelete: 'CASCADE',
   })

@@ -1,16 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository, FindOneOptions, DataSource } from 'typeorm';
-import { User } from './user.entity';
+import { User } from './entities/user.entity';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Cart } from '../cart/entities/cart.entity';
+import { UserAddress } from './entities/user-address.entity';
+import { CreateUserAddressDto } from './dto/create-user-address.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(UserAddress)
+    private userAddressRepository: Repository<UserAddress>,
     @InjectRepository(Cart)
     private cartRepository: Repository<Cart>,
     @InjectDataSource() private readonly dataSource: DataSource,
@@ -54,5 +58,14 @@ export class UserService {
 
       return savedUser;
     });
+  }
+
+  createAddress(userId: number, payload: CreateUserAddressDto) {
+    const address = this.userAddressRepository.create({
+      ...payload,
+      userId,
+    });
+
+    return this.userAddressRepository.save(address);
   }
 }

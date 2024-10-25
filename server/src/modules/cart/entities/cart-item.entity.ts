@@ -12,10 +12,13 @@ import { Cart } from './cart.entity';
 import { Product } from '@modules/product/entities/product.entity';
 
 @Entity('cart_items')
-@Unique(['cart', 'product'])
+@Unique(['cartId', 'productId'])
 export class CartItem {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ name: 'cart_id', type: 'int', nullable: false })
+  cartId: number;
 
   @ManyToOne(() => Cart, (cart) => cart.cartItems, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cart_id' })
