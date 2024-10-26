@@ -4,6 +4,7 @@ export interface ParsedProductData {
   description: string;
   categoryName: string;
   price: number;
+  basePrice: number;
   qty: number;
   images: string[];
 }

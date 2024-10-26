@@ -59,6 +59,7 @@ export class ProductService {
 
       const productAmount = this.productAmountRepository.create({
         price: payload.amount,
+        basePrice: payload.baseAmount,
         product: savedProductEntity,
       });
 

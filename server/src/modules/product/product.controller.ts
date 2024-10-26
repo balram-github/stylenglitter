@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -74,8 +75,15 @@ export class ProductController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadDocx(@UploadedFile() file: Express.Multer.File) {
     const workbook = XLSX.read(file.buffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
+    const productSheetName = workbook.SheetNames.find(
+      (name) => name === 'Products',
+    );
+
+    if (!productSheetName) {
+      throw new BadRequestException('Products sheet not found');
+    }
+
+    const sheet = workbook.Sheets[productSheetName];
 
     const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][]; // Array of rows
 
@@ -89,6 +97,7 @@ export class ProductController {
 
       await this.productService.create({
         amount: data.price,
+        baseAmount: data.basePrice,
         categoryId: category.id,
         code: data.code,
         description: data.description,

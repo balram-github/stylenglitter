@@ -10,6 +10,8 @@ export function parseSheetDataToProductData(rows: any[][]) {
       name,
       description,
       categoryName,
+      themeName,
+      basePrice,
       price,
       quantity,
       ,
@@ -23,6 +25,7 @@ export function parseSheetDataToProductData(rows: any[][]) {
       description,
       categoryName,
       price: parseFloat(price),
+      basePrice: parseFloat(basePrice),
       qty: parseInt(quantity, 10),
       images: imageUrls.filter((url) => url?.trim()), // Filter out empty URLs
     });

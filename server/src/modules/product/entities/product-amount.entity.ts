@@ -16,8 +16,11 @@ export class ProductAmount {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('decimal')
+  @Column({ name: 'price', type: 'decimal', nullable: false })
   price: number;
+
+  @Column({ name: 'base_price', type: 'decimal', nullable: false })
+  basePrice: number;
 
   @Column({ name: 'product_id', type: 'int', nullable: false })
   productId: number;

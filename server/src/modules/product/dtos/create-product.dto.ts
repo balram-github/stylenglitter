@@ -41,6 +41,10 @@ export class CreateProductDto {
   amount: number;
 
   @IsNumber({}, { message: 'Field "$property" must be a number.' })
+  @Min(0, { message: 'Field "$property" must be greater than $constraint1' })
+  baseAmount: number;
+
+  @IsNumber({}, { message: 'Field "$property" must be a number.' })
   @IsNotEmpty({ message: 'Field "$property" is required.' })
   categoryId: number;
 
