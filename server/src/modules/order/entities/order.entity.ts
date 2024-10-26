@@ -27,6 +27,7 @@ export class Order {
   orderNo: string;
 
   @Column({ name: 'payment_id', type: 'int', nullable: false })
+  @Index('idx_payment_id')
   paymentId: number;
 
   @Column({ name: 'user_id', type: 'int', nullable: false })

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order created</title>
+
+    <style>
+      :root {
+        --color-primary: #fb7185;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          Oxygen,
+          Ubuntu,
+          Cantarell,
+          'Open Sans',
+          'Helvetica Neue',
+          sans-serif;
+      }
+      body {
+        background-color: #f8fafc;
+        color: #222;
+      }
+      .layout {
+        padding: 2rem 1rem;
+      }
+      .container {
+        background-color: #f8fafc;
+        padding: 1rem;
+        margin: 0 auto;
+      }
+      .header {
+        margin-bottom: 2rem;
+      }
+      .header-title {
+        font-size: 18px;
+        padding-bottom: 0.5rem;
+        color: var(--color-primary);
+      }
+      .small {
+        font-size: 14px;
+      }
+      .muted {
+        color: #959595;
+      }
+      .content {
+        padding: 1rem 0;
+      }
+      .font-bold {
+        font-weight: 700;
+      }
+      .mb {
+        margin-bottom: 0.5rem;
+      }
+      .mb-2 {
+        margin-bottom: 1rem;
+      }
+      .pl {
+        padding-left: 0.5rem;
+      }
+      .pl-2 {
+        padding-left: 1rem;
+      }
+
+      @media (min-width: 768px) {
+        .container {
+          width: 750px;
+        }
+      }
+      @media (min-width: 992px) {
+        .container {
+          width: 850px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <div class="container">
+        <div class="header">
+          <p class="header-title font-bold">Order Created</p>
+          <p class="small muted">
+            Order number: <span class="font-bold">{{orderNo}}</span>
+          </p>
+        </div>
+        <div class="content mb">
+          <p class="mb-2">Your order has been successfully created with us.</p>
+          <p>We will be shipping your order to the following address</p>
+          <div class="pl-2 font-bold muted mb-2">
+            <div>{{shippingAddress.addressLine}}</div>
+            <div>{{shippingAddress.pinCode}}</div>
+            <div>{{shippingAddress.city}}</div>
+            <div>{{shippingAddress.state}}</div>
+            <div>Phone number: +91 {{shippingAddress.phoneNumber}}</div>
+          </div>
+          <div>
+            <p>Thank you for shopping with us. We hope you have a pleasant experience.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

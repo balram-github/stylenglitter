@@ -21,4 +21,14 @@ export default () => ({
     razorPaySecretKey: process.env.RAZORPAY_KEY_SECRET,
     razorPayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,
   },
+  aws: {
+    ses: {
+      host: process.env.AWS_SES_HOST,
+      port: process.env.AWS_SES_PORT,
+      region: process.env.AWS_SES_REGION,
+      fromEmail: process.env.FROM_EMAIL,
+      accessKey: process.env.AWS_SES_ACCESS_KEY,
+      secretKey: process.env.AWS_SES_SECRET_KEY,
+    },
+  },
 });

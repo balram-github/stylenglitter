@@ -65,4 +65,22 @@ export class EnvironmentVariables {
 
   @IsString()
   RAZORPAY_WEBHOOK_SECRET: string;
+
+  @IsString()
+  AWS_SES_HOST: string;
+
+  @IsString()
+  AWS_SES_PORT: string;
+
+  @IsString()
+  AWS_SES_ACCESS_KEY: string;
+
+  @IsString()
+  AWS_SES_SECRET_KEY: string;
+
+  @IsString()
+  AWS_SES_REGION: string;
+
+  @IsString()
+  FROM_EMAIL: string;
 }

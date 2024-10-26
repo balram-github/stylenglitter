@@ -18,6 +18,8 @@ import {
   WebhookEventPayload,
 } from './types/webhook-event-payload';
 import { PaymentStatus } from './types/payment-status';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NotificationTopic } from '../notification/types/notification-topics';
 
 @Injectable()
 export class PaymentService {
@@ -26,6 +28,7 @@ export class PaymentService {
     @Inject('RAZORPAY_CLIENT') private readonly razorpayClient: Razorpay,
     @InjectRepository(Payment)
     private paymentRepository: Repository<Payment>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   getOne(findOptions: FindOneOptions<Payment>, entityManager?: EntityManager) {
@@ -119,7 +122,9 @@ export class PaymentService {
 
     await this.paymentRepository.save(paymentEntity);
 
-    // TODO - Send email for order paid
+    this.eventEmitter.emit(NotificationTopic.PAYMENT_PAID, {
+      paymentId: paymentEntity.id,
+    });
   }
 
   private async handlePaymentFailed(payload: PaymentFailedWebhookEventPayload) {

@@ -1,4 +1,4 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, FindOneOptions, Repository } from 'typeorm';
 import {
   BadRequestException,
   Injectable,
@@ -23,6 +23,12 @@ export class OrderService {
     private cartService: CartService,
     private paymentService: PaymentService,
   ) {}
+
+  getOne(findOptions: FindOneOptions<Order>, entityManager?: EntityManager) {
+    if (entityManager) return entityManager.findOne(Order, findOptions);
+
+    return this.orderRepository.findOne(findOptions);
+  }
 
   async createOrder(userId: number, addressId: number) {
     return this.dataSource.manager.transaction(async (entityManager) => {
@@ -90,6 +96,14 @@ export class OrderService {
         );
 
       return { paymentGatewayResponse };
+    });
+  }
+
+  getOrderByOrderId(orderId: number) {
+    return this.orderRepository.findOne({
+      where: { id: orderId },
+      relations: ['orderItems'],
+      withDeleted: true,
     });
   }
 

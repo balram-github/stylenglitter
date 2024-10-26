@@ -18,6 +18,8 @@ import { CategoryModule } from './modules/category/category.module';
 import { OrderModule } from './modules/order/order.module';
 import { CartModule } from './modules/cart/cart.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -66,6 +68,7 @@ import { PaymentModule } from './modules/payment/payment.module';
         limit: 100,
       },
     ]),
+    EventEmitterModule.forRoot({ global: true }),
     HealthModule,
     UserModule,
     AuthModule,
@@ -75,6 +78,7 @@ import { PaymentModule } from './modules/payment/payment.module';
     OrderModule,
     CartModule,
     PaymentModule,
+    NotificationModule,
   ],
   controllers: [],
   providers: [],
