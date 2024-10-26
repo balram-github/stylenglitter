@@ -24,7 +24,7 @@ export class OrderService {
     private paymentService: PaymentService,
   ) {}
 
-  async createOrder(userId: number) {
+  async createOrder(userId: number, addressId: number) {
     return this.dataSource.manager.transaction(async (entityManager) => {
       const cart = await this.cartService.getCart(
         { where: { userId } },
@@ -46,6 +46,7 @@ export class OrderService {
 
       const order = this.orderRepository.create({
         user: { id: userId },
+        shippingAddressId: addressId,
       });
 
       const savedOrder = await entityManager.save(order);

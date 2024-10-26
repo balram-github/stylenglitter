@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   NotFoundException,
@@ -11,6 +12,7 @@ import { OrderService } from './order.service';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@guards/auth-guard';
 import { Auth } from '@decorators/auth';
+import { CreateOrderDto } from './dtos/create-order.dto';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -22,8 +24,8 @@ export class OrderController {
    */
   @UseGuards(AuthGuard)
   @Post()
-  async createOrder(@Auth() auth) {
-    await this.orderService.createOrder(auth.userId);
+  async createOrder(@Body() body: CreateOrderDto, @Auth() auth) {
+    await this.orderService.createOrder(auth.userId, body.addressId);
   }
 
   /**

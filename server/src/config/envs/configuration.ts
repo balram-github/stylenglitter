@@ -19,5 +19,6 @@ export default () => ({
   payment: {
     razorPayKeyId: process.env.RAZORPAY_KEY_ID,
     razorPaySecretKey: process.env.RAZORPAY_KEY_SECRET,
+    razorPayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,
   },
 });

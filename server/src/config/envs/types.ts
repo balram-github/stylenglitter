@@ -62,4 +62,7 @@ export class EnvironmentVariables {
 
   @IsString()
   RAZORPAY_KEY_SECRET: string;
+
+  @IsString()
+  RAZORPAY_WEBHOOK_SECRET: string;
 }

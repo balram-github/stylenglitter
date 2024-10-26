@@ -7,18 +7,29 @@ import {
   OneToOne,
   Column,
   Index,
-  BeforeInsert,
 } from 'typeorm';
-import { createPaymentReferenceNo } from '../helpers/create-reference-no';
+import { PaymentStatus } from '../types/payment-status';
 
 @Entity('payments')
 export class Payment {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({
+    name: 'status',
+    type: 'varchar',
+    nullable: false,
+    default: PaymentStatus.INITIATED,
+  })
+  status: PaymentStatus;
+
   @Column({ name: 'reference_no', type: 'varchar', nullable: false })
   @Index('idx_reference_no', { unique: true })
   referenceNo: string;
+
+  @Column({ name: 'payment_gateway_id', type: 'varchar', nullable: false })
+  @Index('idx_payment_gateway_id', { unique: true })
+  paymentGatewayId: string;
 
   @OneToOne(() => Order, (order) => order.payment)
   order: Order;
@@ -28,11 +39,4 @@ export class Payment {
 
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
   updatedAt: Date;
-
-  @BeforeInsert()
-  async generateReferenceNo() {
-    if (!this.referenceNo) {
-      this.referenceNo = await createPaymentReferenceNo();
-    }
-  }
 }

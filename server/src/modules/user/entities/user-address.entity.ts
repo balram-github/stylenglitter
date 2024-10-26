@@ -7,8 +7,10 @@ import {
   UpdateDateColumn,
   Index,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Order } from '@/modules/order/entities/order.entity';
 
 @Entity('user_addresses')
 export class UserAddress {
@@ -45,6 +47,9 @@ export class UserAddress {
   @ManyToOne(() => User, (user) => user.addresses, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @OneToMany(() => Order, (order) => order.shippingAddress)
+  orders: Order[];
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;
