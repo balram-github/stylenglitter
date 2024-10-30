@@ -20,6 +20,8 @@ import { CartModule } from './modules/cart/cart.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './modules/notification/notification.module';
+import { ProductThemeModule } from './modules/product-theme/product-theme.module';
+import { SystemModule } from './modules/system/system.module';
 
 @Module({
   imports: [
@@ -79,6 +81,8 @@ import { NotificationModule } from './modules/notification/notification.module';
     CartModule,
     PaymentModule,
     NotificationModule,
+    ProductThemeModule,
+    SystemModule,
   ],
   controllers: [],
   providers: [],

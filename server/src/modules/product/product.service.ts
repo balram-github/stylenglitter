@@ -39,6 +39,7 @@ export class ProductService {
     return this.dataSource.manager.transaction(async (entityManager) => {
       const product = this.productRepository.create({
         categoryId: payload.categoryId,
+        productThemeId: payload.productThemeId,
         description: payload.description,
         name: payload.name,
         qty: payload.qty,

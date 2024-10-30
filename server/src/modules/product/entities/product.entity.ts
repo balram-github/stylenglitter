@@ -18,6 +18,7 @@ import { ProductAmount } from './product-amount.entity';
 import { CartItem } from '@modules/cart/entities/cart-item.entity';
 import { OrderItem } from '@modules/order/entities/order-item.entity';
 import { ProductImage } from './product-image.entity';
+import { ProductTheme } from '@/modules/product-theme/entities/product-theme.entity';
 
 @Entity('products')
 export class Product {
@@ -55,6 +56,13 @@ export class Product {
   @ManyToOne(() => Category, (category) => category.products)
   @JoinColumn({ name: 'category_id' })
   category: Category;
+
+  @Column({ name: 'product_theme_id', type: 'int', nullable: true })
+  productThemeId?: number;
+
+  @ManyToOne(() => ProductTheme, (theme) => theme.products)
+  @JoinColumn({ name: 'product_theme_id' })
+  productTheme: ProductTheme;
 
   @OneToMany(() => ProductImage, (productImage) => productImage.product, {
     cascade: true,

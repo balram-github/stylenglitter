@@ -19,6 +19,10 @@ export class CategoryService {
     return this.categoryRepository.find(findOptions);
   }
 
+  getOne(findOptions: FindOneOptions<Category>) {
+    return this.categoryRepository.findOne(findOptions);
+  }
+
   async upsert(
     findOptions: FindOneOptions<Category>,
     payload: CreateCategoryDto,

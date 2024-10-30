@@ -5,7 +5,7 @@ export interface ParsedProductData {
   categoryName: string;
   productThemeName: string;
   price: number;
-  basePrice: number;
+  baseAmount: number;
   qty: number;
   images: string[];
 }
