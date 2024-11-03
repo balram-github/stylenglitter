@@ -55,6 +55,7 @@ export class ProductService {
       const image = this.productImageRepository.create({
         url: imageUrl,
         productId: savedProductEntity.id,
+        product: savedProductEntity,
       });
 
       return entityManager.save(image);
@@ -64,6 +65,7 @@ export class ProductService {
       price: payload.amount,
       basePrice: payload.baseAmount,
       productId: savedProductEntity.id,
+      product: savedProductEntity,
     });
 
     const savedProductAmountEntity = await entityManager.save(productAmount);
@@ -136,40 +138,12 @@ export class ProductService {
 
   async upsert(payload: CreateProductDto) {
     return this.dataSource.manager.transaction(async (entityManager) => {
-      const existing = await this.productRepository.findOne({
+      const existing = await entityManager.findOne(Product, {
         where: { code: payload.code },
       });
 
       if (existing) {
-        // Update existing product
-        const productAmount = await this.productAmountRepository.findOne({
-          where: { productId: existing.id },
-        });
-
-        if (productAmount) {
-          // Update amount
-          Object.assign(productAmount, {
-            price: payload.amount,
-            basePrice: payload.baseAmount,
-          });
-          await entityManager.save(productAmount);
-        }
-
-        // Soft delete existing product images
-        await entityManager.softDelete(ProductImage, {
-          productId: existing.id,
-        });
-
-        // Create new product images
-        const newImages = payload.productImages.map((url) =>
-          this.productImageRepository.create({
-            url,
-            productId: existing.id,
-          }),
-        );
-        await entityManager.save(newImages);
-
-        // Update product
+        // Update existing product first
         Object.assign(existing, {
           name: payload.name,
           code: payload.code,
@@ -179,7 +153,40 @@ export class ProductService {
           productThemeId: payload.productThemeId,
         });
 
-        return entityManager.save(existing);
+        // Save the updated product
+        const savedProduct = await entityManager.save(existing);
+
+        // Update amount
+        const productAmount = await entityManager.findOne(ProductAmount, {
+          where: { productId: savedProduct.id },
+        });
+
+        if (productAmount) {
+          Object.assign(productAmount, {
+            price: payload.amount,
+            basePrice: payload.baseAmount,
+          });
+          await entityManager.save(productAmount);
+        }
+
+        // Delete existing images
+        await entityManager.delete(ProductImage, {
+          productId: savedProduct.id,
+        });
+
+        // Create new images after product is saved
+        const imagePromises = payload.productImages.map((imageUrl) => {
+          const image = this.productImageRepository.create({
+            url: imageUrl,
+            productId: savedProduct.id,
+            product: savedProduct,
+          });
+          return entityManager.save(image);
+        });
+
+        await Promise.all(imagePromises);
+
+        return savedProduct;
       }
 
       // Create new product using existing create method

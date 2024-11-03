@@ -45,7 +45,7 @@ export class SystemService {
           `Category or product theme not found ${data.categoryName} ${data.productThemeName}`,
         );
       }
-
+      console.log('Upserting product code', data.code);
       await this.productService.upsert({
         amount: data.price,
         baseAmount: data.baseAmount,
@@ -57,6 +57,7 @@ export class SystemService {
         qty: data.qty,
         productThemeId: productTheme.id,
       });
+      console.log('Upserted product code', data.code);
     }
 
     return { message: 'Products created/updated successfully' };

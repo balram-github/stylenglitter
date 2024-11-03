@@ -21,6 +21,10 @@ export function parseSheetDataToProductData(rows: any[][]) {
       ...imageUrls // Remaining columns will be treated as image URLs
     ] = rows[i];
 
+    if (!code) {
+      continue;
+    }
+
     products.push({
       code,
       name,
