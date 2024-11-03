@@ -36,6 +36,27 @@ export class CartController {
       throw new NotFoundException('Cart not found');
     }
 
+    // Remove items with quantity 0 or less
+    const itemsToRemove = cart.cartItems
+      .filter((item) => item.qty <= 0)
+      .map((item) => item.product.id);
+
+    if (itemsToRemove.length > 0) {
+      await this.cartService.removeCartItems(cartId, itemsToRemove);
+
+      // Fetch updated cart after removing items
+      const updatedCart = await this.cartService.getCart({
+        where: { id: cartId },
+        relations: ['cartItems', 'cartItems.product'],
+      });
+
+      if (!updatedCart) {
+        throw new NotFoundException('Cart not found');
+      }
+
+      return updatedCart.cartItems;
+    }
+
     return cart.cartItems;
   }
 
