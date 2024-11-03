@@ -6,7 +6,7 @@ import {
   NotFoundException,
   Param,
   Patch,
-  Post,
+  Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateProductDto } from './dtos/create-product.dto';
@@ -36,7 +36,7 @@ export class ProductController {
   /**
    * Create a product
    */
-  @Post('/')
+  @Put('/')
   async createProduct(@Body() payload: CreateProductDto): Promise<Product> {
     return this.productService.upsert(payload);
   }
