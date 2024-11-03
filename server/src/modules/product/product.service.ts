@@ -18,10 +18,10 @@ export class ProductService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
-    @InjectRepository(ProductImage)
-    private productImageRepository: Repository<ProductImage>,
     @InjectRepository(ProductAmount)
     private productAmountRepository: Repository<ProductAmount>,
+    @InjectRepository(ProductImage)
+    private productImageRepository: Repository<ProductImage>,
     @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
@@ -35,43 +35,44 @@ export class ProductService {
     return this.productRepository.findOne(findOptions);
   }
 
-  create(payload: CreateProductDto) {
-    return this.dataSource.manager.transaction(async (entityManager) => {
-      const product = this.productRepository.create({
-        categoryId: payload.categoryId,
-        productThemeId: payload.productThemeId,
-        description: payload.description,
-        name: payload.name,
-        qty: payload.qty,
-        code: payload.code,
-      });
+  async create(
+    payload: CreateProductDto,
+    entityManager: EntityManager,
+  ): Promise<Product> {
+    const product = this.productRepository.create({
+      categoryId: payload.categoryId,
+      productThemeId: payload.productThemeId,
+      description: payload.description,
+      name: payload.name,
+      qty: payload.qty,
+      code: payload.code,
+    });
 
-      const savedProductEntity = await entityManager.save(product);
+    const savedProductEntity = await entityManager.save(product);
 
-      // Create ProductImage entities for each URL
-      const promisesToRun = payload.productImages.map((imageUrl) => {
-        const image = this.productImageRepository.create({
-          url: imageUrl,
-          product: savedProductEntity,
-        });
-
-        return entityManager.save(image);
-      });
-
-      const productAmount = this.productAmountRepository.create({
-        price: payload.amount,
-        basePrice: payload.baseAmount,
+    // Create ProductImage entities for each URL
+    const promisesToRun = payload.productImages.map((imageUrl) => {
+      const image = this.productImageRepository.create({
+        url: imageUrl,
         product: savedProductEntity,
       });
 
-      const savedProductAmountEntity = await entityManager.save(productAmount);
-
-      savedProductEntity.amountId = savedProductAmountEntity.id;
-
-      await Promise.all(promisesToRun);
-
-      return entityManager.save(savedProductEntity);
+      return entityManager.save(image);
     });
+
+    const productAmount = this.productAmountRepository.create({
+      price: payload.amount,
+      basePrice: payload.baseAmount,
+      product: savedProductEntity,
+    });
+
+    const savedProductAmountEntity = await entityManager.save(productAmount);
+
+    savedProductEntity.amountId = savedProductAmountEntity.id;
+
+    await Promise.all(promisesToRun);
+
+    return entityManager.save(savedProductEntity);
   }
 
   private async editProduct(
@@ -130,6 +131,59 @@ export class ProductService {
       }
 
       await entityManager.softDelete(Product, { id: productId });
+    });
+  }
+
+  async upsert(payload: CreateProductDto) {
+    return this.dataSource.manager.transaction(async (entityManager) => {
+      const existing = await this.productRepository.findOne({
+        where: { code: payload.code },
+      });
+
+      if (existing) {
+        // Update existing product
+        const productAmount = await this.productAmountRepository.findOne({
+          where: { productId: existing.id },
+        });
+
+        if (productAmount) {
+          // Update amount
+          Object.assign(productAmount, {
+            price: payload.amount,
+            basePrice: payload.baseAmount,
+          });
+          await entityManager.save(productAmount);
+        }
+
+        // Soft delete existing product images
+        await entityManager.softDelete(ProductImage, {
+          productId: existing.id,
+        });
+
+        // Create new product images
+        const newImages = payload.productImages.map((url) =>
+          this.productImageRepository.create({
+            url,
+            productId: existing.id,
+          }),
+        );
+        await entityManager.save(newImages);
+
+        // Update product
+        Object.assign(existing, {
+          name: payload.name,
+          code: payload.code,
+          description: payload.description,
+          qty: payload.qty,
+          categoryId: payload.categoryId,
+          productThemeId: payload.productThemeId,
+        });
+
+        return entityManager.save(existing);
+      }
+
+      // Create new product using existing create method
+      return this.create(payload, entityManager);
     });
   }
 }

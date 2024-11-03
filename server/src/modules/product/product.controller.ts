@@ -38,7 +38,7 @@ export class ProductController {
    */
   @Post('/')
   async createProduct(@Body() payload: CreateProductDto): Promise<Product> {
-    return this.productService.create(payload);
+    return this.productService.upsert(payload);
   }
 
   /**

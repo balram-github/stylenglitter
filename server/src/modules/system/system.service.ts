@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Express } from 'express';
 import * as XLSX from 'xlsx';
 import { ProductService } from '../product/product.service';
 import { CategoryService } from '../category/category.service';
@@ -47,7 +46,7 @@ export class SystemService {
         );
       }
 
-      await this.productService.create({
+      await this.productService.upsert({
         amount: data.price,
         baseAmount: data.baseAmount,
         categoryId: category.id,
@@ -60,7 +59,7 @@ export class SystemService {
       });
     }
 
-    return { message: 'Products created successfully' };
+    return { message: 'Products created/updated successfully' };
   }
 
   async uploadCategories(file: Express.Multer.File) {
