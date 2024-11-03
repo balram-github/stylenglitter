@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { AuthGuard } from '@/guards/auth-guard';
+import { AuthGuard } from '@guards/auth.guard';
 import { Auth } from '@decorators/auth';
 import { ApiTags } from '@nestjs/swagger';
 import { GetUserDto } from './dto/get-user.dto';

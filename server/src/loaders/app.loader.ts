@@ -10,6 +10,7 @@ import swagger from './swagger.loader';
 import { ResponseInterceptor } from '@lib/interceptors/response.interceptor';
 import { AllExceptionsFilter } from '@/lib/filters/exception.filter';
 import { Reflector } from '@nestjs/core';
+import * as cookieParser from 'cookie-parser';
 
 export default function loader(app: INestApplication<any>) {
   // Enable versioning
@@ -19,7 +20,10 @@ export default function loader(app: INestApplication<any>) {
   });
 
   // CORS
-  app.enableCors();
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
 
   // Helmet
   app.use(helmet());
@@ -31,6 +35,9 @@ export default function loader(app: INestApplication<any>) {
       transform: true,
     }),
   );
+
+  // Cookie parser
+  app.use(cookieParser());
 
   // Interceptors
   app.useGlobalInterceptors(new ResponseInterceptor());

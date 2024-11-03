@@ -28,6 +28,9 @@ export class User {
   @Index({ unique: true })
   email: string;
 
+  @Column({ type: 'boolean', name: 'is_email_verified', default: false })
+  isEmailVerified: boolean;
+
   @Column()
   password: string;
 

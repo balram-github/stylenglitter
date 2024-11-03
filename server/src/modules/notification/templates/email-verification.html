@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Your Email</title>
+    <style>
+      :root {
+        --color-primary: #fb7185;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      body {
+        background-color: #f8fafc;
+        color: #222;
+      }
+      .layout {
+        padding: 2rem 1rem;
+      }
+      .container {
+        background-color: #f8fafc;
+        padding: 1rem;
+        margin: 0 auto;
+      }
+      .header {
+        margin-bottom: 2rem;
+      }
+      .header-title {
+        font-size: 18px;
+        padding-bottom: 0.5rem;
+        color: var(--color-primary);
+      }
+      .content {
+        padding: 1rem 0;
+      }
+      .verify-button {
+        display: inline-block;
+        background-color: var(--color-primary);
+        color: white;
+        padding: 12px 24px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 20px 0;
+      }
+      @media (min-width: 768px) {
+        .container {
+          width: 750px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <div class="container">
+        <div class="header">
+          <p class="header-title">Verify Your Email</p>
+        </div>
+        <div class="content">
+          <p>Hello {{name}},</p>
+          <p>Thank you for registering. Please click the button below to verify your email address:</p>
+          <a href="{{verificationUrl}}" class="verify-button">Verify Email</a>
+          <p>If you didn't create an account, you can safely ignore this email.</p>
+          <p>This link will expire in 24 hours.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html> 

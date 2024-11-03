@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { extractTokenFromHeader } from '@utils/utils';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class RefreshGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
@@ -18,14 +18,21 @@ export class AuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    const token = extractTokenFromHeader(request);
+
+    // First try to get token from cookie
+    let token = request.cookies?.refreshToken;
+
+    // If not in cookie, try to get from header
+    if (!token) {
+      token = extractTokenFromHeader(request);
+    }
 
     if (!token) {
       throw new UnauthorizedException('Token not found');
     }
 
     try {
-      const secret = this.configService.get('auth.accessJwtTokenSecret');
+      const secret = this.configService.get('auth.refreshJwtTokenSecret');
       const payload = this.jwtService.verify(token, { secret });
 
       // Attach decoded token to be used later

@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from '@modules/user/user.service';
 import { TokenService } from '../token/token.service';
@@ -10,6 +11,8 @@ import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from '@modules/user/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { AuthTokenPayload } from './types/auth.types';
+import { NotificationService } from '@modules/notification/notification.service';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +20,7 @@ export class AuthService {
     private userService: UserService,
     private tokenService: TokenService,
     private configService: ConfigService,
+    private notificationService: NotificationService,
   ) {}
 
   async generateAccessToken(payload: AuthTokenPayload) {
@@ -90,6 +94,12 @@ export class AuthService {
       throw new NotFoundException('User or password not found');
     }
 
+    if (!user.isEmailVerified) {
+      throw new UnauthorizedException(
+        'Please verify your email before logging in',
+      );
+    }
+
     return this.generateAuthTokenPair({ userId: user.id, cartId: user.cartId });
   }
 
@@ -103,10 +113,59 @@ export class AuthService {
     }
 
     const newUser = await this.userService.create(payload);
+    await this.sendVerificationEmail(newUser);
 
-    return this.generateAuthTokenPair({
-      userId: newUser.id,
-      cartId: newUser.cartId,
+    return true;
+  }
+
+  async generateEmailVerificationToken(userId: number) {
+    return this.tokenService.create(
+      {
+        userId,
+        purpose: 'email-verification',
+      },
+      {
+        secret: this.configService.get('auth.emailVerificationSecret'),
+        expiresIn: this.configService.get<number>(
+          'auth.emailVerificationExpiry',
+        )!,
+      },
+    );
+  }
+
+  async sendVerificationEmail(user: User) {
+    const token = await this.generateEmailVerificationToken(user.id);
+    const verificationUrl = `${this.configService.get('app.frontendUrl')}/verify-email?token=${token}`;
+
+    await this.notificationService.sendEmailTemplate(
+      user.email,
+      'Verify Your Email',
+      'email-verification.html',
+      {
+        name: user.name,
+        verificationUrl,
+      },
+    );
+  }
+
+  async verifyEmail(token: string) {
+    const payload = await this.tokenService.verify(token, {
+      secret: this.configService.get('auth.emailVerificationSecret'),
     });
+
+    const user = await this.userService.getUser({
+      where: { id: payload.userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.userService.update(
+      { where: { id: user.id } },
+      { isEmailVerified: true },
+    );
+
+    return true;
   }
 }

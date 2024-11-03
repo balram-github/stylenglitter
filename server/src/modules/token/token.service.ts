@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
 import { TokenSignOptions } from './types/token.types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Token } from './token.entity';
@@ -18,6 +18,10 @@ export class TokenService {
 
   async get(tokenId: string) {
     return this.tokenRepository.findOne({ where: { tokenId } });
+  }
+
+  async verify(token: string, options: JwtVerifyOptions) {
+    return this.jwtService.verifyAsync(token, options);
   }
 
   async create(

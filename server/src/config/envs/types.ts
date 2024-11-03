@@ -73,14 +73,20 @@ export class EnvironmentVariables {
   AWS_SES_PORT: string;
 
   @IsString()
-  AWS_SES_ACCESS_KEY: string;
+  AWS_ACCESS_KEY: string;
 
   @IsString()
-  AWS_SES_SECRET_KEY: string;
+  AWS_SECRET_KEY: string;
 
   @IsString()
-  AWS_SES_REGION: string;
+  AWS_REGION: string;
 
   @IsString()
   FROM_EMAIL: string;
+
+  @IsString()
+  FRONTEND_URL: string;
+
+  @IsString()
+  EMAIL_VERIFICATION_SECRET: string;
 }

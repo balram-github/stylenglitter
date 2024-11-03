@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { UserDropDown } from "@/components/user-drop-down/user-drop-down";
 import { Menu, Search, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -19,6 +20,7 @@ export const AppBar = () => {
           <Button variant="ghost" size="icon">
             <Search size={20} />
           </Button>
+          <UserDropDown />
           <Button variant="ghost" size="icon">
             <ShoppingCart size={20} />
           </Button>

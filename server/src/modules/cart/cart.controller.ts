@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { AuthGuard } from '@guards/auth-guard';
+import { AuthGuard } from '@guards/auth.guard';
 import { Auth } from '@decorators/auth';
 import { UpsertCartItemsDto } from './dtos/upsert-cart-items.dto';
 import { RemoveCartItemsDto } from './dtos/remove-cart-items.dto';

@@ -1,6 +1,9 @@
 export default () => ({
   nodeEnv: process.env.NODE_ENV,
   port: parseInt(process.env.PORT!, 10) || 4000,
+  app: {
+    frontendUrl: process.env.FRONTEND_URL,
+  },
   database: {
     host: process.env.DATABASE_HOST,
     port: parseInt(process.env.DATABASE_PORT!, 10) || 3306,
@@ -15,6 +18,9 @@ export default () => ({
     refreshJwtTokenSecret: process.env.REFRESH_JWT_TOKEN_SECRET,
     refreshJwtTokenExpiry:
       process.env.REFRESH_JWT_TOKEN_EXPIRY || 60 * 60 * 24 * 7, // 7 days
+    emailVerificationSecret: process.env.EMAIL_VERIFICATION_SECRET,
+    emailVerificationExpiry:
+      process.env.EMAIL_VERIFICATION_EXPIRY || 24 * 60 * 60, // 24 hours
   },
   payment: {
     razorPayKeyId: process.env.RAZORPAY_KEY_ID,
@@ -22,13 +28,13 @@ export default () => ({
     razorPayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,
   },
   aws: {
+    accessKey: process.env.AWS_ACCESS_KEY,
+    secretKey: process.env.AWS_SECRET_KEY,
+    region: process.env.AWS_REGION,
     ses: {
       host: process.env.AWS_SES_HOST,
       port: process.env.AWS_SES_PORT,
-      region: process.env.AWS_SES_REGION,
       fromEmail: process.env.FROM_EMAIL,
-      accessKey: process.env.AWS_SES_ACCESS_KEY,
-      secretKey: process.env.AWS_SES_SECRET_KEY,
     },
   },
 });

@@ -6,5 +6,6 @@ import { UserModule } from '../user/user.module';
 @Module({
   imports: [OrderModule, UserModule],
   providers: [NotificationService],
+  exports: [NotificationService],
 })
 export class NotificationModule {}

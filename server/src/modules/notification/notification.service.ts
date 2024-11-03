@@ -1,5 +1,5 @@
-import fs from 'fs/promises';
-import path from 'path';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 import handlebars from 'handlebars';
 import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses';
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -20,11 +20,10 @@ export class NotificationService {
     private userService: UserService,
   ) {
     this.sesClient = new SESClient({
-      region: this.configService.getOrThrow<string>('aws.ses.region'),
+      region: this.configService.getOrThrow<string>('aws.region'),
       credentials: {
-        accessKeyId: this.configService.getOrThrow<string>('aws.ses.accessKey'),
-        secretAccessKey:
-          this.configService.getOrThrow<string>('aws.ses.secretKey'),
+        accessKeyId: this.configService.getOrThrow<string>('aws.accessKey'),
+        secretAccessKey: this.configService.getOrThrow<string>('aws.secretKey'),
       },
     });
   }
@@ -44,14 +43,14 @@ export class NotificationService {
     await this.sesClient.send(emailCommand);
   }
 
-  private async sendEmailTemplate(
+  async sendEmailTemplate(
     to: string,
     subject: string,
     filePath: string,
     context: Record<string, unknown> = {},
   ) {
     const templateSource = (
-      await fs.readFile(path.join(__dirname, './templates', filePath), 'utf-8')
+      await fs.readFile(path.join(__dirname, 'templates', filePath), 'utf-8')
     ).toString();
 
     const template = handlebars.compile(templateSource);
