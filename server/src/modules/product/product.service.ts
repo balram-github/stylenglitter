@@ -54,7 +54,7 @@ export class ProductService {
     const promisesToRun = payload.productImages.map((imageUrl) => {
       const image = this.productImageRepository.create({
         url: imageUrl,
-        product: savedProductEntity,
+        productId: savedProductEntity.id,
       });
 
       return entityManager.save(image);
@@ -63,7 +63,7 @@ export class ProductService {
     const productAmount = this.productAmountRepository.create({
       price: payload.amount,
       basePrice: payload.baseAmount,
-      product: savedProductEntity,
+      productId: savedProductEntity.id,
     });
 
     const savedProductAmountEntity = await entityManager.save(productAmount);

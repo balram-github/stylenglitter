@@ -89,6 +89,6 @@ export class Product {
 
   @BeforeInsert()
   generateSlug() {
-    this.slug = slugify(this.name, { lower: true, trim: true }); // Create a slug from the name
+    this.slug = `${slugify(this.name, { lower: true, trim: true })}-${this.code}`;
   }
 }
