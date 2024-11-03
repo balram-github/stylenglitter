@@ -3,6 +3,7 @@ import { Category } from "../categories/categories.types";
 export interface ProductAmount {
   id: number;
   price: string;
+  basePrice: string;
   createdAt: Date;
   updatedAt: Date;
 }

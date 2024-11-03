@@ -40,5 +40,7 @@ export const getCategories = async () => {
     };
   });
 
-  return Promise.all<Promise<Category>[]>(promisesToRun);
+  const categories = await Promise.all<Promise<Category>[]>(promisesToRun);
+
+  return categories.filter((category) => category.products.length > 0);
 };

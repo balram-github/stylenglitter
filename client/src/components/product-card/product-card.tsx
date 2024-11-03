@@ -26,8 +26,11 @@ export const ProductCard = ({ data }: ProductCardProps) => {
         </div>
       )}
       <div className="mt-2 capitalize text-sm md:text-xl ">{data.name}</div>
-      <div className="mt-1 text-xs md:text-lg text-rose-300">
-        Rs. {parseFloat(data.amount.price).toFixed(2)}
+      <div className="mt-1 text-rose-300 flex items-baseline md:gap-2 flex-col md:flex-row">
+        <span className="md:text-lg">Rs. {parseFloat(data.amount.price).toFixed(2)}</span>
+        <span className="text-gray-500 line-through text-xs">
+          Rs. {parseFloat(data.amount.basePrice).toFixed(2)}
+        </span>
       </div>
     </Link>
   );

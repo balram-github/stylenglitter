@@ -1,23 +1,33 @@
 import { Banners } from "@/modules/home/components/banners/banners";
 import { CategoriesList } from "@/modules/home/components/categories-list/categories-list";
 import { CategoryProductList } from "@/modules/home/components/category-product-list/category-product-list";
-import { CategorySlider } from "@/modules/home/components/category-slider/category-slider";
+import { ProductThemesSlider } from "@/modules/home/components/product-themes-slider/product-themes-slider";
 import { REVALIDATE_HOME_PAGE } from "@/modules/home/constants/constants";
 import { getCategories } from "@/services/categories/categories.service";
 import { Category } from "@/services/categories/categories.types";
+import { getProductThemes } from "@/services/product-themes/product-themes.service";
+import { ProductTheme } from "@/services/product-themes/product-themes.types";
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import Head from "next/head";
 
 export const getStaticProps = (async () => {
-  const categories = await getCategories();
+  const [categories, productThemes] = await Promise.all([
+    getCategories(),
+    getProductThemes(),
+  ]);
 
-  return { props: { categories }, revalidate: REVALIDATE_HOME_PAGE };
+  return {
+    props: { categories, productThemes },
+    revalidate: REVALIDATE_HOME_PAGE,
+  };
 }) satisfies GetStaticProps<{
   categories: Category[];
+  productThemes: ProductTheme[];
 }>;
 
 export default function Home({
   categories,
+  productThemes,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <>
@@ -26,7 +36,7 @@ export default function Home({
       </Head>
       <main>
         <div className="py-6 md:py-10">
-          <CategorySlider categories={categories} />
+          <ProductThemesSlider productThemes={productThemes} />
           <Banners />
           <div className="container px-4 mx-auto">
             <CategoriesList categories={categories} />
