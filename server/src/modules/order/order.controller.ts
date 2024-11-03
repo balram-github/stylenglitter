@@ -25,7 +25,11 @@ export class OrderController {
   @UseGuards(AuthGuard)
   @Post()
   async createOrder(@Body() body: CreateOrderDto, @Auth() auth) {
-    await this.orderService.createOrder(auth.userId, body.addressId);
+    await this.orderService.createOrder(
+      auth.userId,
+      body.addressId,
+      body.paymentMethod,
+    );
   }
 
   /**

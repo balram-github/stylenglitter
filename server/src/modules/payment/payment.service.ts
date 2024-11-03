@@ -45,7 +45,7 @@ export class PaymentService {
     const paymentReferenceNo = await createPaymentReferenceNo();
 
     const response = await this.razorpayClient.orders.create({
-      amount: payload.amount,
+      amount: payload.amount * 100,
       currency: 'INR',
       receipt: paymentReferenceNo,
       payment_capture: true,
@@ -57,6 +57,7 @@ export class PaymentService {
     const payment = this.paymentRepository.create({
       referenceNo: paymentReferenceNo,
       paymentGatewayId: response.id,
+      amount: payload.amount,
     });
 
     const savedPayment = await transactionEntityManager.save(payment);

@@ -10,6 +10,13 @@ import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CartService } from '../cart/cart.service';
 import { PaymentService } from '../payment/payment.service';
+import { TypeOfPayment } from './types/payment-method';
+import {
+  COD_ORDER_DELIVERY_CHARGE,
+  PREPAID_ORDER_DELIVERY_CHARGE,
+  PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY,
+} from './constants';
+import { LockedCartItem } from '../cart/types/locked-cart-item';
 
 @Injectable()
 export class OrderService {
@@ -30,7 +37,33 @@ export class OrderService {
     return this.orderRepository.findOne(findOptions);
   }
 
-  async createOrder(userId: number, addressId: number) {
+  async getOrderTotalValue(
+    lockedCartItems: LockedCartItem[],
+    paymentMethod: TypeOfPayment,
+  ) {
+    const totalValue = lockedCartItems.reduce(
+      (acc, item) => acc + item.totalPrice,
+      0,
+    );
+
+    switch (paymentMethod) {
+      case TypeOfPayment.PREPAID: {
+        if (totalValue >= PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY) {
+          return totalValue;
+        }
+
+        return totalValue + PREPAID_ORDER_DELIVERY_CHARGE;
+      }
+      case TypeOfPayment.COD:
+        return COD_ORDER_DELIVERY_CHARGE;
+    }
+  }
+
+  async createOrder(
+    userId: number,
+    addressId: number,
+    paymentMethod: TypeOfPayment,
+  ) {
     return this.dataSource.manager.transaction(async (entityManager) => {
       const cart = await this.cartService.getCart(
         { where: { userId } },
@@ -41,12 +74,12 @@ export class OrderService {
         throw new InternalServerErrorException('Cart not found');
       }
 
-      const cartItems = await this.cartService.getLockedCartItems(
+      const lockedCartItems = await this.cartService.getLockedCartItems(
         cart.id,
         entityManager,
       );
 
-      if (cartItems.length === 0) {
+      if (lockedCartItems.length === 0) {
         throw new BadRequestException('Cart is empty');
       }
 
@@ -57,12 +90,12 @@ export class OrderService {
 
       const savedOrder = await entityManager.save(order);
 
-      const totalOrderValue = cartItems.reduce(
-        (acc, item) => acc + item.totalPrice,
-        0,
+      const totalOrderValue = await this.getOrderTotalValue(
+        lockedCartItems,
+        paymentMethod,
       );
 
-      const promisesToRun = cartItems.map(async (cartItem) => {
+      const promisesToRun = lockedCartItems.map(async (cartItem) => {
         const orderItem = this.orderItemRepository.create({
           order: savedOrder,
           product: cartItem.product,
@@ -90,7 +123,7 @@ export class OrderService {
         await this.paymentService.createPayment(
           savedOrder.id,
           {
-            amount: totalOrderValue * 100,
+            amount: totalOrderValue,
           },
           entityManager,
         );

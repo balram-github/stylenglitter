@@ -8,6 +8,7 @@ import { Cart } from './entities/cart.entity';
 import { EntityManager, FindOneOptions, In, Repository } from 'typeorm';
 import { CartItem } from './entities/cart-item.entity';
 import { ProductService } from '@modules/product/product.service';
+import { LockedCartItem } from './types/locked-cart-item';
 
 @Injectable()
 export class CartService {
@@ -76,7 +77,10 @@ export class CartService {
     await this.cartItemRepository.save(cartItem);
   }
 
-  async getLockedCartItems(cartId: number, entityManager: EntityManager) {
+  async getLockedCartItems(
+    cartId: number,
+    entityManager: EntityManager,
+  ): Promise<LockedCartItem[]> {
     const cartItems = await entityManager.find(CartItem, {
       where: { cart: { id: cartId } },
       lock: { mode: 'pessimistic_write' },

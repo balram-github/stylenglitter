@@ -31,6 +31,9 @@ export class Payment {
   @Index('idx_payment_gateway_id', { unique: true })
   paymentGatewayId: string;
 
+  @Column({ name: 'amount', type: 'decimal', nullable: false })
+  amount: number;
+
   @OneToOne(() => Order, (order) => order.payment)
   order: Order;
 
