@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Menu, Search, ShoppingCart } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 export const AppBar = () => {
@@ -11,7 +12,9 @@ export const AppBar = () => {
             <Menu size={20} />
           </Button>
         </div>
-        <p className="text-2xl md:text-3xl">Style & Glitter</p>
+        <Link href="/" className="text-2xl md:text-3xl">
+          Style & Glitter
+        </Link>
         <div className="flex items-center gap-1 absolute right-0 top-[50%] translate-y-[-50%]">
           <Button variant="ghost" size="icon">
             <Search size={20} />

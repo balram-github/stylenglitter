@@ -23,10 +23,24 @@ export const getProductsOfCategory = async (
   return data;
 };
 
-export const getCategories = async () => {
+export const getCategoryBySlug = async (slug: string) => {
+  const { data } = await request.get<Category>(`/categories/${slug}`);
+
+  return data;
+};
+
+export const getCategories = async ({
+  withProducts = false,
+}: {
+  withProducts?: boolean;
+}) => {
   const {
     data: { data },
   } = await request.get<GetCategoriesResponse>("/categories");
+
+  if (!withProducts) {
+    return data;
+  }
 
   const promisesToRun = data.map(async (category) => {
     const { products } = await getProductsOfCategory(category.slug, {

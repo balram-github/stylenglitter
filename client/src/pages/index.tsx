@@ -12,7 +12,7 @@ import Head from "next/head";
 
 export const getStaticProps = (async () => {
   const [categories, productThemes] = await Promise.all([
-    getCategories(),
+    getCategories({ withProducts: true }),
     getProductThemes(),
   ]);
 

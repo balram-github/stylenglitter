@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 import { rose } from "tailwindcss/colors";
+import tailwindAnimate from "tailwindcss-animate";
 
 const config: Config = {
   darkMode: ["class"],
@@ -12,13 +13,13 @@ const config: Config = {
   theme: {
     extend: {
       keyframes: {
-        scroll: {
-          "0%": { transform: "translateX(100%)" },
-          '100%': { transform: 'translateX(-100%)' }
+        "scroll-left": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-100%)" },
         },
       },
       animation: {
-        scroll: "scroll 10s linear infinite",
+        "scroll-left": "scroll-left 30s linear infinite",
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"],
@@ -35,6 +36,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindAnimate],
 };
 export default config;
