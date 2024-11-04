@@ -53,7 +53,9 @@ export class Product {
   @Column({ name: 'category_id', type: 'int', nullable: true })
   categoryId?: number;
 
-  @ManyToOne(() => Category, (category) => category.products)
+  @ManyToOne(() => Category, (category) => category.products, {
+    eager: true,
+  })
   @JoinColumn({ name: 'category_id' })
   category: Category;
 

@@ -1,7 +1,7 @@
 import { MobileDrawer } from "@/components/mobile-drawer/mobile-drawer";
 import { Button } from "@/components/ui/button";
 import { UserDropDown } from "@/components/user-drop-down/user-drop-down";
-import { Search, ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -16,9 +16,9 @@ export const AppBar = () => {
           Style & Glitter
         </Link>
         <div className="flex items-center gap-1 absolute right-0 top-[50%] translate-y-[-50%]">
-          <Button variant="ghost" size="icon">
+          {/* <Button variant="ghost" size="icon">
             <Search size={20} />
-          </Button>
+          </Button> */}
           <div className="hidden md:block">
             <UserDropDown />
           </div>

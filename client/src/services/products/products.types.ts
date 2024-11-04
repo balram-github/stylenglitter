@@ -28,3 +28,8 @@ export interface Product {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface GetProductBySlugResponse {
+  success: boolean;
+  data: Product;
+}

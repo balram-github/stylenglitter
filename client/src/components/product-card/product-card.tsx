@@ -18,7 +18,7 @@ export const ProductCard = ({ data }: ProductCardProps) => {
         </div>
       )}
       <div className="mt-2 capitalize text-sm md:text-xl ">{data.name}</div>
-      <div className="mt-1 text-rose-300 flex items-baseline md:gap-2 flex-col md:flex-row">
+      <div className="mt-1 text-rose-400 flex items-baseline md:gap-2 flex-col md:flex-row">
         <span className="md:text-lg">
           Rs. {parseFloat(data.amount.price).toFixed(2)}
         </span>
