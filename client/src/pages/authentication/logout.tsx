@@ -1,8 +1,20 @@
 import { GetServerSideProps } from "next";
 import { serialize } from "cookie";
+import { useEffect } from "react";
+import { queryClient } from "@/lib/query";
+import { useRouter } from "next/router";
 
 // This component won't actually render since we're redirecting in getServerSideProps
-const Logout = () => {
+const Logout = ({ success }: { success: boolean }) => {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (success) {
+      queryClient.resetQueries({ queryKey: ["user"] });
+    }
+    router.replace("/");
+  }, [router, success]);
+
   return null;
 };
 
@@ -34,17 +46,15 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     ]);
 
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
+      props: {
+        success: true,
       },
     };
   } catch (error) {
     console.error("Logout failed:", error);
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
+      props: {
+        success: false,
       },
     };
   }
