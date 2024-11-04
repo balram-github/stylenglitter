@@ -63,7 +63,7 @@ const LoginForm = () => {
     }
   };
   return (
-    <Card>
+    <Card className="border-0 shadow-none md:border md:shadow-sm">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>Enter your email below to login</CardDescription>

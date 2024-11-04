@@ -60,7 +60,7 @@ const RegisterForm = () => {
     }
   };
   return (
-    <Card>
+    <Card className="border-0 shadow-none md:border md:shadow-sm">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Register</CardTitle>
         <CardDescription>Enter your details below to register</CardDescription>
