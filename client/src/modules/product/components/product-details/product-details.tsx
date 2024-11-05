@@ -16,8 +16,13 @@ type ProductDetailsProps = {
   product: Product;
 };
 
+const MAX_QUANTITY = 2;
+
 const formSchema = z.object({
-  qty: z.number().min(1, "Quantity must be at least 1"),
+  qty: z
+    .number()
+    .min(1, "Quantity must be at least 1")
+    .max(MAX_QUANTITY, `You cannot add more than ${MAX_QUANTITY} items`),
 });
 
 type ProductDetailsFormValues = z.infer<typeof formSchema>;
@@ -105,7 +110,11 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
                       className="border-0 h-10"
                       disabled={!isProductInStock}
                       onClick={() => {
-                        field.onChange(field.value + 1);
+                        const newValue = Math.min(
+                          MAX_QUANTITY,
+                          field.value + 1
+                        );
+                        field.onChange(newValue);
                       }}
                     >
                       <Plus className="h-4 w-4" />

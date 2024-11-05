@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, Max } from 'class-validator';
 
 export class UpsertCartItemsDto {
   @IsNumber()
@@ -6,6 +6,7 @@ export class UpsertCartItemsDto {
   productId: number;
 
   @IsNumber()
+  @Max(2, { message: 'You cannot add more than 2 items of the same product.' })
   @IsNotEmpty({ message: 'Field "$property" is required.' })
   qty: number;
 }
