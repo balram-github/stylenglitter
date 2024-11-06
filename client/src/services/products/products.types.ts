@@ -33,3 +33,8 @@ export interface GetProductBySlugResponse {
   success: boolean;
   data: Product;
 }
+
+export interface GetProductByIdResponse {
+  success: boolean;
+  data: Product;
+}

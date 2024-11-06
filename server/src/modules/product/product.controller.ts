@@ -20,11 +20,25 @@ export class ProductController {
   constructor(private productService: ProductService) {}
 
   /**
-   * Get a product
+   * Get a product by slug
    */
-  @Get('/:slug')
-  async getProduct(@Param('slug') slug: string): Promise<Product> {
+  @Get('/slug/:slug')
+  async getProductBySlug(@Param('slug') slug: string): Promise<Product> {
     const product = await this.productService.getOne({ where: { slug } });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return product;
+  }
+
+  /**
+   * Get a product by id
+   */
+  @Get('/:id')
+  async getProductById(@Param('id') id: number): Promise<Product> {
+    const product = await this.productService.getOne({ where: { id } });
 
     if (!product) {
       throw new NotFoundException('Product not found');

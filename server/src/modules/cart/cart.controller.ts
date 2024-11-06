@@ -23,7 +23,7 @@ export class CartController {
    * Get cart with all the products
    */
   @UseGuards(AuthGuard)
-  @Get('/items')
+  @Get('/')
   async getCartItems(@Auth() auth) {
     const cartId = auth.cartId;
 
@@ -54,10 +54,10 @@ export class CartController {
         throw new NotFoundException('Cart not found');
       }
 
-      return updatedCart.cartItems;
+      return updatedCart;
     }
 
-    return cart.cartItems;
+    return cart;
   }
 
   /**
