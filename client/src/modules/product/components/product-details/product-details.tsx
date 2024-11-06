@@ -11,23 +11,29 @@ import { Minus, Plus, Ship } from "lucide-react";
 import Image from "next/image";
 import PaymentMethodBanner from "../../../../../public/images/banners/payment-methods.png";
 import { Separator } from "@/components/ui/separator";
+import { MAX_PRODUCT_QUANTITY_ALLOWED } from "@/constants";
 
 type ProductDetailsProps = {
   product: Product;
+  upsertToCart: (qty: number) => Promise<void>;
 };
-
-const MAX_QUANTITY = 2;
 
 const formSchema = z.object({
   qty: z
     .number()
     .min(1, "Quantity must be at least 1")
-    .max(MAX_QUANTITY, `You cannot add more than ${MAX_QUANTITY} items`),
+    .max(
+      MAX_PRODUCT_QUANTITY_ALLOWED,
+      `You cannot add more than ${MAX_PRODUCT_QUANTITY_ALLOWED} items`
+    ),
 });
 
 type ProductDetailsFormValues = z.infer<typeof formSchema>;
 
-export const ProductDetails = ({ product }: ProductDetailsProps) => {
+export const ProductDetails = ({
+  product,
+  upsertToCart: onAddToCart,
+}: ProductDetailsProps) => {
   const form = useForm<ProductDetailsFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,7 +42,7 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
   });
 
   const onSubmit: SubmitHandler<ProductDetailsFormValues> = async (values) => {
-    console.log(values);
+    await onAddToCart(values.qty);
   };
 
   const isProductInStock = product.qty > 0;
@@ -111,7 +117,7 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
                       disabled={!isProductInStock}
                       onClick={() => {
                         const newValue = Math.min(
-                          MAX_QUANTITY,
+                          MAX_PRODUCT_QUANTITY_ALLOWED,
                           field.value + 1
                         );
                         field.onChange(newValue);
@@ -128,6 +134,7 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
             type="submit"
             className="w-full md:w-80 bg-rose-400 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
             disabled={!isProductInStock}
+            isLoading={form.formState.isSubmitting}
           >
             Add to Cart
           </Button>

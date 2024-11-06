@@ -2,6 +2,7 @@ import { request } from "@/lib/request";
 import { Cart, CartItem, GetCartResponse } from "./cart.types";
 import { GUEST_CART_ITEMS_KEY_NAME } from "@/modules/cart/constants";
 import { getProductById } from "../products/products.service";
+import { isClient } from "@/lib/utils";
 
 export const getUserCart = async () => {
   const {
@@ -12,6 +13,10 @@ export const getUserCart = async () => {
 };
 
 export const getGuestCartItems = () => {
+  if (!isClient()) {
+    return [];
+  }
+
   const cartItems = JSON.parse(
     localStorage.getItem(GUEST_CART_ITEMS_KEY_NAME) || "[]"
   ) as CartItem[];
@@ -63,7 +68,7 @@ export const getGuestCart = async (): Promise<Cart> => {
   };
 };
 
-export const upsertCartItem = async (
+export const upsertCartItemToDB = async (
   productId: number,
   qty: number,
   isGuestCart: boolean
@@ -73,9 +78,21 @@ export const upsertCartItem = async (
     if (qty <= 0) {
       cartItems = cartItems.filter((item) => item.productId !== productId);
     } else {
-      cartItems = cartItems.map((item) =>
-        item.productId === productId ? { ...item, qty } : item
+      const isExistingItem = cartItems.find(
+        (item) => item.productId === productId
       );
+
+      if (isExistingItem) {
+        cartItems = cartItems.map((item) =>
+          item.productId === productId ? { ...item, qty } : item
+        );
+      } else {
+        cartItems.push({
+          id: -1,
+          productId,
+          qty,
+        });
+      }
     }
 
     localStorage.setItem(GUEST_CART_ITEMS_KEY_NAME, JSON.stringify(cartItems));
@@ -84,7 +101,7 @@ export const upsertCartItem = async (
   }
 };
 
-export const removeCartItems = async (
+export const removeCartItemsFromDB = async (
   productIds: number[],
   isGuestCart: boolean
 ) => {
@@ -93,12 +110,11 @@ export const removeCartItems = async (
 
     if (productIds.length === 0) {
       cartItems = [];
-      return;
+    } else {
+      cartItems = cartItems.filter(
+        (item) => !productIds.includes(item.productId)
+      );
     }
-
-    cartItems = cartItems.filter(
-      (item) => !productIds.includes(item.productId)
-    );
 
     localStorage.setItem(GUEST_CART_ITEMS_KEY_NAME, JSON.stringify(cartItems));
   } else {
@@ -114,10 +130,10 @@ export const saveGuestCartItemsToDB = async () => {
   }
 
   const promisesToRun = cartItems.map(async (item) => {
-    return upsertCartItem(item.productId, item.qty, false);
+    return upsertCartItemToDB(item.productId, item.qty, false);
   });
 
   await Promise.allSettled(promisesToRun);
 
-  removeCartItems([], true);
+  removeCartItemsFromDB([], true);
 };

@@ -65,7 +65,7 @@ request.interceptors.response.use(
         // If refresh failed, reject all queued requests
         processQueue(error);
         // Redirect to login or dispatch logout action
-        window.location.href = "/logout";
+        window.location.href = "/authentication/logout";
         return Promise.reject(error);
       }
 

@@ -13,6 +13,11 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { ProductDetails } from "@/modules/product/components/product-details/product-details";
+import { upsertCartItemToDB } from "@/services/cart/cart.service";
+import { useCartStore } from "@/stores/cart/cart.store";
+import { useUser } from "@/hooks/use-user";
+import { toast } from "@/hooks/use-toast";
+import { sleep } from "@/lib/utils";
 
 interface ProductPageProps {
   product: Product;
@@ -21,10 +26,37 @@ interface ProductPageProps {
 const ProductPage = ({
   product,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const { isLoggedIn } = useUser();
+  const { setLoading, upsertCartItem: upsertCartItemToStore } = useCartStore();
+
+  console.log(isLoggedIn);
+
+  const handleUpsertToCart = async (qty: number) => {
+    try {
+      setLoading(true);
+
+      if (!isLoggedIn) {
+        await sleep(500);
+      }
+
+      await upsertCartItemToDB(product.id, qty, !isLoggedIn);
+
+      upsertCartItemToStore(product, qty);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Failed to add item to cart",
+        description: "Please try again later",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <Head>
-        <title>{product.name} | Style N Glitter</title>
+        <title>{product.name}</title>
       </Head>
       <main className="p-4 md:p-8 container mx-auto">
         <Breadcrumb>
@@ -54,7 +86,10 @@ const ProductPage = ({
             <ProductImageCarousel product={product} />
           </div>
           <div className="basis-full md:basis-3/5">
-            <ProductDetails product={product} />
+            <ProductDetails
+              product={product}
+              upsertToCart={handleUpsertToCart}
+            />
           </div>
         </div>
       </main>

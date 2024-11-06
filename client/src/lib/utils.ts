@@ -6,3 +6,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const isClient = () => typeof window !== "undefined";
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

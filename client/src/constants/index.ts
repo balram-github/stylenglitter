@@ -1,0 +1,1 @@
+export const MAX_PRODUCT_QUANTITY_ALLOWED = 2;
