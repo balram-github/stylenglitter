@@ -37,7 +37,7 @@ export const Cart = () => {
     try {
       setLoading(true);
       let cart: ICart;
-      console.log({ isLoggedIn })
+
       if (isLoggedIn) {
         await saveGuestCartItemsToDB();
         cart = await getUserCart();
@@ -129,10 +129,10 @@ export const Cart = () => {
           )}
           {!isLoading && cart.cartItems.length > 0 && (
             <>
-              <div className="basis-4/5 overflow-y-auto flex flex-col gap-4">
+              <div className="basis-3/4 overflow-y-auto flex flex-col gap-4">
                 {cart.cartItems.map((item) => (
                   <CartItem
-                    key={item.id}
+                    key={item.productId}
                     data={item}
                     onRemove={() => handleRemoveCartItem(item.productId)}
                     onUpdateQty={(data, qty) => {
@@ -143,9 +143,11 @@ export const Cart = () => {
                   />
                 ))}
               </div>
-              <div className="flex justify-between basis-1/5">
-                <p className="font-bold">Sub total</p>
-                <p>Rs. {totalCartValue}</p>
+              <div className="flex justify-end basis-1/4 flex-col">
+                <div className="flex justify-between">
+                  <p className="font-bold">Sub total</p>
+                  <p>Rs. {totalCartValue}</p>
+                </div>
               </div>
             </>
           )}

@@ -12,7 +12,7 @@ export const AppBar = () => {
           <MobileDrawer />
         </div>
         <Link href="/" className="text-2xl md:text-3xl">
-          Style & Glitter
+          Style Glitter
         </Link>
         <div className="flex items-center gap-1 absolute right-1 top-[50%] translate-y-[-50%]">
           {/* <Button variant="ghost" size="icon">
