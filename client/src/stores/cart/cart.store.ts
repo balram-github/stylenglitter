@@ -12,7 +12,7 @@ type CartStore = {
 };
 
 export const useCartStore = create<CartStore>((set) => ({
-  isLoading: false,
+  isLoading: true,
   cart: {
     id: -1,
     userId: -1,

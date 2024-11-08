@@ -3,12 +3,24 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Cart } from './entities/cart.entity';
-import { EntityManager, FindOneOptions, In, Repository } from 'typeorm';
+import {
+  DataSource,
+  EntityManager,
+  FindOneOptions,
+  In,
+  Repository,
+} from 'typeorm';
 import { CartItem } from './entities/cart-item.entity';
 import { ProductService } from '@modules/product/product.service';
 import { LockedCartItem } from './types/locked-cart-item';
+import {
+  COD_ORDER_DELIVERY_CHARGE,
+  PREPAID_ORDER_DELIVERY_CHARGE,
+} from '../order/constants';
+import { TypeOfPayment } from '../order/types/payment-method';
+import { PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY } from '../order/constants';
 
 @Injectable()
 export class CartService {
@@ -18,6 +30,7 @@ export class CartService {
     @InjectRepository(CartItem)
     private cartItemRepository: Repository<CartItem>,
     private productService: ProductService,
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
   async getCart(
@@ -135,5 +148,49 @@ export class CartService {
     }
 
     await this.cartItemRepository.delete(criteria);
+  }
+
+  async getCartOrderValue(
+    lockedCartItems: LockedCartItem[],
+    paymentMethod: TypeOfPayment,
+  ) {
+    const totalValue = lockedCartItems.reduce(
+      (acc, item) => acc + item.totalPrice,
+      0,
+    );
+
+    switch (paymentMethod) {
+      case TypeOfPayment.PREPAID: {
+        if (totalValue >= PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY) {
+          return totalValue;
+        }
+
+        return totalValue + PREPAID_ORDER_DELIVERY_CHARGE;
+      }
+      case TypeOfPayment.COD:
+        return COD_ORDER_DELIVERY_CHARGE;
+    }
+  }
+
+  async getCartPurchaseAmount(cartId: number, paymentMethod: TypeOfPayment) {
+    return this.dataSource.manager.transaction(async (entityManager) => {
+      const cart = await this.getCart({ where: { id: cartId } }, entityManager);
+
+      if (!cart) {
+        throw new NotFoundException('Cart not found');
+      }
+
+      const lockedCartItems = await this.getLockedCartItems(
+        cartId,
+        entityManager,
+      );
+
+      const purchaseAmount = await this.getCartOrderValue(
+        lockedCartItems,
+        paymentMethod,
+      );
+
+      return purchaseAmount;
+    });
   }
 }

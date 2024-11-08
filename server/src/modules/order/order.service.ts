@@ -11,12 +11,6 @@ import { OrderItem } from './entities/order-item.entity';
 import { CartService } from '../cart/cart.service';
 import { PaymentService } from '../payment/payment.service';
 import { TypeOfPayment } from './types/payment-method';
-import {
-  COD_ORDER_DELIVERY_CHARGE,
-  PREPAID_ORDER_DELIVERY_CHARGE,
-  PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY,
-} from './constants';
-import { LockedCartItem } from '../cart/types/locked-cart-item';
 
 @Injectable()
 export class OrderService {
@@ -35,28 +29,6 @@ export class OrderService {
     if (entityManager) return entityManager.findOne(Order, findOptions);
 
     return this.orderRepository.findOne(findOptions);
-  }
-
-  async getOrderTotalValue(
-    lockedCartItems: LockedCartItem[],
-    paymentMethod: TypeOfPayment,
-  ) {
-    const totalValue = lockedCartItems.reduce(
-      (acc, item) => acc + item.totalPrice,
-      0,
-    );
-
-    switch (paymentMethod) {
-      case TypeOfPayment.PREPAID: {
-        if (totalValue >= PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY) {
-          return totalValue;
-        }
-
-        return totalValue + PREPAID_ORDER_DELIVERY_CHARGE;
-      }
-      case TypeOfPayment.COD:
-        return COD_ORDER_DELIVERY_CHARGE;
-    }
   }
 
   async createOrder(
@@ -90,7 +62,7 @@ export class OrderService {
 
       const savedOrder = await entityManager.save(order);
 
-      const totalOrderValue = await this.getOrderTotalValue(
+      const totalOrderValue = await this.cartService.getCartOrderValue(
         lockedCartItems,
         paymentMethod,
       );

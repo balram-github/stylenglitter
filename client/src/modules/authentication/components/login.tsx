@@ -31,6 +31,10 @@ const LoginForm = () => {
   const { toast } = useToast();
   const router = useRouter();
 
+  const redirectTo = router.query.redirectTo
+    ? decodeURIComponent(router.query.redirectTo as string)
+    : "/";
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,7 +52,7 @@ const LoginForm = () => {
         description: "Successfully logged in!",
       });
       await queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.push("/");
+      router.push(redirectTo);
     } catch (error) {
       let errorMsg = (error as Error).message;
       if (isRequestError(error)) {
@@ -109,7 +113,7 @@ const LoginForm = () => {
             <p className="text-sm text-gray-500">
               Don&apos;t have an account?{" "}
               <Link
-                href="/authentication/register"
+                href={`/authentication/register?redirectTo=${redirectTo}`}
                 className="underline text-rose-500"
               >
                 Register

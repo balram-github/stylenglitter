@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
@@ -21,8 +22,10 @@ import type { Cart as ICart } from "@/services/cart/cart.types";
 import { Product } from "@/services/products/products.types";
 import { toast } from "@/hooks/use-toast";
 import { CartItem } from "../cart-item/cart-item";
+import { useRouter } from "next/router";
 
 export const Cart = () => {
+  const router = useRouter();
   const { isLoggedIn } = useUser();
   const {
     isLoading,
@@ -85,6 +88,16 @@ export const Cart = () => {
     }
   };
 
+  const handleCheckout = () => {
+    if (!isLoggedIn) {
+      router.push(
+        `/authentication/login?redirectTo=${encodeURIComponent("/checkout")}`
+      );
+    } else {
+      router.push("/checkout");
+    }
+  };
+
   const totalCartValue = useMemo(() => {
     return cart.cartItems.reduce((acc, item) => {
       if (item.product) {
@@ -106,16 +119,13 @@ export const Cart = () => {
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent
-        side="right"
-        className="flex flex-col h-full w-full max-w-[540px]"
-      >
-        <SheetHeader className="mb-4">
+      <SheetContent side="right" className="h-screen w-full max-w-[540px]">
+        <SheetHeader className="pb-4">
           <SheetTitle className="text-lg md:text-2xl font-bold">
             Cart
           </SheetTitle>
         </SheetHeader>
-        <div className="flex-1 flex flex-col">
+        <div className="h-[calc(100%-48px)] flex flex-col justify-between">
           {isLoading && (
             <div className="flex justify-center items-center h-full">
               <Loader2 size={20} />
@@ -129,7 +139,7 @@ export const Cart = () => {
           )}
           {!isLoading && cart.cartItems.length > 0 && (
             <>
-              <div className="basis-3/4 overflow-y-auto flex flex-col gap-4">
+              <div className="h-full overflow-y-auto flex flex-col gap-4 pb-4">
                 {cart.cartItems.map((item) => (
                   <CartItem
                     key={item.productId}
@@ -143,10 +153,20 @@ export const Cart = () => {
                   />
                 ))}
               </div>
-              <div className="flex justify-end basis-1/4 flex-col">
-                <div className="flex justify-between">
+              <div>
+                <div className="flex justify-between mb-4 md:mb-8 border-t border-b pt-4 pb-4">
                   <p className="font-bold">Sub total</p>
                   <p>Rs. {totalCartValue}</p>
+                </div>
+                <div className="flex justify-center">
+                  <SheetClose asChild>
+                    <Button
+                      onClick={handleCheckout}
+                      className="w-full max-w-80 bg-rose-400 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      Checkout
+                    </Button>
+                  </SheetClose>
                 </div>
               </div>
             </>

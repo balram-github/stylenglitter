@@ -5,6 +5,7 @@ import {
   Get,
   NotFoundException,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
@@ -13,6 +14,7 @@ import { Auth } from '@decorators/auth';
 import { UpsertCartItemsDto } from './dtos/upsert-cart-items.dto';
 import { RemoveCartItemsDto } from './dtos/remove-cart-items.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { TypeOfPayment } from '../order/types/payment-method';
 
 @ApiTags('Cart')
 @Controller('cart')
@@ -84,5 +86,17 @@ export class CartController {
     const cartId = auth.cartId;
 
     await this.cartService.removeCartItems(cartId, payload.productIds);
+  }
+
+  /**
+   * Get cart purchase value
+   */
+  @UseGuards(AuthGuard)
+  @Get('/purchase-amount')
+  async getCartPurchaseAmount(
+    @Query('paymentMethod') paymentMethod: TypeOfPayment,
+    @Auth() auth,
+  ) {
+    return this.cartService.getCartPurchaseAmount(auth.cartId, paymentMethod);
   }
 }

@@ -25,9 +25,16 @@ import { useToast } from "@/hooks/use-toast";
 import { register } from "@/services/auth/auth.service";
 import Link from "next/link";
 import { PHONE_NUMBER_REGEX } from "../constants";
+import { useRouter } from "next/router";
 
 const RegisterForm = () => {
   const { toast } = useToast();
+
+  const router = useRouter();
+  
+  const redirectTo =
+    router.query.redirectTo ? decodeURIComponent(router.query.redirectTo as string)
+      : "/";
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(formSchema),
@@ -167,7 +174,7 @@ const RegisterForm = () => {
             <p className="text-sm text-gray-500">
               Already have an account?{" "}
               <Link
-                href="/authentication/login"
+                href={`/authentication/login?redirectTo=${redirectTo}`}
                 className="underline text-rose-500"
               >
                 Login

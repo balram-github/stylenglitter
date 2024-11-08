@@ -29,8 +29,6 @@ const ProductPage = ({
   const { isLoggedIn } = useUser();
   const { setLoading, upsertCartItem: upsertCartItemToStore } = useCartStore();
 
-  console.log(isLoggedIn);
-
   const handleUpsertToCart = async (qty: number) => {
     try {
       setLoading(true);
