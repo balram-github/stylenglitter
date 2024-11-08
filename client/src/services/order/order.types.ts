@@ -15,3 +15,16 @@ export interface CreateOrderPayload {
   paymentMethod: TypeOfPayment;
   shippingAddress: ShippingAddressPayload;
 }
+
+export interface PaymentGatewayResponse {
+  amount: number;
+  currency: string;
+}
+
+export interface CreateOrderResponse {
+  success: boolean;
+  data: {
+    paymentGatewayResponse: PaymentGatewayResponse;
+    orderNo: string;
+  };
+}

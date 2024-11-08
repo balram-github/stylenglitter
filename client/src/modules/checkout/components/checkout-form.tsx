@@ -22,6 +22,8 @@ import { useCartStore } from "@/stores/cart/cart.store";
 import { useQuery } from "@tanstack/react-query";
 import { getCartPurchaseCharges } from "@/services/cart/cart.service";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "@/hooks/use-toast";
+import { createOrder } from "@/services/order/order.service";
 
 export function CheckoutForm() {
   const {
@@ -59,10 +61,24 @@ export function CheckoutForm() {
     refetchOnReconnect: true,
   });
 
-  const onSubmit: SubmitHandler<CheckoutFormSchema> = (
+  const onSubmit: SubmitHandler<CheckoutFormSchema> = async (
     data: CheckoutFormSchema
   ) => {
-    console.log(data);
+    try {
+      const { orderNo } = await createOrder(data);
+
+      toast({
+        title: "Order placed successfully",
+        description: `Your order number is ${orderNo}`,
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "We are looking into it. Please try again later",
+      });
+    }
   };
 
   return (

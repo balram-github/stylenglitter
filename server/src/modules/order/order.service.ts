@@ -115,7 +115,7 @@ export class OrderService {
 
       await this.cartService.removeCartItems(cart.id, [], entityManager);
 
-      const { paymentGatewayResponse } =
+      const { paymentGatewayResponse, payment } =
         await this.paymentService.createPayment(
           savedOrder.id,
           {
@@ -124,7 +124,11 @@ export class OrderService {
           entityManager,
         );
 
-      return { paymentGatewayResponse };
+      Object.assign(savedOrder, { paymentId: payment.id });
+
+      await entityManager.save(savedOrder);
+
+      return { paymentGatewayResponse, orderNo: savedOrder.orderNo };
     });
   }
 

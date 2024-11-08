@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
 import Head from "next/head";
+import Script from "next/script";
 import { useCartStore } from "@/stores/cart/cart.store";
 import { useProtectedRoute } from "@/hooks/use-protected-route";
 import { CartItem } from "@/modules/cart/components/cart-item/cart-item";
@@ -17,6 +18,10 @@ const CheckoutPage = () => {
       <Head>
         <title>Checkout | Style N Glitter</title>
       </Head>
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="afterInteractive"
+      />
       <main className="container mx-auto py-8 px-4">
         <div className="flex flex-col md:grid md:grid-cols-2 gap-12">
           {/* First row on mobile / Left column on desktop - Order details */}
