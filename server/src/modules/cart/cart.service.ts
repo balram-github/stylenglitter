@@ -150,7 +150,7 @@ export class CartService {
     await this.cartItemRepository.delete(criteria);
   }
 
-  async getCartOrderValue(
+  async getCartPurchaseCharges(
     lockedCartItems: LockedCartItem[],
     paymentMethod: TypeOfPayment,
   ) {
@@ -159,20 +159,39 @@ export class CartService {
       0,
     );
 
+    const charges = {
+      subTotal: totalValue,
+      deliveryCharge: 0,
+      payNow: 0,
+      payLater: 0,
+    };
+
     switch (paymentMethod) {
       case TypeOfPayment.PREPAID: {
         if (totalValue >= PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY) {
-          return totalValue;
+          charges.deliveryCharge = 0;
+        } else {
+          charges.deliveryCharge = PREPAID_ORDER_DELIVERY_CHARGE;
         }
 
-        return totalValue + PREPAID_ORDER_DELIVERY_CHARGE;
+        charges.payNow = totalValue + charges.deliveryCharge;
+
+        return charges;
       }
-      case TypeOfPayment.COD:
-        return COD_ORDER_DELIVERY_CHARGE;
+      case TypeOfPayment.COD: {
+        charges.deliveryCharge = COD_ORDER_DELIVERY_CHARGE;
+        charges.payNow = charges.deliveryCharge;
+        charges.payLater = totalValue;
+
+        return charges;
+      }
     }
   }
 
-  async getCartPurchaseAmount(cartId: number, paymentMethod: TypeOfPayment) {
+  async getAllCartPurchaseCharges(
+    cartId: number,
+    paymentMethod: TypeOfPayment,
+  ) {
     return this.dataSource.manager.transaction(async (entityManager) => {
       const cart = await this.getCart({ where: { id: cartId } }, entityManager);
 
@@ -185,12 +204,12 @@ export class CartService {
         entityManager,
       );
 
-      const purchaseAmount = await this.getCartOrderValue(
+      const purchaseCharges = await this.getCartPurchaseCharges(
         lockedCartItems,
         paymentMethod,
       );
 
-      return purchaseAmount;
+      return purchaseCharges;
     });
   }
 }

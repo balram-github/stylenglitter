@@ -1,8 +1,14 @@
 import { request } from "@/lib/request";
-import { Cart, CartItem, GetCartResponse } from "./cart.types";
+import {
+  Cart,
+  CartItem,
+  GetCartPurchaseChargesResponse,
+  GetCartResponse,
+} from "./cart.types";
 import { GUEST_CART_ITEMS_KEY_NAME } from "@/modules/cart/constants";
 import { getProductById } from "../products/products.service";
 import { isClient } from "@/lib/utils";
+import { TypeOfPayment } from "../order/order.types";
 
 export const getUserCart = async () => {
   const {
@@ -136,4 +142,17 @@ export const saveGuestCartItemsToDB = async () => {
   await Promise.allSettled(promisesToRun);
 
   removeCartItemsFromDB([], true);
+};
+
+export const getCartPurchaseCharges = async (paymentMethod: TypeOfPayment) => {
+  const {
+    data: { data },
+  } = await request.get<GetCartPurchaseChargesResponse>(
+    `/cart/purchase-charges`,
+    {
+      params: { paymentMethod },
+    }
+  );
+
+  return data;
 };

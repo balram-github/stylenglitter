@@ -1,10 +1,10 @@
-import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
 import { TypeOfPayment } from '../types/payment-method';
+import { CreateShippingAddressDto } from './create-shipping-address.dto';
 
 export class CreateOrderDto {
-  @IsNumber()
-  @IsNotEmpty({ message: 'Field "$property" is required.' })
-  addressId: number;
+  @IsNotEmpty()
+  shippingAddress: CreateShippingAddressDto;
 
   @IsEnum(TypeOfPayment)
   paymentMethod: TypeOfPayment;

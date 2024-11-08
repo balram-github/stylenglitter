@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ProductService } from '@modules/product/product.service';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +12,9 @@ import { OrderItem } from './entities/order-item.entity';
 import { CartService } from '../cart/cart.service';
 import { PaymentService } from '../payment/payment.service';
 import { TypeOfPayment } from './types/payment-method';
+import { CreateShippingAddressDto } from './dtos/create-shipping-address.dto';
+import { ShippingAddress } from './entities/shipping-address.entity';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class OrderService {
@@ -20,9 +24,12 @@ export class OrderService {
     private orderRepository: Repository<Order>,
     @InjectRepository(OrderItem)
     private orderItemRepository: Repository<OrderItem>,
+    @InjectRepository(ShippingAddress)
+    private shippingAddressRepository: Repository<ShippingAddress>,
     private productService: ProductService,
     private cartService: CartService,
     private paymentService: PaymentService,
+    private userService: UserService,
   ) {}
 
   getOne(findOptions: FindOneOptions<Order>, entityManager?: EntityManager) {
@@ -33,10 +40,18 @@ export class OrderService {
 
   async createOrder(
     userId: number,
-    addressId: number,
+    shippingAddress: CreateShippingAddressDto,
     paymentMethod: TypeOfPayment,
   ) {
     return this.dataSource.manager.transaction(async (entityManager) => {
+      const user = await this.userService.getOne({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
       const cart = await this.cartService.getCart(
         { where: { userId } },
         entityManager,
@@ -55,17 +70,26 @@ export class OrderService {
         throw new BadRequestException('Cart is empty');
       }
 
+      const address = this.shippingAddressRepository.create({
+        ...shippingAddress,
+        name: user.name,
+        email: user.email,
+      });
+
+      const savedShippingAddress = await entityManager.save(address);
+
       const order = this.orderRepository.create({
         user: { id: userId },
-        shippingAddressId: addressId,
+        shippingAddress: savedShippingAddress,
       });
 
       const savedOrder = await entityManager.save(order);
 
-      const totalOrderValue = await this.cartService.getCartOrderValue(
-        lockedCartItems,
-        paymentMethod,
-      );
+      const { payNow: totalOrderValue } =
+        await this.cartService.getCartPurchaseCharges(
+          lockedCartItems,
+          paymentMethod,
+        );
 
       const promisesToRun = lockedCartItems.map(async (cartItem) => {
         const orderItem = this.orderItemRepository.create({

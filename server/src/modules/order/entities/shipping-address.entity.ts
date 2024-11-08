@@ -1,19 +1,15 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  ManyToOne,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  Index,
-  JoinColumn,
-  OneToMany,
+  OneToOne,
 } from 'typeorm';
-import { User } from './user.entity';
-import { Order } from '@/modules/order/entities/order.entity';
+import { Order } from './order.entity';
 
-@Entity('user_addresses')
-export class UserAddress {
+@Entity('shipping_addresses')
+export class ShippingAddress {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -24,6 +20,12 @@ export class UserAddress {
     nullable: false,
   })
   phoneNumber: string;
+
+  @Column()
+  name: string;
+
+  @Column({ type: 'varchar', length: 320 })
+  email: string;
 
   @Column({ name: 'address_line', type: 'varchar', length: 1024 })
   addressLine: string;
@@ -37,19 +39,11 @@ export class UserAddress {
   @Column({ name: 'pin_code', type: 'varchar' })
   pinCode: string;
 
-  @Column({ name: 'country', type: 'varchar' })
+  @Column({ name: 'country', type: 'varchar', default: 'India' })
   country: string;
 
-  @Column({ name: 'user_id', type: 'int', nullable: false })
-  @Index('idx_user_id')
-  userId: number;
-
-  @ManyToOne(() => User, (user) => user.addresses, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
-  user: User;
-
-  @OneToMany(() => Order, (order) => order.shippingAddress)
-  orders: Order[];
+  @OneToOne(() => Order, (order) => order.shippingAddress)
+  order: Order;
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;

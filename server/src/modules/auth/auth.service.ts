@@ -82,7 +82,7 @@ export class AuthService {
   }
 
   async login(payload: LoginDto) {
-    const user = await this.userService.getUser({
+    const user = await this.userService.getOne({
       where: { email: payload.email },
     });
 
@@ -104,7 +104,7 @@ export class AuthService {
   }
 
   async register(payload: CreateUserDto) {
-    const existingEmail = await this.userService.getUser({
+    const existingEmail = await this.userService.getOne({
       where: { email: payload.email },
     });
 
@@ -153,7 +153,7 @@ export class AuthService {
       secret: this.configService.get('auth.emailVerificationSecret'),
     });
 
-    const user = await this.userService.getUser({
+    const user = await this.userService.getOne({
       where: { id: payload.userId },
     });
 

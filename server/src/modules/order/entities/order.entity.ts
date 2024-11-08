@@ -15,7 +15,7 @@ import { User } from '@modules/user/entities/user.entity';
 import { OrderItem } from './order-item.entity';
 import { Payment } from '@/modules/payment/entities/payment.entity';
 import { createOrderNo } from '../helpers/create-order-no';
-import { UserAddress } from '@/modules/user/entities/user-address.entity';
+import { ShippingAddress } from './shipping-address.entity';
 
 @Entity('orders')
 export class Order {
@@ -41,9 +41,9 @@ export class Order {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => UserAddress, (userAddress) => userAddress.orders)
+  @OneToOne(() => ShippingAddress, (shippingAddress) => shippingAddress.order)
   @JoinColumn({ name: 'shipping_address_id' })
-  shippingAddress: UserAddress;
+  shippingAddress: ShippingAddress;
 
   // One order can have multiple order items
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order, {

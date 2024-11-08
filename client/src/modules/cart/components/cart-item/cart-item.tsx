@@ -43,7 +43,7 @@ export const CartItem = ({
                 <Minus size={16} />
               </Button>
             )}
-            <span className="font-bold">
+            <span className="text-sm">
               {readonly ? "Qty " : ""}
               {data.qty}
             </span>

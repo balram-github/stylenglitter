@@ -11,7 +11,12 @@ import { Minus, Plus, Ship } from "lucide-react";
 import Image from "next/image";
 import PaymentMethodBanner from "../../../../../public/images/banners/payment-methods.png";
 import { Separator } from "@/components/ui/separator";
-import { MAX_PRODUCT_QUANTITY_ALLOWED } from "@/constants";
+import {
+  COD_ORDER_DELIVERY_CHARGE,
+  MAX_PRODUCT_QUANTITY_ALLOWED,
+  PREPAID_ORDER_DELIVERY_CHARGE,
+  PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY,
+} from "@/constants";
 
 type ProductDetailsProps = {
   product: Product;
@@ -165,13 +170,17 @@ export const ProductDetails = ({
         </h3>
         <ul className="list-disc list-inside">
           <li className="py-2">
-            Free delivery above Rs. 500 for prepaid orders.
+            Free delivery above Rs. {PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY}{" "}
+            for prepaid orders.
           </li>
           <li className="py-2">
-            Fixed delivery charges: Rs. 65 for prepaid orders.
+            Fixed delivery charges: Rs. {PREPAID_ORDER_DELIVERY_CHARGE} for
+            prepaid orders.
           </li>
           <li className="py-2">COD available</li>
-          <li className="py-2">Pay flat Rs. 160 upfront for COD orders.</li>
+          <li className="py-2">
+            Pay flat Rs. {COD_ORDER_DELIVERY_CHARGE} upfront for COD orders.
+          </li>
           <li className="py-2">
             Delivery time: 5-9 days (India). Please note that the delivery time
             may vary depending on the location.

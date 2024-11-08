@@ -4,6 +4,7 @@ import Head from "next/head";
 import { useCartStore } from "@/stores/cart/cart.store";
 import { useProtectedRoute } from "@/hooks/use-protected-route";
 import { CartItem } from "@/modules/cart/components/cart-item/cart-item";
+import { CheckoutForm } from "@/modules/checkout/components/checkout-form";
 
 const CheckoutPage = () => {
   const { isLoading: isCartLoading, cart } = useCartStore();
@@ -16,14 +17,15 @@ const CheckoutPage = () => {
       <Head>
         <title>Checkout | Style N Glitter</title>
       </Head>
-      <main className="container mx-auto pt-8">
-        <div className="flex flex-col md:grid md:grid-cols-2 gap-8">
+      <main className="container mx-auto py-8 px-4">
+        <div className="flex flex-col md:grid md:grid-cols-2 gap-12">
           {/* First row on mobile / Left column on desktop - Order details */}
           <div className="space-y-4 order-2 md:order-1">
-            <div className="grid grid-cols-1 gap-2 h-12 md:h-4/5 overflow-y-auto">
+            <h2 className="text-2xl font-semibold tracking-tight">Products</h2>
+            <div className="grid grid-cols-1 gap-8">
               {isLoading &&
                 Array.from({ length: 3 }).map((_, index) => (
-                  <Skeleton key={index} className="h-full w-full" />
+                  <Skeleton key={index} className="h-52 w-full" />
                 ))}
               {!isLoading &&
                 cart.cartItems.map((item) => (
@@ -34,11 +36,9 @@ const CheckoutPage = () => {
 
           {/* Second row on mobile / Right column on desktop - Payment details */}
           <div className="space-y-4 order-1 md:order-2">
-            <div className="h-48 w-full">
-              {isLoading && <Skeleton className="h-full w-full" />}
-            </div>
-            <div className="h-32 w-full">
-              {isLoading && <Skeleton className="h-full w-full" />}
+            <div className="w-full">
+              {isLoading && <Skeleton className="h-12 md:h-4/5 w-full" />}
+              {!isLoading && <CheckoutForm />}
             </div>
           </div>
         </div>

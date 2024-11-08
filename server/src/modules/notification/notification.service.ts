@@ -68,7 +68,7 @@ export class NotificationService {
         throw new NotFoundException('Order not found by paymentId');
       }
 
-      const user = await this.userService.getUser({
+      const user = await this.userService.getOne({
         where: { id: order.userId },
       });
 

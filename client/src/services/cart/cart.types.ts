@@ -18,3 +18,13 @@ export interface GetCartResponse {
   success: boolean;
   data: Cart;
 }
+
+export interface GetCartPurchaseChargesResponse {
+  success: boolean;
+  data: {
+    subTotal: number;
+    deliveryCharge: number;
+    payNow: number;
+    payLater: number;
+  };
+}

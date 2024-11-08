@@ -61,7 +61,7 @@ export class AuthController {
   @Post('resend-verification')
   @UseGuards(AuthGuard)
   async resendVerification(@Auth() auth) {
-    const user = await this.userService.getUser({
+    const user = await this.userService.getOne({
       where: { id: auth.userId },
     });
 

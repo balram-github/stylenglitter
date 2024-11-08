@@ -89,14 +89,19 @@ export class CartController {
   }
 
   /**
-   * Get cart purchase value
+   * Get cart purchase charges
    */
   @UseGuards(AuthGuard)
-  @Get('/purchase-amount')
+  @Get('/purchase-charges')
   async getCartPurchaseAmount(
     @Query('paymentMethod') paymentMethod: TypeOfPayment,
     @Auth() auth,
   ) {
-    return this.cartService.getCartPurchaseAmount(auth.cartId, paymentMethod);
+    const response = await this.cartService.getAllCartPurchaseCharges(
+      auth.cartId,
+      paymentMethod,
+    );
+
+    return response;
   }
 }

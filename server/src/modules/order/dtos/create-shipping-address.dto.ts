@@ -6,7 +6,7 @@ import {
   MaxLength,
 } from 'class-validator';
 
-export class CreateUserAddressDto {
+export class CreateShippingAddressDto {
   @IsPhoneNumber('IN')
   phoneNumber: string;
 
@@ -28,9 +28,4 @@ export class CreateUserAddressDto {
   @IsNotEmpty()
   @IsPostalCode('IN')
   pinCode: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(100)
-  country: string;
 }
