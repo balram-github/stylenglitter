@@ -39,12 +39,12 @@ export default function loader(app: INestApplication<any>) {
   // Cookie parser
   app.use(cookieParser());
 
+  // Filters
+  app.useGlobalFilters(new AllExceptionsFilter());
+
   // Interceptors
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-
-  // Filters
-  app.useGlobalFilters(new AllExceptionsFilter());
 
   swagger(app);
 }

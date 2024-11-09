@@ -3,7 +3,6 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from '@modules/user/user.service';
 import { TokenService } from '../token/token.service';
@@ -90,12 +89,14 @@ export class AuthService {
       throw new NotFoundException('User or password not found');
     }
 
-    if (!user.validatePassword(payload.password)) {
+    const isValidPassword = await user.validatePassword(payload.password);
+
+    if (!isValidPassword) {
       throw new NotFoundException('User or password not found');
     }
 
     if (!user.isEmailVerified) {
-      throw new UnauthorizedException(
+      throw new BadRequestException(
         'Please verify your email before logging in',
       );
     }
