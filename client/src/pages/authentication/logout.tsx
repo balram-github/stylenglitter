@@ -3,6 +3,8 @@ import { serialize } from "cookie";
 import { useEffect } from "react";
 import { queryClient } from "@/lib/query";
 import { useRouter } from "next/router";
+import { enableTracking } from "@/services/tracking/tracking.service";
+import mixpanel from "mixpanel-browser";
 
 // This component won't actually render since we're redirecting in getServerSideProps
 const Logout = ({ success }: { success: boolean }) => {
@@ -11,6 +13,9 @@ const Logout = ({ success }: { success: boolean }) => {
   useEffect(() => {
     if (success) {
       queryClient.resetQueries({ queryKey: ["user"] });
+      if (enableTracking) {
+        mixpanel.reset();
+      }
     }
     router.replace("/");
   }, [router, success]);
