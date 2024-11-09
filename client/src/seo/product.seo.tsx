@@ -8,7 +8,7 @@ interface ProductSeoProps {
 export const ProductSeo = ({ product }: ProductSeoProps) => {
   return (
     <>
-      <title>{product.name} | Style Glitter</title>
+      <title>{product.name}</title>
       <meta name="description" content={product.description} />
       <meta name="robots" content="index, follow" />
       <link

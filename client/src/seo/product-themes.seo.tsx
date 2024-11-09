@@ -8,7 +8,7 @@ interface ProductThemesSeoProps {
 export const ProductThemesSeo = ({ productTheme }: ProductThemesSeoProps) => {
   return (
     <>
-      <title>{productTheme.name} | Style Glitter</title>
+      <title>{productTheme.name}</title>
 
       {/* Basic SEO */}
       <meta

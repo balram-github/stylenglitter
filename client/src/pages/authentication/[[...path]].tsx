@@ -53,7 +53,7 @@ const Authentication = () => {
   return (
     <>
       <Head>
-        <title>{`${pageTitle} | Style Glitter`}</title>
+        <title>{pageTitle}</title>
         <meta
           name="description"
           content={`${pageTitle} to access your account`}

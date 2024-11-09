@@ -8,7 +8,7 @@ interface CategoriesSeoProps {
 export const CategoriesSeo = ({ category }: CategoriesSeoProps) => {
   return (
     <>
-      <title>{category.name} | Style Glitter</title>
+      <title>{category.name}</title>
 
       {/* Basic SEO */}
       <meta
