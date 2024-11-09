@@ -16,7 +16,7 @@ const CheckoutPage = () => {
   return (
     <>
       <Head>
-        <title>Checkout | Style N Glitter</title>
+        <title>Checkout | Style Glitter</title>
       </Head>
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"

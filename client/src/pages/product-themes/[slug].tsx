@@ -11,6 +11,7 @@ import {
   getProductThemeBySlug,
   getProductThemes,
 } from "@/services/product-themes/product-themes.service";
+import { ProductThemesSeo } from "@/seo/product-themes.seo";
 
 interface ProductThemePageProps {
   initialData: {
@@ -56,7 +57,7 @@ export default function ProductThemePage({
   return (
     <>
       <Head>
-        <title>{productTheme.name}</title>
+        <ProductThemesSeo productTheme={productTheme} />
       </Head>
       <main>
         <div className="py-6 md:py-10">

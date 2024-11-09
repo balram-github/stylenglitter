@@ -11,6 +11,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import Head from "next/head";
 import { Category } from "@/services/categories/categories.types";
+import { CategoriesSeo } from "@/seo/categories.seo";
 
 interface CategoryPageProps {
   initialData: {
@@ -56,7 +57,7 @@ export default function CategoryPage({
   return (
     <>
       <Head>
-        <title>{category.name}</title>
+        <CategoriesSeo category={category} />
       </Head>
       <main>
         <div className="py-6 md:py-10">

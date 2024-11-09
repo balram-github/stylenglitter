@@ -18,6 +18,7 @@ import { useCartStore } from "@/stores/cart/cart.store";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "@/hooks/use-toast";
 import { sleep } from "@/lib/utils";
+import { ProductSeo } from "@/seo/product.seo";
 
 interface ProductPageProps {
   product: Product;
@@ -54,7 +55,7 @@ const ProductPage = ({
   return (
     <>
       <Head>
-        <title>{product.name}</title>
+        <ProductSeo product={product} />
       </Head>
       <main className="p-4 md:p-8 container mx-auto">
         <Breadcrumb>

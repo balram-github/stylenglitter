@@ -27,6 +27,9 @@ export interface Product {
   images: ProductImage[];
   createdAt: Date;
   updatedAt: Date;
+  color?: string;
+  material?: string;
+  weight?: string;
 }
 
 export interface GetProductBySlugResponse {

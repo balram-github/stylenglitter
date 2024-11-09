@@ -3,6 +3,7 @@ import { CategoriesList } from "@/modules/home/components/categories-list/catego
 import { CategoryProductList } from "@/modules/home/components/category-product-list/category-product-list";
 import { ProductThemesSlider } from "@/modules/home/components/product-themes-slider/product-themes-slider";
 import { REVALIDATE_HOME_PAGE } from "@/modules/home/constants/constants";
+import { HomeSeo } from "@/seo/home.seo";
 import { getCategories } from "@/services/categories/categories.service";
 import { Category } from "@/services/categories/categories.types";
 import { getProductThemes } from "@/services/product-themes/product-themes.service";
@@ -32,7 +33,7 @@ export default function Home({
   return (
     <>
       <Head>
-        <title>Style N Glitter</title>
+        <HomeSeo />
       </Head>
       <main>
         <div className="py-6 md:py-10">

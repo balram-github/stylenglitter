@@ -7,8 +7,8 @@ import {
 
 export default function swagger(app: INestApplication<any>) {
   const config = new DocumentBuilder()
-    .setTitle('Style N Glitter')
-    .setDescription('Style N Glitter apis')
+    .setTitle('Style Glitter')
+    .setDescription('Style Glitter apis')
     .addBearerAuth()
     .addSecurityRequirements('bearer')
     .build();
