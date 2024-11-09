@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { LoginResponse } from "@/services/auth/auth.types";
-import { request } from "@/lib/request";
 import { serialize } from "cookie";
+import axios from "axios";
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,9 +12,21 @@ export default async function handler(
   }
 
   try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      throw new Error("No refresh token found");
+    }
     const {
       data: { data },
-    } = await request.get<LoginResponse>("/auth/refresh-token");
+    } = await axios.get<LoginResponse>(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`,
+      {
+        headers: {
+          Authorization: `Bearer ${refreshToken}`,
+        },
+      }
+    );
 
     // Set access token cookie
     res.setHeader("Set-Cookie", [

@@ -1,21 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosError } from "axios";
 
+export const internalRequest = axios.create({
+  baseURL: "/api",
+  withCredentials: true,
+});
+
 const refreshTokens = async () => {
-  const { data } = await axios.post("/api/refresh-token", {
-    withCredentials: true,
-  });
+  const { data } = await internalRequest.post("/refresh-token");
 
   return data;
 };
 
 export const request = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true,
-});
-
-export const internalRequest = axios.create({
-  baseURL: "/api",
   withCredentials: true,
 });
 
