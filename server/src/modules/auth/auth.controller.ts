@@ -17,7 +17,7 @@ import { RefreshGuard } from '@guards/refresh.guard';
 import { EmailVerificationGuard } from '@guards/email-verification.guard';
 import { AuthGuard } from '@guards/auth.guard';
 import { UserService } from '@modules/user/user.service';
-import { Throttle } from '@nestjs/throttler';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -43,12 +43,14 @@ export class AuthController {
     };
   }
 
+  @UseGuards(ThrottlerGuard)
   @Throttle({ medium: { limit: 5, ttl: 10000 } })
   @Post('/login')
   login(@Body() payload: LoginDto) {
     return this.authService.login(payload);
   }
 
+  @UseGuards(ThrottlerGuard)
   @Throttle({ long: { limit: 3, ttl: 60000 } })
   @Post('/register')
   register(@Body() payload: CreateUserDto) {
