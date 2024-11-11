@@ -21,8 +21,10 @@ export default function loader(app: INestApplication<any>) {
 
   // CORS
   app.enableCors({
-    origin: true,
+    origin: ['https://www.stylenglitter.com', 'http://localhost:3000'],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
   });
 
   // Helmet
