@@ -7,7 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { validate as validateEnvs } from '@config/envs/env.validation';
 import configuration from '@config/envs/configuration';
 import { Environment } from './config/envs/types';
-import { seconds, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule, seconds } from '@nestjs/throttler';
 import { HealthModule } from '@modules/health/health.module';
 import { UserModule } from '@modules/user/user.module';
 import { AuthModule } from '@modules/auth/auth.module';
@@ -22,6 +22,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './modules/notification/notification.module';
 import { ProductThemeModule } from './modules/product-theme/product-theme.module';
 import { SystemModule } from './modules/system/system.module';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ import { SystemModule } from './modules/system/system.module';
       global: true,
     }),
     MulterModule.register({
-      storage: multer.memoryStorage(), // Use in-memory storage
+      storage: multer.memoryStorage(),
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -85,6 +86,11 @@ import { SystemModule } from './modules/system/system.module';
     SystemModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
