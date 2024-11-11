@@ -93,24 +93,24 @@ export const getStaticProps: GetStaticProps<ProductThemePageProps> = async ({
 }) => {
   try {
     const slug = params?.slug as string;
-    const productTheme = await getProductThemeBySlug(slug);
+    const [productTheme, productsData] = await Promise.all([
+      getProductThemeBySlug(slug).catch(() => null),
+      getProductsOfProductTheme(slug, {
+        page: 1,
+        limit: NB_ITEMS_PER_PAGE,
+      }).catch(() => ({ products: [], hasNext: false })),
+    ]);
 
-    const { products, hasNext } = await getProductsOfProductTheme(slug, {
-      page: 1,
-      limit: NB_ITEMS_PER_PAGE,
-    });
-
-    if (!products || products.length === 0) {
-      return {
-        notFound: true,
-      };
+    // If we couldn't get the product theme at all, return 404
+    if (!productTheme) {
+      return { notFound: true };
     }
 
     return {
       props: {
         initialData: {
-          products,
-          hasNext,
+          products: productsData.products,
+          hasNext: productsData.hasNext,
           pageParam: 1,
         },
         productTheme,
@@ -118,9 +118,7 @@ export const getStaticProps: GetStaticProps<ProductThemePageProps> = async ({
       revalidate: 60 * 60,
     };
   } catch (error) {
-    console.error(error);
-    return {
-      notFound: true,
-    };
+    console.error('Error fetching product theme page data:', error);
+    return { notFound: true }; // Keep 404 if we can't get the product theme
   }
 };

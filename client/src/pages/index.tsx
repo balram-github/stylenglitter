@@ -12,15 +12,24 @@ import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import Head from "next/head";
 
 export const getStaticProps = (async () => {
-  const [categories, productThemes] = await Promise.all([
-    getCategories({ withProducts: true }),
-    getProductThemes(),
-  ]);
+  try {
+    const [categories, productThemes] = await Promise.all([
+      getCategories({ withProducts: true }),
+      getProductThemes(),
+    ]);
 
-  return {
-    props: { categories, productThemes },
-    revalidate: REVALIDATE_HOME_PAGE,
-  };
+    return {
+      props: { categories, productThemes },
+      revalidate: REVALIDATE_HOME_PAGE,
+    };
+  } catch (error) {
+    console.error("Error fetching home page data:", error);
+    // Return empty arrays instead of failing
+    return {
+      props: { categories: [], productThemes: [] },
+      revalidate: REVALIDATE_HOME_PAGE,
+    };
+  }
 }) satisfies GetStaticProps<{
   categories: Category[];
   productThemes: ProductTheme[];
