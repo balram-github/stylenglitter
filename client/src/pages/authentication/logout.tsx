@@ -25,28 +25,30 @@ const Logout = ({ success }: { success: boolean }) => {
 
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   try {
-    // Call the logout API endpoint
     res.setHeader("Set-Cookie", [
       serialize("accessToken", "", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         path: "/",
-        maxAge: 0, // Expire immediately
+        domain: process.env.NODE_ENV === "production" ? ".stylenglitter.com" : undefined,
+        maxAge: 0
       }),
       serialize("refreshToken", "", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         path: "/",
-        maxAge: 0, // Expire immediately
+        domain: process.env.NODE_ENV === "production" ? ".stylenglitter.com" : undefined,
+        maxAge: 0
       }),
       serialize("userLoggedIn", "", {
         httpOnly: false,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         path: "/",
-        maxAge: 0, // Expire immediately
+        domain: process.env.NODE_ENV === "production" ? ".stylenglitter.com" : undefined,
+        maxAge: 0
       }),
     ]);
 
