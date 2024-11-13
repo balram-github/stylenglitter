@@ -19,6 +19,7 @@ export interface CreateOrderPayload {
 export interface PaymentGatewayResponse {
   amount: number;
   currency: string;
+  id: string;
 }
 
 export interface CreateOrderResponse {

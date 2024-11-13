@@ -24,6 +24,12 @@ import { getCartPurchaseCharges } from "@/services/cart/cart.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import { createOrder } from "@/services/order/order.service";
+import {
+  RazorpayOptions,
+  RazorpayResponse,
+  RazorpayErrorResponse,
+} from "@/types/razorpay";
+import { verifyPayment } from "@/services/payment/payment.service";
 
 export function CheckoutForm() {
   const {
@@ -65,12 +71,70 @@ export function CheckoutForm() {
     data: CheckoutFormSchema
   ) => {
     try {
-      const { orderNo } = await createOrder(data);
+      const { orderNo, paymentGatewayResponse } = await createOrder(data);
 
-      toast({
-        title: "Order placed successfully",
-        description: `Your order number is ${orderNo}`,
+      const options: RazorpayOptions = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+        amount: paymentGatewayResponse.amount.toString(),
+        currency: paymentGatewayResponse.currency,
+        name: "Style Glitter",
+        description: "Purchase from Style Glitter",
+        order_id: paymentGatewayResponse.id,
+        handler: async (response: RazorpayResponse) => {
+          const isPaymentVerified = await verifyPayment({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+          });
+
+          if (!isPaymentVerified) {
+            toast({
+              variant: "destructive",
+              title: "Uh oh! Something went wrong.",
+              description: "We are looking into it. Please try again later",
+            });
+            window.location.href = "/";
+
+            return;
+          }
+
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 3000);
+
+          toast({
+            title: "Order placed successfully",
+            description: `Thank you for shopping with us!`,
+          });
+        },
+        notes: {
+          orderNo,
+        },
+        theme: {
+          color: "#f43f5e",
+        },
+      };
+
+      if (!window.Razorpay) {
+        throw new Error("Razorpay is not available");
+      }
+
+      const rzp = new window.Razorpay(options);
+
+      rzp.on("payment.failed", function (response: RazorpayErrorResponse) {
+        console.log(response);
+        toast({
+          variant: "destructive",
+          title: "Payment failed, please try again",
+          description: response.error.description,
+        });
+
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 3000);
       });
+
+      rzp.open();
     } catch (error) {
       console.error(error);
       toast({

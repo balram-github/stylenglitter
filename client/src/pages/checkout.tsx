@@ -1,17 +1,29 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import React from "react";
+import React, { useEffect } from "react";
 import Head from "next/head";
 import Script from "next/script";
 import { useCartStore } from "@/stores/cart/cart.store";
 import { useProtectedRoute } from "@/hooks/use-protected-route";
 import { CartItem } from "@/modules/cart/components/cart-item/cart-item";
 import { CheckoutForm } from "@/modules/checkout/components/checkout-form";
+import { useRouter } from "next/router";
 
 const CheckoutPage = () => {
-  const { isLoading: isCartLoading, cart } = useCartStore();
+  const {
+    isLoading: isCartLoading,
+    cart: { cartItems },
+  } = useCartStore();
   const { isLoading: isProtectedRouteLoading } = useProtectedRoute();
 
+  const router = useRouter();
+
   const isLoading = isProtectedRouteLoading || isCartLoading;
+
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      router.replace("/");
+    }
+  }, [cartItems]);
 
   return (
     <>
@@ -33,7 +45,7 @@ const CheckoutPage = () => {
                   <Skeleton key={index} className="h-52 w-full" />
                 ))}
               {!isLoading &&
-                cart.cartItems.map((item) => (
+                cartItems.map((item) => (
                   <CartItem key={item.productId} data={item} readonly />
                 ))}
             </div>
