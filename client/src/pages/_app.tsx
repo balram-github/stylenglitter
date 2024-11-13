@@ -13,6 +13,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { queryClient } from "@/lib/query";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { Footer } from "@/layout/footer/footer";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -44,9 +45,10 @@ export default function App({ Component, pageProps }: AppProps) {
         <header>
           <AppBar />
         </header>
-        <div className="flex-1 mt-16">
+        <div className="flex-1 mt-16 pb-4">
           <Component {...pageProps} />
         </div>
+        <Footer />
         <Toaster />
       </div>
     </QueryClientProvider>

@@ -1,5 +1,6 @@
 import {
   COD_ORDER_DELIVERY_CHARGE,
+  CONTACT_EMAIL,
   PREPAID_ORDER_DELIVERY_CHARGE,
 } from "@/constants";
 import { ShippingPolicySeo } from "@/seo/shipping-policy.seo";
@@ -124,8 +125,8 @@ const ShippingPolicy = () => {
             For any inquiries related to your order status, tracking
             information, or delivery concerns, please contact our customer
             support at{" "}
-            <a href="mailto:styleglitter001@gmail.com" className="underline">
-              styleglitter001@gmail.com
+            <a href={`mailto:${CONTACT_EMAIL}`} className="underline">
+              {CONTACT_EMAIL}
             </a>
           </p>
           <p className="text-base md:text-lg mb-4 md:mb-8 leading-8 font-bold">

@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL } from "@/constants";
 import { TermsOfServiceSeo } from "@/seo/terms-of-service";
 import Head from "next/dist/shared/lib/head";
 import React from "react";
@@ -111,8 +112,8 @@ const TermsOfService = () => {
             <p className="text-base md:text-lg mb-4 md:mb-8 leading-8">
               If you have any questions or concerns about these terms, please
               contact us at{" "}
-              <a href="mailto:styleglitter001@gmail.com" className="underline">
-                styleglitter001@gmail.com
+              <a href={`mailto:${CONTACT_EMAIL}`} className="underline">
+                {CONTACT_EMAIL}
               </a>
             </p>
           </div>

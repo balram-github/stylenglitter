@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/constants";
 import { RefundReturnPolicySeo } from "@/seo/refund-return-policy.seo";
 import Head from "next/dist/shared/lib/head";
 import React from "react";
@@ -60,14 +61,14 @@ const RefundReturnPolicy = () => {
           <ul className="list-disc list-inside text-base md:text-lg mb-4 md:mb-8 leading-8">
             <li>
               <strong>Email:</strong>{" "}
-              <a href="mailto:styleglitter001@gmail.com" className="underline">
-                styleglitter001@gmail.com
+              <a href={`mailto:${CONTACT_EMAIL}`} className="underline">
+                {CONTACT_EMAIL}
               </a>
             </li>
             <li>
               <strong>WhatsApp:</strong>{" "}
-              <a href="https://wa.me/9289765767" className="underline">
-                +91 9289765767
+              <a href={`https://wa.me/${CONTACT_PHONE}`} className="underline">
+                {CONTACT_PHONE}
               </a>
             </li>
           </ul>

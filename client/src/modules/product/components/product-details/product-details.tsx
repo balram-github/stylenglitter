@@ -72,7 +72,7 @@ export const ProductDetails = ({
 
       {isProductInStock && (
         <>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm">
             Hurry up! Only{" "}
             <span className="font-bold text-rose-400">{product.qty}</span> left.
           </p>
@@ -160,11 +160,9 @@ export const ProductDetails = ({
         </div>
       )}
       <Separator className="my-4 md:my-8" />
-      <p className="text-sm md:text-base text-gray-600">
-        {product.description}
-      </p>
+      <p className="text-sm md:text-base">{product.description}</p>
       <Separator className="my-4 md:my-8" />
-      <div className="text-sm md:text-base text-gray-500">
+      <div className="text-sm md:text-base">
         <h3 className="text-base md:text-lg font-bold mb-4 md:mb-6">
           Shipping Policy
         </h3>
@@ -188,13 +186,11 @@ export const ProductDetails = ({
         </ul>
       </div>
       <Separator className="my-4 md:my-8" />
-      <div className="text-sm md:text-base text-gray-500">
+      <div className="text-sm md:text-base">
         <h3 className="text-base md:text-lg font-bold mb-4 md:mb-6">
           Refund & Exchange
         </h3>
-        <p className="text-gray-500">
-          Once purchased, the product cannot be returned or exchanged.
-        </p>
+        <p>Once purchased, the product cannot be returned or exchanged.</p>
       </div>
     </div>
   );
