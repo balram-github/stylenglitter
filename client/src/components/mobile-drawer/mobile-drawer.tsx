@@ -55,7 +55,7 @@ export const MobileDrawer = () => {
             </SheetClose>
           )}
           <SheetClose asChild>
-            <Link href="/contact" className="font-bold text-sm uppercase py-4">
+            <Link href="/contact-us" className="font-bold text-sm uppercase py-4">
               Contact Us
             </Link>
           </SheetClose>
