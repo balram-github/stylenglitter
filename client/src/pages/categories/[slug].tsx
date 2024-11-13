@@ -9,7 +9,6 @@ import { ProductList } from "@/components/product-list/product-list";
 import { Product } from "@/services/products/products.types";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import Head from "next/head";
 import { Category } from "@/services/categories/categories.types";
 import { CategoriesSeo } from "@/seo/categories.seo";
 
@@ -56,9 +55,7 @@ export default function CategoryPage({
 
   return (
     <>
-      <Head>
-        <CategoriesSeo category={category} />
-      </Head>
+      <CategoriesSeo category={category} />
       <main>
         <div className="py-6 md:py-10">
           <div className="container mx-auto px-4 py-8">

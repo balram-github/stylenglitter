@@ -9,7 +9,6 @@ import { Category } from "@/services/categories/categories.types";
 import { getProductThemes } from "@/services/product-themes/product-themes.service";
 import { ProductTheme } from "@/services/product-themes/product-themes.types";
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
-import Head from "next/head";
 
 export const getStaticProps = (async () => {
   try {
@@ -41,9 +40,8 @@ export default function Home({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <>
-      <Head>
-        <HomeSeo />
-      </Head>
+      <HomeSeo />
+
       <main>
         <div className="py-6 md:py-10">
           <ProductThemesSlider productThemes={productThemes} />

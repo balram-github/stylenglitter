@@ -1,13 +1,10 @@
 import { AboutUsSeo } from "@/seo/about-us.seo";
-import Head from "next/head";
 import React from "react";
 
 const AboutUs = () => {
   return (
     <>
-      <Head>
-        <AboutUsSeo />
-      </Head>
+      <AboutUsSeo />
       <main className="container px-4 mx-auto">
         <div className="py-6 md:py-10">
           <h1 className="text-3xl md:text-5xl font-bold mb-8 md:mb-12">

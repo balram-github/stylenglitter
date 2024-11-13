@@ -4,7 +4,6 @@ import { ProductList } from "@/components/product-list/product-list";
 import { Product } from "@/services/products/products.types";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import Head from "next/head";
 import { ProductTheme } from "@/services/product-themes/product-themes.types";
 import {
   getProductsOfProductTheme,
@@ -56,9 +55,7 @@ export default function ProductThemePage({
 
   return (
     <>
-      <Head>
-        <ProductThemesSeo productTheme={productTheme} />
-      </Head>
+      <ProductThemesSeo productTheme={productTheme} />
       <main>
         <div className="py-6 md:py-10">
           <div className="container mx-auto px-4 py-8">

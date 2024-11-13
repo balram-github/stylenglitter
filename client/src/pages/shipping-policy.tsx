@@ -4,15 +4,11 @@ import {
   PREPAID_ORDER_DELIVERY_CHARGE,
 } from "@/constants";
 import { ShippingPolicySeo } from "@/seo/shipping-policy.seo";
-import Head from "next/head";
-import React from "react";
 
 const ShippingPolicy = () => {
   return (
     <>
-      <Head>
-        <ShippingPolicySeo />
-      </Head>
+      <ShippingPolicySeo />
       <main className="container px-4 mx-auto">
         <div className="py-6 md:py-10">
           <h1 className="text-3xl md:text-5xl font-bold mb-8 md:mb-12">

@@ -1,13 +1,13 @@
 import React from "react";
 import { Category } from "@/services/categories/categories.types";
-
+import Head from "next/head";
 interface CategoriesSeoProps {
   category: Category;
 }
 
 export const CategoriesSeo = ({ category }: CategoriesSeoProps) => {
   return (
-    <>
+    <Head>
       <title>{category.name}</title>
 
       {/* Basic SEO */}
@@ -64,6 +64,6 @@ export const CategoriesSeo = ({ category }: CategoriesSeoProps) => {
         name="keywords"
         content={`${category.name}, products, shopping, ${category.name} collection`}
       />
-    </>
+    </Head>
   );
 };

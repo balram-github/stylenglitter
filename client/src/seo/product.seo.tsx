@@ -1,4 +1,5 @@
 import { Product } from "@/services/products/products.types";
+import Head from "next/head";
 import React from "react";
 
 interface ProductSeoProps {
@@ -7,7 +8,7 @@ interface ProductSeoProps {
 
 export const ProductSeo = ({ product }: ProductSeoProps) => {
   return (
-    <>
+    <Head>
       <title>{product.name}</title>
       <meta name="description" content={product.description} />
       <meta name="robots" content="index, follow" />
@@ -123,6 +124,6 @@ export const ProductSeo = ({ product }: ProductSeoProps) => {
           }),
         }}
       />
-    </>
+    </Head>
   );
 };

@@ -1,8 +1,9 @@
 import React from "react";
+import Head from "next/head";
 
 export const HomeSeo = () => {
   return (
-    <>
+    <Head>
       <title>Style Glitter</title>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <link rel="canonical" href={`${process.env.NEXT_PUBLIC_APP_URL}`} />
@@ -47,6 +48,6 @@ export const HomeSeo = () => {
         name="keywords"
         content={`trendy fashion accessories, glitter products, stylish items`}
       />
-    </>
+    </Head>
   );
 };

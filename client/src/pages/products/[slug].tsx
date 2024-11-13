@@ -1,7 +1,6 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { Product } from "@/services/products/products.types";
 import { getProductBySlug } from "@/services/products/products.service";
-import Head from "next/head";
 import { ProductImageCarousel } from "@/modules/product/components/product-image-carousel/product-image-carousel";
 import {
   Breadcrumb,
@@ -54,9 +53,7 @@ const ProductPage = ({
 
   return (
     <>
-      <Head>
-        <ProductSeo product={product} />
-      </Head>
+      <ProductSeo product={product} />
       <main className="p-4 md:p-8 container mx-auto">
         <Breadcrumb>
           <BreadcrumbList>

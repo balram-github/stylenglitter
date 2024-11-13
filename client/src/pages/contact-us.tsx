@@ -1,14 +1,11 @@
 import { ContactUsSeo } from "@/seo/contact-us.seo";
 import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_HOURS } from "@/constants";
-import Head from "next/head";
 import React from "react";
 
 const ContactUs = () => {
   return (
     <>
-      <Head>
-        <ContactUsSeo />
-      </Head>
+      <ContactUsSeo />
       <main className="container px-4 mx-auto">
         <div className="py-6 md:py-10">
           <h1 className="text-3xl md:text-5xl font-bold mb-8 md:mb-12">

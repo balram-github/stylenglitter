@@ -1,8 +1,8 @@
-import React from "react";
+import Head from "next/head";
 
 export const TermsOfServiceSeo = () => {
   return (
-    <>
+    <Head>
       <title>Terms of Service | Style Glitter</title>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <link rel="canonical" href={`${process.env.NEXT_PUBLIC_APP_URL}`} />
@@ -46,6 +46,6 @@ export const TermsOfServiceSeo = () => {
         name="keywords"
         content={`trendy fashion accessories, glitter products, stylish items`}
       />
-    </>
+    </Head>
   );
 };

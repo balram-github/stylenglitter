@@ -1,4 +1,4 @@
-import React from "react";
+import Head from "next/head";
 import { ProductTheme } from "@/services/product-themes/product-themes.types";
 
 interface ProductThemesSeoProps {
@@ -7,7 +7,7 @@ interface ProductThemesSeoProps {
 
 export const ProductThemesSeo = ({ productTheme }: ProductThemesSeoProps) => {
   return (
-    <>
+    <Head>
       <title>{productTheme.name}</title>
 
       {/* Basic SEO */}
@@ -67,6 +67,6 @@ export const ProductThemesSeo = ({ productTheme }: ProductThemesSeoProps) => {
         name="keywords"
         content={`${productTheme.name}, products, shopping, ${productTheme.name} collection`}
       />
-    </>
+    </Head>
   );
 };

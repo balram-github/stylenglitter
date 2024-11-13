@@ -1,14 +1,10 @@
 import { CONTACT_EMAIL, CONTACT_PHONE } from "@/constants";
 import { RefundReturnPolicySeo } from "@/seo/refund-return-policy.seo";
-import Head from "next/dist/shared/lib/head";
-import React from "react";
 
 const RefundReturnPolicy = () => {
   return (
     <>
-      <Head>
-        <RefundReturnPolicySeo />
-      </Head>
+      <RefundReturnPolicySeo />
       <main className="container px-4 mx-auto">
         <div className="py-6 md:py-10">
           <h1 className="text-3xl md:text-5xl font-bold mb-8 md:mb-12">
