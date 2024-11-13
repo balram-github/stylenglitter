@@ -30,6 +30,16 @@ import {
   RazorpayErrorResponse,
 } from "@/types/razorpay";
 import { verifyPayment } from "@/services/payment/payment.service";
+import { PaymentSuccessDialog } from "./payment-success-dialog";
+import { PaymentFailedDialog } from "./payment-failed-dialog";
+import { useState } from "react";
+
+interface DialogState {
+  isOpen: boolean;
+  type: "success" | "error" | null;
+  message: string;
+  orderNo?: string;
+}
 
 export function CheckoutForm() {
   const {
@@ -67,6 +77,13 @@ export function CheckoutForm() {
     refetchOnReconnect: true,
   });
 
+  const [dialogState, setDialogState] = useState<DialogState>({
+    isOpen: false,
+    type: null,
+    message: "",
+    orderNo: "",
+  });
+
   const onSubmit: SubmitHandler<CheckoutFormSchema> = async (
     data: CheckoutFormSchema
   ) => {
@@ -88,23 +105,19 @@ export function CheckoutForm() {
           });
 
           if (!isPaymentVerified) {
-            toast({
-              variant: "destructive",
-              title: "Uh oh! Something went wrong.",
-              description: "We are looking into it. Please try again later",
+            setDialogState({
+              isOpen: true,
+              type: "error",
+              message: "We are looking into it. Please try again later",
             });
-            window.location.href = "/";
-
             return;
           }
 
-          setTimeout(() => {
-            window.location.href = "/";
-          }, 3000);
-
-          toast({
-            title: "Order placed successfully",
-            description: `Thank you for shopping with us!`,
+          setDialogState({
+            isOpen: true,
+            type: "success",
+            message: "Thank you for shopping with us!",
+            orderNo,
           });
         },
         notes: {
@@ -123,20 +136,18 @@ export function CheckoutForm() {
 
       rzp.on("payment.failed", function (response: RazorpayErrorResponse) {
         console.log(response);
-        toast({
-          variant: "destructive",
-          title: "Payment failed, please try again",
-          description: response.error.description,
-        });
 
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 3000);
+        setDialogState({
+          isOpen: true,
+          type: "error",
+          message: response.error.description,
+        });
       });
 
       rzp.open();
     } catch (error) {
       console.error(error);
+
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
@@ -329,6 +340,14 @@ export function CheckoutForm() {
           </Button>
         </div>
       </form>
+      <PaymentSuccessDialog
+        open={dialogState.type === "success" && dialogState.isOpen}
+        orderNo={dialogState.orderNo ?? ""}
+      />
+      <PaymentFailedDialog
+        open={dialogState.type === "error" && dialogState.isOpen}
+        errorMessage={dialogState.message}
+      />
     </Form>
   );
 }
