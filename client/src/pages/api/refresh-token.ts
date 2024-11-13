@@ -33,16 +33,25 @@ export default async function handler(
       serialize("accessToken", data.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         path: "/",
+        domain: process.env.NODE_ENV === "production" ? ".stylenglitter.com" : undefined,
         maxAge: 15 * 60, // 15 minutes
       }),
       serialize("refreshToken", data.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         path: "/",
+        domain: process.env.NODE_ENV === "production" ? ".stylenglitter.com" : undefined,
         maxAge: 7 * 24 * 60 * 60, // 7 days
+      }),
+      serialize("userLoggedIn", "true", {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        domain: process.env.NODE_ENV === "production" ? ".stylenglitter.com" : undefined
       }),
     ]);
 
