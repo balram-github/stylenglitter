@@ -147,11 +147,26 @@ export class OrderService {
     });
   }
 
-  updateOrderStatus(
+  async updateOrderStatus(
     filterExpression: FindOptionsWhere<Order>,
     status: OrderStatus,
   ) {
-    return this.orderRepository.update(filterExpression, { status });
+    const order = await this.getOne({ where: filterExpression });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    order.status = status;
+
+    await this.orderRepository.save(order);
+
+    this.eventEmitter.emitAsync(NotificationTopic.ORDER_STATUS_UPDATED, {
+      orderId: order.id,
+      status,
+    });
+
+    return order;
   }
 
   getOrderByOrderId(orderId: number) {
@@ -186,44 +201,64 @@ export class OrderService {
   private async handlePaymentPaidEvent(
     payload: PaymentPaidNotificationPayload,
   ) {
-    const { paymentId } = payload;
+    try {
+      const { paymentId } = payload;
 
-    await this.updateOrderStatus({ paymentId }, OrderStatus.PLACED);
+      await this.updateOrderStatus({ paymentId }, OrderStatus.PLACED);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   @OnEvent(NotificationTopic.PAYMENT_FAILED)
   private async handlePaymentFailedEvent(
     payload: PaymentFailedNotificationPayload,
   ) {
-    const { paymentId } = payload;
+    try {
+      const { paymentId } = payload;
 
-    await this.updateOrderStatus({ paymentId }, OrderStatus.PAYMENT_FAILED);
+      await this.updateOrderStatus({ paymentId }, OrderStatus.PAYMENT_FAILED);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   @OnEvent(NotificationTopic.REFUND_INITIATED)
   private async handleRefundInitiatedEvent(
     payload: PaymentRefundInitiatedNotificationPayload,
   ) {
-    const { paymentId } = payload;
+    try {
+      const { paymentId } = payload;
 
-    await this.updateOrderStatus({ paymentId }, OrderStatus.CANCELLED);
+      await this.updateOrderStatus({ paymentId }, OrderStatus.CANCELLED);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   @OnEvent(NotificationTopic.REFUND_COMPLETED)
   private async handleRefundCompletedEvent(
     payload: PaymentRefundCompletedNotificationPayload,
   ) {
-    const { paymentId } = payload;
+    try {
+      const { paymentId } = payload;
 
-    await this.updateOrderStatus({ paymentId }, OrderStatus.CANCELLED);
+      await this.updateOrderStatus({ paymentId }, OrderStatus.CANCELLED);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   @OnEvent(NotificationTopic.REFUND_FAILED)
   private async handleRefundFailedEvent(
     payload: PaymentRefundFailedNotificationPayload,
   ) {
-    const { paymentId } = payload;
+    try {
+      const { paymentId } = payload;
 
-    await this.updateOrderStatus({ paymentId }, OrderStatus.CANCELLED);
+      await this.updateOrderStatus({ paymentId }, OrderStatus.CANCELLED);
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

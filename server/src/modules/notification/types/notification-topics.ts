@@ -4,4 +4,6 @@ export enum NotificationTopic {
   REFUND_INITIATED = 'refund.initiated',
   REFUND_COMPLETED = 'refund.completed',
   REFUND_FAILED = 'refund.failed',
+
+  ORDER_STATUS_UPDATED = 'order.status.updated',
 }

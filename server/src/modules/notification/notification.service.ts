@@ -6,9 +6,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OnEvent } from '@nestjs/event-emitter';
 import { NotificationTopic } from './types/notification-topics';
-import { PaymentPaidNotificationPayload } from './types/payment-paid-notification-payload';
 import { OrderService } from '../order/order.service';
 import { UserService } from '../user/user.service';
+import { OrderStatusChangedNotificationPayload } from './types/order-status-changed-notification-payload';
+import { OrderStatus } from '../order/types/order-status';
 
 @Injectable()
 export class NotificationService {
@@ -59,13 +60,17 @@ export class NotificationService {
     return this.sendEmail(to, subject, htmlContent);
   }
 
-  @OnEvent(NotificationTopic.PAYMENT_PAID)
-  async handlePaymentPaid({ paymentId }: PaymentPaidNotificationPayload) {
+  @OnEvent(NotificationTopic.ORDER_STATUS_UPDATED)
+  async handleOrderStatusChanged(
+    payload: OrderStatusChangedNotificationPayload,
+  ) {
     try {
-      const order = await this.orderService.getOne({ where: { paymentId } });
+      const order = await this.orderService.getOne({
+        where: { id: payload.orderId },
+      });
 
       if (!order) {
-        throw new NotFoundException('Order not found by paymentId');
+        throw new NotFoundException('Order not found');
       }
 
       const user = await this.userService.getOne({
@@ -76,15 +81,19 @@ export class NotificationService {
         throw new NotFoundException('Order creator not found');
       }
 
-      await this.sendEmailTemplate(
-        user.email,
-        'Order placed successfully!',
-        'order-created.html',
-        {
-          orderNo: order.orderNo,
-          shippingAddress: order.shippingAddress,
-        },
-      );
+      switch (payload.status) {
+        case OrderStatus.PLACED: {
+          return this.sendEmailTemplate(
+            user.email,
+            'Order placed successfully!',
+            'order-created.html',
+            {
+              orderNo: order.orderNo,
+              shippingAddress: order.shippingAddress,
+            },
+          );
+        }
+      }
     } catch (error) {
       console.error(error);
     }
