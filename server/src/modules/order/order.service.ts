@@ -1,4 +1,10 @@
-import { DataSource, EntityManager, FindOneOptions, Repository } from 'typeorm';
+import {
+  DataSource,
+  EntityManager,
+  FindOneOptions,
+  FindOptionsWhere,
+  Repository,
+} from 'typeorm';
 import {
   BadRequestException,
   Injectable,
@@ -15,6 +21,14 @@ import { TypeOfPayment } from './types/payment-method';
 import { CreateShippingAddressDto } from './dtos/create-shipping-address.dto';
 import { ShippingAddress } from './entities/shipping-address.entity';
 import { UserService } from '../user/user.service';
+import { OrderStatus } from './types/order-status';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { NotificationTopic } from '../notification/types/notification-topics';
+import { PaymentPaidNotificationPayload } from '../notification/types/payment-paid-notification-payload';
+import { PaymentFailedNotificationPayload } from '../notification/types/payment-failed-notification-payload';
+import { PaymentRefundInitiatedNotificationPayload } from '../notification/types/payment-refund-initiated-payload';
+import { PaymentRefundFailedNotificationPayload } from '../notification/types/payment-refund-failed-payload';
+import { PaymentRefundCompletedNotificationPayload } from '../notification/types/payment-refund-complete-payload';
 
 @Injectable()
 export class OrderService {
@@ -30,6 +44,7 @@ export class OrderService {
     private cartService: CartService,
     private paymentService: PaymentService,
     private userService: UserService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   getOne(findOptions: FindOneOptions<Order>, entityManager?: EntityManager) {
@@ -132,6 +147,13 @@ export class OrderService {
     });
   }
 
+  updateOrderStatus(
+    filterExpression: FindOptionsWhere<Order>,
+    status: OrderStatus,
+  ) {
+    return this.orderRepository.update(filterExpression, { status });
+  }
+
   getOrderByOrderId(orderId: number) {
     return this.orderRepository.findOne({
       where: { id: orderId },
@@ -158,5 +180,50 @@ export class OrderService {
       take: limit + 1,
       withDeleted: true,
     });
+  }
+
+  @OnEvent(NotificationTopic.PAYMENT_PAID)
+  private async handlePaymentPaidEvent(
+    payload: PaymentPaidNotificationPayload,
+  ) {
+    const { paymentId } = payload;
+
+    await this.updateOrderStatus({ paymentId }, OrderStatus.PLACED);
+  }
+
+  @OnEvent(NotificationTopic.PAYMENT_FAILED)
+  private async handlePaymentFailedEvent(
+    payload: PaymentFailedNotificationPayload,
+  ) {
+    const { paymentId } = payload;
+
+    await this.updateOrderStatus({ paymentId }, OrderStatus.PAYMENT_FAILED);
+  }
+
+  @OnEvent(NotificationTopic.REFUND_INITIATED)
+  private async handleRefundInitiatedEvent(
+    payload: PaymentRefundInitiatedNotificationPayload,
+  ) {
+    const { paymentId } = payload;
+
+    await this.updateOrderStatus({ paymentId }, OrderStatus.CANCELLED);
+  }
+
+  @OnEvent(NotificationTopic.REFUND_COMPLETED)
+  private async handleRefundCompletedEvent(
+    payload: PaymentRefundCompletedNotificationPayload,
+  ) {
+    const { paymentId } = payload;
+
+    await this.updateOrderStatus({ paymentId }, OrderStatus.CANCELLED);
+  }
+
+  @OnEvent(NotificationTopic.REFUND_FAILED)
+  private async handleRefundFailedEvent(
+    payload: PaymentRefundFailedNotificationPayload,
+  ) {
+    const { paymentId } = payload;
+
+    await this.updateOrderStatus({ paymentId }, OrderStatus.CANCELLED);
   }
 }

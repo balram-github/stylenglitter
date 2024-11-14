@@ -123,7 +123,7 @@ export class PaymentService {
 
     await this.paymentRepository.save(paymentEntity);
 
-    this.eventEmitter.emit(NotificationTopic.PAYMENT_PAID, {
+    this.eventEmitter.emitAsync(NotificationTopic.PAYMENT_PAID, {
       paymentId: paymentEntity.id,
     });
   }
@@ -145,7 +145,9 @@ export class PaymentService {
 
     await this.paymentRepository.save(paymentEntity);
 
-    // TODO - Send email for payment failed
+    this.eventEmitter.emitAsync(NotificationTopic.PAYMENT_FAILED, {
+      paymentId: paymentEntity.id,
+    });
   }
 
   private async handleRefundCreated(payload: RefundCreatedWebhookEventPayload) {
@@ -165,7 +167,9 @@ export class PaymentService {
 
     await this.paymentRepository.save(paymentEntity);
 
-    // TODO - Send email for refund initiated
+    this.eventEmitter.emitAsync(NotificationTopic.REFUND_INITIATED, {
+      paymentId: paymentEntity.id,
+    });
   }
 
   private async handleRefundProcessed(
@@ -187,7 +191,9 @@ export class PaymentService {
 
     await this.paymentRepository.save(paymentEntity);
 
-    // TODO - Send email for refund complete
+    this.eventEmitter.emitAsync(NotificationTopic.REFUND_COMPLETED, {
+      paymentId: paymentEntity.id,
+    });
   }
 
   private async handleRefundFailed(payload: RefundFailedWebhookEventPayload) {
@@ -207,7 +213,9 @@ export class PaymentService {
 
     await this.paymentRepository.save(paymentEntity);
 
-    // TODO - Send email for refund failed
+    this.eventEmitter.emitAsync(NotificationTopic.REFUND_FAILED, {
+      paymentId: paymentEntity.id,
+    });
   }
 
   async handleWebhookEvent(eventPayload: WebhookEventPayload) {
