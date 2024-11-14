@@ -1,18 +1,22 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './category.entity';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
-import { ProductService } from '@modules/product/product.service';
-import { Pagination } from '@/types/pagination.type';
 import { CreateCategoryDto } from './dtos/create-category.dto';
+import {
+  GetCategoryProductsDto,
+  ProductAvailability,
+  ProductSortBy,
+} from './dtos/get-category-products.dto';
+import { Product } from '../product/entities/product.entity';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
-    @Inject(forwardRef(() => ProductService))
-    private productService: ProductService,
+    @InjectRepository(Product)
+    private productRepository: Repository<Product>,
   ) {}
 
   get(findOptions?: FindManyOptions<Category>) {
@@ -42,17 +46,68 @@ export class CategoryService {
 
   async getProductsById(
     categoryId: number,
-    { page, limit }: Pagination = { page: 1, limit: 10 },
-  ) {
-    const products = await this.productService.get({
-      where: { category: { id: categoryId } },
-      order: {
-        createdAt: 'DESC',
-      },
-      skip: (page - 1) * limit,
-      take: limit + 1,
-    });
+    options: GetCategoryProductsDto,
+  ): Promise<{
+    products: Product[];
+    hasNext: boolean;
+  }> {
+    const query = this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.amount', 'amount')
+      .leftJoinAndSelect('product.images', 'images')
+      .where('product.categoryId = :categoryId', { categoryId });
 
+    // Apply availability filter
+    if (options.availability) {
+      switch (options.availability) {
+        case ProductAvailability.IN_STOCK:
+          query.andWhere('product.qty > 0');
+          break;
+        case ProductAvailability.OUT_OF_STOCK:
+          query.andWhere('product.qty = 0');
+          break;
+      }
+    }
+
+    // Apply price range filter
+    if (options.minPrice !== undefined) {
+      query.andWhere('amount.basePrice >= :minPrice', {
+        minPrice: options.minPrice,
+      });
+    }
+
+    if (options.maxPrice !== undefined) {
+      query.andWhere('amount.basePrice <= :maxPrice', {
+        maxPrice: options.maxPrice,
+      });
+    }
+
+    // Apply sorting
+    if (options.sortBy) {
+      switch (options.sortBy) {
+        case ProductSortBy.PRICE_HIGH_TO_LOW:
+          query.orderBy('amount.basePrice', 'DESC');
+          break;
+        case ProductSortBy.PRICE_LOW_TO_HIGH:
+          query.orderBy('amount.basePrice', 'ASC');
+          break;
+        case ProductSortBy.DATE_ADDED_DESC:
+          query.orderBy('product.createdAt', 'DESC');
+          break;
+        case ProductSortBy.DATE_ADDED_ASC:
+          query.orderBy('product.createdAt', 'ASC');
+          break;
+      }
+    }
+
+    // Apply pagination
+    const limit = options.limit ?? 10;
+    const page = options.page ?? 1;
+    const skip = (page - 1) * limit;
+
+    query.skip(skip).take(limit + 1);
+
+    const products = await query.getMany();
     const hasNext = products.length > limit;
 
     return {

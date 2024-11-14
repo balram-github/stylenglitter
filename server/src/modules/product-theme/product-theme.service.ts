@@ -1,18 +1,22 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductTheme } from './entities/product-theme.entity';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
-import { ProductService } from '../product/product.service';
 import { CreateProductThemeDto } from './dtos/create-product-theme.dto';
-import { Pagination } from '@/types/pagination.type';
+import { Product } from '../product/entities/product.entity';
+import {
+  GetThemeProductsDto,
+  ProductAvailability,
+  ProductSortBy,
+} from './dtos/get-theme-products.dto';
 
 @Injectable()
 export class ProductThemeService {
   constructor(
     @InjectRepository(ProductTheme)
     private productThemeRepository: Repository<ProductTheme>,
-    @Inject(forwardRef(() => ProductService))
-    private productService: ProductService,
+    @InjectRepository(Product)
+    private productRepository: Repository<Product>,
   ) {}
 
   get(findOptions?: FindManyOptions<ProductTheme>) {
@@ -42,15 +46,68 @@ export class ProductThemeService {
 
   async getProductsById(
     productThemeId: number,
-    { page, limit }: Pagination = { page: 1, limit: 10 },
-  ) {
-    const products = await this.productService.get({
-      where: { productThemeId },
-      skip: (page - 1) * limit,
-      take: limit + 1,
-      order: { createdAt: 'DESC' },
-    });
+    options: GetThemeProductsDto,
+  ): Promise<{
+    products: Product[];
+    hasNext: boolean;
+  }> {
+    const query = this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.amount', 'amount')
+      .leftJoinAndSelect('product.images', 'images')
+      .where('product.productThemeId = :productThemeId', { productThemeId });
 
+    // Apply availability filter
+    if (options.availability) {
+      switch (options.availability) {
+        case ProductAvailability.IN_STOCK:
+          query.andWhere('product.qty > 0');
+          break;
+        case ProductAvailability.OUT_OF_STOCK:
+          query.andWhere('product.qty = 0');
+          break;
+      }
+    }
+
+    // Apply price range filter
+    if (options.minPrice !== undefined) {
+      query.andWhere('amount.basePrice >= :minPrice', {
+        minPrice: options.minPrice,
+      });
+    }
+
+    if (options.maxPrice !== undefined) {
+      query.andWhere('amount.basePrice <= :maxPrice', {
+        maxPrice: options.maxPrice,
+      });
+    }
+
+    // Apply sorting
+    if (options.sortBy) {
+      switch (options.sortBy) {
+        case ProductSortBy.PRICE_HIGH_TO_LOW:
+          query.orderBy('amount.basePrice', 'DESC');
+          break;
+        case ProductSortBy.PRICE_LOW_TO_HIGH:
+          query.orderBy('amount.basePrice', 'ASC');
+          break;
+        case ProductSortBy.DATE_ADDED_DESC:
+          query.orderBy('product.createdAt', 'DESC');
+          break;
+        case ProductSortBy.DATE_ADDED_ASC:
+          query.orderBy('product.createdAt', 'ASC');
+          break;
+      }
+    }
+
+    // Apply pagination
+    const limit = options.limit ?? 10;
+    const page = options.page ?? 1;
+    const skip = (page - 1) * limit;
+
+    query.skip(skip).take(limit + 1);
+
+    const products = await query.getMany();
     const hasNext = products.length > limit;
 
     return {
@@ -60,8 +117,7 @@ export class ProductThemeService {
   }
 
   create(payload: CreateProductThemeDto) {
-    const category = this.productThemeRepository.create(payload);
-
-    return this.productThemeRepository.save(category);
+    const theme = this.productThemeRepository.create(payload);
+    return this.productThemeRepository.save(theme);
   }
 }

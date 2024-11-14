@@ -12,6 +12,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { Category } from './category.entity';
 import { Product } from '../product/entities/product.entity';
+import { GetCategoryProductsDto } from './dtos/get-category-products.dto';
 
 @ApiTags('Categories')
 @Controller('categories')
@@ -37,8 +38,7 @@ export class CategoryController {
   @Get('/:slug/products')
   async getProducts(
     @Param('slug') slug: string,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query() query: GetCategoryProductsDto,
   ): Promise<{
     products: Product[];
     hasNext: boolean;
@@ -49,7 +49,7 @@ export class CategoryController {
       throw new NotFoundException('Category not found');
     }
 
-    return this.categoryService.getProductsById(category.id, { page, limit });
+    return this.categoryService.getProductsById(category.id, query);
   }
 
   @Post('/')

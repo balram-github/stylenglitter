@@ -41,6 +41,9 @@ export class Order {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
+  @Column({ name: 'tracking_no', type: 'varchar', nullable: true })
+  trackingNo: string;
+
   @Column({
     name: 'status',
     type: 'enum',

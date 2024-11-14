@@ -12,6 +12,7 @@ import { ProductThemeService } from './product-theme.service';
 import { ProductTheme } from './entities/product-theme.entity';
 import { Product } from '../product/entities/product.entity';
 import { CreateProductThemeDto } from './dtos/create-product-theme.dto';
+import { GetThemeProductsDto } from './dtos/get-theme-products.dto';
 
 @ApiTags('Product Themes')
 @Controller('product-themes')
@@ -37,8 +38,7 @@ export class ProductThemeController {
   @Get('/:slug/products')
   async getProducts(
     @Param('slug') slug: string,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query() query: GetThemeProductsDto,
   ): Promise<{
     products: Product[];
     hasNext: boolean;
@@ -49,14 +49,11 @@ export class ProductThemeController {
       throw new NotFoundException('Product theme not found');
     }
 
-    return this.productThemeService.getProductsById(productTheme.id, {
-      page,
-      limit,
-    });
+    return this.productThemeService.getProductsById(productTheme.id, query);
   }
 
   @Post('/')
-  async createCategory(
+  async createProductTheme(
     @Body() body: CreateProductThemeDto,
   ): Promise<ProductTheme> {
     return this.productThemeService.create(body);
