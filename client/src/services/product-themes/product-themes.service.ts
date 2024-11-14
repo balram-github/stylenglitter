@@ -1,22 +1,21 @@
 import { request } from "@/lib/request";
 import {
   GetProductThemesResponse,
+  GetProductsOfProductThemeParams,
   GetProductsOfProductThemeResponse,
   ProductTheme,
 } from "./product-themes.types";
 
 export const getProductsOfProductTheme = async (
   slug: string,
-  pagination: { page: number; limit: number }
+  params: GetProductsOfProductThemeParams
 ) => {
   const {
     data: { data },
   } = await request.get<GetProductsOfProductThemeResponse>(
     `/product-themes/${slug}/products`,
     {
-      params: {
-        ...pagination,
-      },
+      params,
     }
   );
 

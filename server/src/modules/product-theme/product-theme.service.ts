@@ -71,13 +71,13 @@ export class ProductThemeService {
 
     // Apply price range filter
     if (options.minPrice !== undefined) {
-      query.andWhere('amount.basePrice >= :minPrice', {
+      query.andWhere('amount.price >= :minPrice', {
         minPrice: options.minPrice,
       });
     }
 
     if (options.maxPrice !== undefined) {
-      query.andWhere('amount.basePrice <= :maxPrice', {
+      query.andWhere('amount.price <= :maxPrice', {
         maxPrice: options.maxPrice,
       });
     }
@@ -86,10 +86,10 @@ export class ProductThemeService {
     if (options.sortBy) {
       switch (options.sortBy) {
         case ProductSortBy.PRICE_HIGH_TO_LOW:
-          query.orderBy('amount.basePrice', 'DESC');
+          query.orderBy('amount.price', 'DESC');
           break;
         case ProductSortBy.PRICE_LOW_TO_HIGH:
-          query.orderBy('amount.basePrice', 'ASC');
+          query.orderBy('amount.price', 'ASC');
           break;
         case ProductSortBy.DATE_ADDED_DESC:
           query.orderBy('product.createdAt', 'DESC');

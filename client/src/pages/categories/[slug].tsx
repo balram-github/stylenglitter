@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import {
   getCategories,
@@ -6,11 +6,18 @@ import {
   getProductsOfCategory,
 } from "@/services/categories/categories.service";
 import { ProductList } from "@/components/product-list/product-list";
-import { Product } from "@/services/products/products.types";
+import {
+  Product,
+  ProductAvailability,
+  ProductFilters,
+  ProductSortBy,
+} from "@/services/products/products.types";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { Category } from "@/services/categories/categories.types";
 import { CategoriesSeo } from "@/seo/categories.seo";
+import { SortBySelector } from "@/components/sort-by-selector/sort-by-selector";
+import { ProductFilterSheet } from "@/components/product-filter-sheet/product-filter-sheet";
 
 interface CategoryPageProps {
   initialData: {
@@ -27,12 +34,22 @@ export default function CategoryPage({
   initialData,
   category,
 }: CategoryPageProps) {
+  const [sortBy, setSortBy] = useState<ProductSortBy>(
+    ProductSortBy.DATE_ADDED_DESC
+  );
+
+  const [filters, setFilters] = useState<ProductFilters>({
+    availability: ProductAvailability.ALL,
+    minPrice: undefined,
+    maxPrice: undefined,
+  });
+
   const params = useParams();
   const slug = params?.slug as string;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ["category-products", slug],
+      queryKey: ["category-products", slug, sortBy, filters],
       initialPageParam: 1,
       initialData: {
         pages: [initialData],
@@ -42,6 +59,10 @@ export default function CategoryPage({
         const result = await getProductsOfCategory(slug, {
           page: pageParam,
           limit: NB_ITEMS_PER_PAGE,
+          sortBy,
+          availability: filters.availability,
+          minPrice: filters.minPrice,
+          maxPrice: filters.maxPrice,
         });
         return { ...result, pageParam };
       },
@@ -59,6 +80,13 @@ export default function CategoryPage({
       <main>
         <div className="py-6 md:py-10">
           <div className="container mx-auto px-4 py-8">
+            <div className="flex items-center justify-between px-4 mb-4">
+              <ProductFilterSheet
+                filters={filters}
+                onApply={(filters) => setFilters(filters)}
+              />
+              <SortBySelector sortBy={sortBy} onChange={setSortBy} />
+            </div>
             <ProductList
               data={products}
               loading={isFetchingNextPage}
@@ -95,6 +123,7 @@ export const getStaticProps: GetStaticProps<CategoryPageProps> = async ({
       getProductsOfCategory(slug, {
         page: 1,
         limit: NB_ITEMS_PER_PAGE,
+        sortBy: ProductSortBy.DATE_ADDED_DESC,
       }).catch(() => ({ products: [], hasNext: false })),
     ]);
 
@@ -115,7 +144,7 @@ export const getStaticProps: GetStaticProps<CategoryPageProps> = async ({
       revalidate: 60 * 60,
     };
   } catch (error) {
-    console.error('Error fetching category page data:', error);
+    console.error("Error fetching category page data:", error);
     return { notFound: true }; // Keep 404 if we can't get the category
   }
 };

@@ -2,21 +2,21 @@ import { request } from "@/lib/request";
 import {
   Category,
   GetCategoriesResponse,
+  GetProductsOfCategoryParams,
   GetProductsOfCategoryResponse,
 } from "./categories.types";
+import { ProductSortBy } from "../products/products.types";
 
 export const getProductsOfCategory = async (
   slug: string,
-  pagination: { page: number; limit: number }
+  params: GetProductsOfCategoryParams
 ) => {
   const {
     data: { data },
   } = await request.get<GetProductsOfCategoryResponse>(
     `/categories/${slug}/products`,
     {
-      params: {
-        ...pagination,
-      },
+      params,
     }
   );
 
@@ -46,6 +46,7 @@ export const getCategories = async ({
     const { products } = await getProductsOfCategory(category.slug, {
       page: 1,
       limit: 5,
+      sortBy: ProductSortBy.DATE_ADDED_DESC,
     });
 
     return {

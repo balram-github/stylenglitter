@@ -1,4 +1,8 @@
-import { Product } from "../products/products.types";
+import {
+  Product,
+  ProductAvailability,
+  ProductSortBy,
+} from "../products/products.types";
 
 export interface ProductTheme {
   id: number;
@@ -21,4 +25,13 @@ export interface GetProductsOfProductThemeResponse {
     hasNext: boolean;
     products: Product[];
   };
+}
+
+export interface GetProductsOfProductThemeParams {
+  page: number;
+  limit: number;
+  sortBy: ProductSortBy;
+  availability?: ProductAvailability;
+  minPrice?: number;
+  maxPrice?: number;
 }
