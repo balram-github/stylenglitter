@@ -40,7 +40,7 @@ export class PaymentController {
   ) {
     const raw = req.rawBody!;
 
-    const signature = req.headers['X-Razorpay-Signature'];
+    const signature = req.headers['x-razorpay-signature'];
 
     const isVerified = await this.paymentService.verifyWebhookSignature({
       payload: raw,
