@@ -10,3 +10,5 @@ export const CONTACT_HOURS = "Monday - Saturday From 10 Am - 6 PM Only";
 export const INSTAGRAM_URL = "https://www.instagram.com/style_glitter__";
 
 export const ADDRESS = "Sai Kunj, New Palam vihar phase 3, Gurgaon, 122017, Haryana";
+
+export const TRACK_ORDER_URL = "https://www.delhivery.com/tracking";

@@ -119,7 +119,10 @@ export const Cart = () => {
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="h-screen w-full max-w-[540px]">
+      <SheetContent
+        side="right"
+        className="h-dvh w-full max-w-[540px] overflow-y-auto"
+      >
         <SheetHeader className="pb-4">
           <SheetTitle className="text-lg md:text-2xl font-bold">
             Cart

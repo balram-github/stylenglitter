@@ -1,4 +1,4 @@
-import { INSTAGRAM_URL } from "@/constants";
+import { INSTAGRAM_URL, TRACK_ORDER_URL } from "@/constants";
 import { InstagramIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -21,18 +21,17 @@ export const Footer = () => {
             </Link>
           </div>
           <div>
-            <p className="font-bold text-base mb-4 md:mb-6">
-              Quick Links
-            </p>
+            <p className="font-bold text-base mb-4 md:mb-6">Quick Links</p>
             <div className="flex flex-col gap-4 text-sm">
               <Link href="/about-us">About Us</Link>
               <Link href="/contact-us">Contact Us</Link>
+              <Link href={TRACK_ORDER_URL} target="_blank">
+                Track Order
+              </Link>
             </div>
           </div>
           <div>
-            <p className="font-bold text-base mb-4 md:mb-6">
-              Store Policies
-            </p>
+            <p className="font-bold text-base mb-4 md:mb-6">Store Policies</p>
             <div className="flex flex-col gap-4 text-sm">
               <Link href="/privacy-policy">Privacy Policy</Link>
               <Link href="/refund-return-policy">Refund & Return Policy</Link>
