@@ -1,5 +1,5 @@
 import { ContactUsSeo } from "@/seo/contact-us.seo";
-import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_HOURS } from "@/constants";
+import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_HOURS, ADDRESS } from "@/constants";
 import React from "react";
 
 const ContactUs = () => {
@@ -25,6 +25,9 @@ const ContactUs = () => {
             <a href={`mailto:${CONTACT_EMAIL}`} className="underline">
               {CONTACT_EMAIL}
             </a>
+          </p>
+          <p className="text-base md:text-lg mb-4 md:mb-8 leading-8">
+            <strong>Address:</strong> {ADDRESS}
           </p>
         </div>
       </main>
