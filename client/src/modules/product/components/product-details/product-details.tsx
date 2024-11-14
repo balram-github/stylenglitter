@@ -17,6 +17,7 @@ import {
   PREPAID_ORDER_DELIVERY_CHARGE,
   PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY,
 } from "@/constants";
+import { trackEvent } from "@/services/tracking/tracking.service";
 
 type ProductDetailsProps = {
   product: Product;
@@ -47,6 +48,11 @@ export const ProductDetails = ({
   });
 
   const onSubmit: SubmitHandler<ProductDetailsFormValues> = async (values) => {
+    trackEvent("add_to_cart", {
+      productId: product.id,
+      productCode: product.code,
+      qty: values.qty,
+    });
     await onAddToCart(values.qty);
   };
 

@@ -23,6 +23,7 @@ import { Product } from "@/services/products/products.types";
 import { toast } from "@/hooks/use-toast";
 import { CartItem } from "../cart-item/cart-item";
 import { useRouter } from "next/router";
+import { trackEvent } from "@/services/tracking/tracking.service";
 
 export const Cart = () => {
   const router = useRouter();
@@ -89,6 +90,8 @@ export const Cart = () => {
   };
 
   const handleCheckout = () => {
+    trackEvent("checkout", {});
+
     if (!isLoggedIn) {
       router.push(
         `/authentication/login?redirectTo=${encodeURIComponent("/checkout")}`

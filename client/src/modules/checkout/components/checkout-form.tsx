@@ -33,6 +33,7 @@ import { verifyPayment } from "@/services/payment/payment.service";
 import { PaymentSuccessDialog } from "./payment-success-dialog";
 import { PaymentFailedDialog } from "./payment-failed-dialog";
 import { useState } from "react";
+import { trackEvent } from "@/services/tracking/tracking.service";
 
 interface DialogState {
   isOpen: boolean;
@@ -88,6 +89,10 @@ export function CheckoutForm() {
     data: CheckoutFormSchema
   ) => {
     try {
+      trackEvent("pay-button-clicked", {
+        paymentMethod: data.paymentMethod,
+      });
+
       const { orderNo, paymentGatewayResponse } = await createOrder(data);
 
       const options: RazorpayOptions = {
