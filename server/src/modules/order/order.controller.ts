@@ -4,6 +4,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -13,6 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@guards/auth.guard';
 import { Auth } from '@decorators/auth';
 import { CreateOrderDto } from './dtos/create-order.dto';
+import { UpdateOrderStatusDto } from './dtos/update-order-status.dto';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -30,6 +32,17 @@ export class OrderController {
       body.shippingAddress,
       body.paymentMethod,
     );
+  }
+
+  /**
+   * Update order status
+   */
+  @Patch('/:orderId/status')
+  updateOrderStatus(
+    @Param('orderId') orderId: number,
+    @Body() body: UpdateOrderStatusDto,
+  ) {
+    return this.orderService.updateOrderStatus({ id: orderId }, body.status);
   }
 
   /**
