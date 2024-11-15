@@ -21,6 +21,8 @@ export default () => ({
     emailVerificationSecret: process.env.EMAIL_VERIFICATION_SECRET,
     emailVerificationExpiry:
       process.env.EMAIL_VERIFICATION_EXPIRY || 24 * 60 * 60, // 24 hours
+    passwordResetSecret: process.env.PASSWORD_RESET_SECRET,
+    passwordResetExpiry: process.env.PASSWORD_RESET_EXPIRY || 60 * 30, // 30 mins
   },
   payment: {
     razorPayKeyId: process.env.RAZORPAY_KEY_ID,

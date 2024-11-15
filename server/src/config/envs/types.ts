@@ -89,4 +89,7 @@ export class EnvironmentVariables {
 
   @IsString()
   EMAIL_VERIFICATION_SECRET: string;
+
+  @IsString()
+  PASSWORD_RESET_SECRET: string;
 }

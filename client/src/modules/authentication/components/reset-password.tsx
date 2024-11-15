@@ -22,37 +22,36 @@ import {
 import { Input } from "@/components/ui/input";
 import { isRequestError } from "@/lib/request";
 import { useToast } from "@/hooks/use-toast";
+import { resetPassword } from "@/services/auth/auth.service";
 import { useRouter } from "next/router";
-import { login } from "@/services/auth/auth.service";
-import { queryClient } from "@/lib/query";
-import Link from "next/link";
 
-const LoginForm = () => {
+interface ResetPasswordFormProps {
+  token: string;
+}
+
+const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
   const { toast } = useToast();
+
   const router = useRouter();
 
-  const redirectTo = router.query.redirectTo
-    ? decodeURIComponent(router.query.redirectTo as string)
-    : "/";
-
-  const form = useForm<LoginFormValues>({
+  const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
   const { isSubmitting } = form.formState;
 
-  const onSubmit: SubmitHandler<LoginFormValues> = async (values) => {
+  const onSubmit: SubmitHandler<ResetPasswordFormValues> = async (values) => {
     try {
-      await login(values);
+      await resetPassword(token, values.password);
       toast({
-        description: "Successfully logged in!",
+        description:
+          "Successfully reset password, please login with your new password.",
       });
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.push(redirectTo);
+      router.push("/authentication/login");
     } catch (error) {
       let errorMsg = (error as Error).message;
       if (isRequestError(error)) {
@@ -69,29 +68,12 @@ const LoginForm = () => {
   return (
     <Card className="border-0 shadow-none md:border md:shadow-sm">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl">Login</CardTitle>
-        <CardDescription>Enter your email below to login</CardDescription>
+        <CardTitle className="text-2xl">Reset Password</CardTitle>
+        <CardDescription>Enter your new password below</CardDescription>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="grid gap-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="Enter your email"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="password"
@@ -101,36 +83,36 @@ const LoginForm = () => {
                   <FormControl>
                     <Input
                       type="password"
-                      {...field}
                       placeholder="Enter your password"
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="flex justify-end">
-              <Link
-                href={`/authentication/request-password-reset`}
-                className="text-sm text-gray-500 hover:underline hover:text-rose-500"
-              >
-                Forgot password?
-              </Link>
-            </div>
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Confirm your password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
           <CardFooter className="flex flex-col items-center gap-4">
             <Button className="w-full max-w-72" isLoading={isSubmitting}>
               Submit
             </Button>
-            <p className="text-sm text-gray-500">
-              Don&apos;t have an account?{" "}
-              <Link
-                href={`/authentication/register?redirectTo=${redirectTo}`}
-                className="underline text-rose-500"
-              >
-                Register
-              </Link>
-            </p>
           </CardFooter>
         </form>
       </Form>
@@ -138,15 +120,20 @@ const LoginForm = () => {
   );
 };
 
-const formSchema = z.object({
-  email: z.string().email({
-    message: "Email must be valid",
-  }),
-  password: z.string().min(8, {
-    message: "Password must be valid",
-  }),
-});
+const formSchema = z
+  .object({
+    password: z.string().min(8, {
+      message: "Password must be valid",
+    }),
+    confirmPassword: z.string().min(8, {
+      message: "Password must be valid",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
 
-export type LoginFormValues = z.infer<typeof formSchema>;
+export type ResetPasswordFormValues = z.infer<typeof formSchema>;
 
-export default LoginForm;
+export default ResetPasswordForm;

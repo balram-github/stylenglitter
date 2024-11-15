@@ -162,10 +162,86 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    await this.userService.update(
-      { where: { id: user.id } },
-      { isEmailVerified: true },
+    await Promise.all([
+      this.tokenService.delete(payload.jti),
+      this.userService.update(
+        { where: { id: user.id } },
+        { isEmailVerified: true },
+      ),
+    ]);
+
+    return true;
+  }
+
+  async generatePasswordResetToken(userId: number) {
+    return this.tokenService.create(
+      {
+        userId,
+        purpose: 'password-reset',
+      },
+      {
+        secret: this.configService.get('auth.passwordResetSecret'),
+        expiresIn: this.configService.get<number>('auth.passwordResetExpiry')!,
+        persistInDB: true,
+        jwtid: uuidv4(),
+      },
     );
+  }
+
+  async resetPasswordRequest(email: string) {
+    const user = await this.userService.getOne({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const token = await this.generatePasswordResetToken(user.id);
+    const resetUrl = `${this.configService.get('app.frontendUrl')}/authentication/reset-password?token=${token}`;
+
+    await this.notificationService.sendEmailTemplate(
+      user.email,
+      'Reset Your Password',
+      'password-reset.html',
+      {
+        name: user.name,
+        resetUrl,
+      },
+    );
+
+    return true;
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const payload = await this.tokenService.verify(token, {
+      secret: this.configService.get('auth.passwordResetSecret'),
+    });
+
+    if (payload.purpose !== 'password-reset') {
+      throw new BadRequestException('Invalid token purpose');
+    }
+
+    const tokenRecord = await this.tokenService.get(payload.jti);
+    if (!tokenRecord) {
+      throw new BadRequestException('Invalid or expired token');
+    }
+
+    const user = await this.userService.getOne({
+      where: { id: payload.userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await Promise.all([
+      this.userService.update(
+        { where: { id: user.id } },
+        { password: newPassword },
+      ),
+      this.tokenService.delete(payload.jti),
+    ]);
 
     return true;
   }

@@ -32,3 +32,18 @@ export const getUserStatus = async () => {
   const response = await request.get<UserStatusResponse>(`/users/me`);
   return response.data;
 };
+
+export const requestPasswordReset = async (email: string) => {
+  const response = await request.post<boolean>(`/auth/password-resets`, {
+    email,
+  });
+  return response.data;
+};
+
+export const resetPassword = async (token: string, password: string) => {
+  const response = await request.post<boolean>(
+    `/auth/password-resets/reset?token=${token}`,
+    { password }
+  );
+  return response.data;
+};

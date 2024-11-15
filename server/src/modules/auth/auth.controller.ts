@@ -18,6 +18,8 @@ import { EmailVerificationGuard } from '@guards/email-verification.guard';
 import { AuthGuard } from '@guards/auth.guard';
 import { UserService } from '@modules/user/user.service';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { ResetPasswordRequestDto } from './dto/reset-password-request.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -80,5 +82,20 @@ export class AuthController {
 
     await this.authService.sendVerificationEmail(user);
     return true;
+  }
+
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ long: { limit: 5, ttl: 60 * 60 * 1000 } })
+  @Post('password-resets')
+  async resetPasswordRequest(@Body() payload: ResetPasswordRequestDto) {
+    return this.authService.resetPasswordRequest(payload.email);
+  }
+
+  @Post('password-resets/reset')
+  async resetPassword(
+    @Query('token') token: string,
+    @Body() payload: ResetPasswordDto,
+  ) {
+    return this.authService.resetPassword(token, payload.password);
   }
 }
