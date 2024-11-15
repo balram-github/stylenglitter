@@ -49,6 +49,18 @@ export interface OrderItem {
   totalPrice: number;
 }
 
+export interface ShippingAddress {
+  id: number;
+  phoneNumber: string;
+  name: string;
+  email: string;
+  addressLine: string;
+  city: string;
+  state: string;
+  pinCode: string;
+  country: string;
+}
+
 export interface Order {
   id: number;
   orderNo: string;
@@ -56,6 +68,7 @@ export interface Order {
   trackingNo: string | null;
   payment: Payment;
   orderItems: OrderItem[];
+  shippingAddress: ShippingAddress;
   createdAt: string;
 }
 

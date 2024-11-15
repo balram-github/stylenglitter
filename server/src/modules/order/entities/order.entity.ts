@@ -52,7 +52,9 @@ export class Order {
   })
   status: OrderStatus;
 
-  @OneToOne(() => ShippingAddress, (shippingAddress) => shippingAddress.order)
+  @OneToOne(() => ShippingAddress, (shippingAddress) => shippingAddress.order, {
+    eager: true,
+  })
   @JoinColumn({ name: 'shipping_address_id' })
   shippingAddress: ShippingAddress;
 

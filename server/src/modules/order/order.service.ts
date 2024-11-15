@@ -172,7 +172,13 @@ export class OrderService {
   getOrderByOrderId(orderId: number) {
     return this.orderRepository.findOne({
       where: { id: orderId },
-      relations: ['orderItems'],
+      relations: [
+        'orderItems',
+        'orderItems.product',
+        'orderItems.product.images',
+        'orderItems.product.amount',
+        'orderItems.product.category',
+      ],
       withDeleted: true,
     });
   }
@@ -180,7 +186,11 @@ export class OrderService {
   getOrder(filterExpression: FindOptionsWhere<Order>, userId: number) {
     return this.orderRepository.findOne({
       where: { ...filterExpression, user: { id: userId } },
-      relations: ['orderItems'],
+      relations: [
+        'orderItems',
+        'orderItems.product',
+        'orderItems.product.images',
+      ],
       withDeleted: true,
     });
   }

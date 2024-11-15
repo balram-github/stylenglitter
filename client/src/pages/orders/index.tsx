@@ -11,7 +11,7 @@ const NB_ITEMS_PER_PAGE = 10;
 const OrdersPage = () => {
   const { isLoading: isProtectedRouteLoading } = useProtectedRoute();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } =
     useInfiniteQuery({
       queryKey: ["orders"],
       initialPageParam: 1,
@@ -28,7 +28,7 @@ const OrdersPage = () => {
       refetchOnMount: false,
     });
 
-  const isLoading = isProtectedRouteLoading || isFetchingNextPage;
+  const isLoading = isProtectedRouteLoading || isFetching;
 
   const orders = data?.pages.flatMap((page) => page.orders) ?? [];
 
@@ -44,7 +44,7 @@ const OrdersPage = () => {
         <div className="flex flex-col gap-4">
           {isLoading &&
             Array.from({ length: 3 }).map((_, index) => (
-              <Skeleton key={index} className="h-52 w-full" />
+              <Skeleton key={index} className="h-28 w-full" />
             ))}
           {!isLoading && orders.length === 0 && (
             <p className="text-center text-sm text-gray-500">No orders found</p>
