@@ -67,6 +67,7 @@ export class NotificationService {
     try {
       const order = await this.orderService.getOne({
         where: { id: payload.orderId },
+        relations: ['shippingAddress'],
       });
 
       if (!order) {

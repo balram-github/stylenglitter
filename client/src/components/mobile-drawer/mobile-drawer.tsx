@@ -27,7 +27,7 @@ export const MobileDrawer = () => {
           {isLoggedIn ? (
             <SheetClose asChild>
               <Link
-                href="/profile"
+                href="/orders"
                 className="flex items-center gap-2 font-bold text-sm uppercase border-b-2 py-4"
               >
                 <Package size={20} />

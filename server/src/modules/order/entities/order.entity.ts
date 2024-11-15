@@ -59,7 +59,6 @@ export class Order {
   // One order can have multiple order items
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order, {
     cascade: true,
-    eager: true,
   })
   orderItems: OrderItem[];
 

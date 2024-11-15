@@ -46,12 +46,12 @@ export class OrderController {
   }
 
   /**
-   * Get order by orderId
+   * Get order by orderNo
    */
   @UseGuards(AuthGuard)
-  @Get('/:orderId')
-  async getOrder(@Param('orderId') orderId: number, @Auth() auth) {
-    const order = await this.orderService.getOrder(orderId, auth.userId);
+  @Get('/:orderNo')
+  async getOrder(@Param('orderNo') orderNo: string, @Auth() auth) {
+    const order = await this.orderService.getOrder({ orderNo }, auth.userId);
 
     if (!order) {
       throw new NotFoundException('Order not found');
@@ -70,12 +70,12 @@ export class OrderController {
     @Query('limit') limit: number = 10,
     @Auth() auth,
   ) {
-    const orders = await this.orderService.getUserOrders(
+    const response = await this.orderService.getUserOrders(
       auth.userId,
       page,
       limit,
     );
 
-    return orders;
+    return response;
   }
 }

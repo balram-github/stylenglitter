@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useCallback } from "react";
-import { ProductListProps } from "./product-list.types";
-import { ProductCard } from "../product-card/product-card";
+import { OrderListProps } from "./order-list.types";
+import { OrderCard } from "../order-card/order-card";
 
-export const ProductList = ({
+export const OrderList = ({
   data,
   loading,
   loadData,
   hasNext,
-}: ProductListProps) => {
+}: OrderListProps) => {
   const observerTarget = useRef(null);
 
   const handleObserver = useCallback(
@@ -35,9 +35,9 @@ export const ProductList = ({
   }, [handleObserver]);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-6 p-4">
-      {data.map((product) => (
-        <ProductCard key={product.id} data={product} />
+    <div className="flex flex-col gap-4">
+      {data.map((order) => (
+        <OrderCard key={order.id} data={order} />
       ))}
 
       <div ref={observerTarget} className="w-full h-10">

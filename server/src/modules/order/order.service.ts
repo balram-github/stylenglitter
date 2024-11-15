@@ -177,16 +177,16 @@ export class OrderService {
     });
   }
 
-  getOrder(orderId: number, userId: number) {
+  getOrder(filterExpression: FindOptionsWhere<Order>, userId: number) {
     return this.orderRepository.findOne({
-      where: { id: orderId, user: { id: userId } },
+      where: { ...filterExpression, user: { id: userId } },
       relations: ['orderItems'],
       withDeleted: true,
     });
   }
 
-  getUserOrders(userId: number, page: number, limit: number) {
-    return this.orderRepository.find({
+  async getUserOrders(userId: number, page: number, limit: number) {
+    const orders = await this.orderRepository.find({
       where: { user: { id: userId } },
       order: {
         createdAt: 'DESC',
@@ -195,6 +195,10 @@ export class OrderService {
       take: limit + 1,
       withDeleted: true,
     });
+
+    const hasNext = orders.length > limit;
+
+    return { orders: orders.slice(0, limit), hasNext };
   }
 
   @OnEvent(NotificationTopic.PAYMENT_PAID)
