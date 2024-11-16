@@ -17,6 +17,7 @@ import { Payment } from '@/modules/payment/entities/payment.entity';
 import { createOrderNo } from '../helpers/create-order-no';
 import { ShippingAddress } from './shipping-address.entity';
 import { OrderStatus } from '../types/order-status';
+import { TypeOfPayment } from '../types/payment-method';
 @Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn()
@@ -25,6 +26,15 @@ export class Order {
   @Column({ name: 'order_no', type: 'varchar', nullable: false })
   @Index('idx_order_no', { unique: true })
   orderNo: string;
+
+  @Column({
+    name: 'payment_method',
+    type: 'enum',
+    enum: TypeOfPayment,
+    nullable: false,
+    default: TypeOfPayment.PREPAID,
+  })
+  paymentMethod: TypeOfPayment;
 
   @Column({ name: 'payment_id', type: 'int', nullable: true, default: null })
   @Index('idx_payment_id')

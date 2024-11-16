@@ -34,7 +34,7 @@ export class AuthController {
   ) {}
 
   @UseGuards(RefreshGuard)
-  @Get('/refresh-token')
+  @Get('refresh-token')
   async refreshToken(@Auth() auth) {
     const tokenPayload = { userId: auth.userId, cartId: auth.cartId };
 
@@ -51,14 +51,14 @@ export class AuthController {
 
   @UseGuards(ThrottlerGuard)
   @Throttle({ medium: { limit: 5, ttl: 10000 } })
-  @Post('/login')
+  @Post('login')
   login(@Body() payload: LoginDto) {
     return this.authService.login(payload);
   }
 
   @UseGuards(ThrottlerGuard)
   @Throttle({ long: { limit: 3, ttl: 60000 } })
-  @Post('/register')
+  @Post('register')
   register(@Body() payload: CreateUserDto) {
     return this.authService.register(payload);
   }
@@ -103,7 +103,7 @@ export class AuthController {
     return this.authService.resetPassword(token, payload.password);
   }
 
-  @Post('/admin/login')
+  @Post('admin/login')
   async adminLogin(@Body() payload: AdminLoginDto) {
     const adminEmail = this.configService.get<string>('auth.adminEmail');
     const adminPassword = this.configService.get<string>('auth.adminPassword');
@@ -118,14 +118,11 @@ export class AuthController {
       cartId: null,
     };
 
-    const [accessToken, refreshToken] = await Promise.all([
-      this.authService.generateAccessToken(tokenPayload),
-      this.authService.generateRefreshToken(tokenPayload),
-    ]);
+    const accessToken =
+      await this.authService.generateAccessToken(tokenPayload);
 
     return {
       accessToken,
-      refreshToken,
     };
   }
 }
