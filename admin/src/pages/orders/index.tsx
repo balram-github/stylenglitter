@@ -1,4 +1,4 @@
-import OrdersTable from "@/modules/order/orders-table/orders-table";
+import OrdersTable from "@/modules/order/components/orders-table/orders-table";
 import Head from "next/head";
 import React from "react";
 
