@@ -4,11 +4,25 @@ import { AuthGuard } from '@guards/auth.guard';
 import { Auth } from '@decorators/auth';
 import { ApiTags } from '@nestjs/swagger';
 import { GetUserDto } from './dto/get-user.dto';
+import { AdminGuard } from '@/guards/admin.guard';
 
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
+
+  /**
+   * Get logged in admin's details
+   */
+  @UseGuards(AdminGuard)
+  @Get('/admin/me')
+  async getAdminDetails(@Auth() auth) {
+    return {
+      id: auth.userId,
+      name: 'Admin',
+      isAdmin: true,
+    };
+  }
 
   /**
    * Get logged in user's details

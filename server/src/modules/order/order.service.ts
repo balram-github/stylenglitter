@@ -32,6 +32,7 @@ import { PaymentRefundFailedNotificationPayload } from '../notification/types/pa
 import { PaymentRefundCompletedNotificationPayload } from '../notification/types/payment-refund-complete-payload';
 import { Jobs } from '@/jobs/jobs';
 import { Cron } from '@nestjs/schedule';
+import { GetOrderListDto } from './dtos/get-order-list.dto';
 
 @Injectable()
 export class OrderService {
@@ -151,6 +152,7 @@ export class OrderService {
   async updateOrderStatus(
     filterExpression: FindOptionsWhere<Order>,
     status: OrderStatus,
+    trackingNumber?: string,
   ) {
     const order = await this.getOne({ where: filterExpression });
 
@@ -159,6 +161,8 @@ export class OrderService {
     }
 
     order.status = status;
+
+    order.trackingNo = trackingNumber || null;
 
     await this.orderRepository.save(order);
 
@@ -184,9 +188,9 @@ export class OrderService {
     });
   }
 
-  getOrder(filterExpression: FindOptionsWhere<Order>, userId: number) {
+  getOrder(filterExpression: FindOptionsWhere<Order>) {
     return this.orderRepository.findOne({
-      where: { ...filterExpression, user: { id: userId } },
+      where: filterExpression,
       relations: [
         'orderItems',
         'orderItems.product',
@@ -194,6 +198,41 @@ export class OrderService {
       ],
       withDeleted: true,
     });
+  }
+
+  async getOrderList({ orderNo, status, page, limit }: GetOrderListDto) {
+    const where: FindOptionsWhere<Order> = {};
+
+    if (orderNo) {
+      where.orderNo = orderNo;
+    }
+
+    if (status) {
+      where.status = status;
+    }
+
+    const [orders, count] = await Promise.all([
+      this.orderRepository.find({
+        where,
+        relations: [
+          'shippingAddress',
+          'payment',
+          'orderItems',
+          'orderItems.product',
+          'orderItems.product.images',
+        ],
+        order: { createdAt: 'DESC' },
+        skip: (page - 1) * limit,
+        take: limit,
+        withDeleted: true,
+      }),
+      this.orderRepository.count({ where }),
+    ]);
+
+    return {
+      orders,
+      count,
+    };
   }
 
   async getUserOrders(userId: number, page: number, limit: number) {
