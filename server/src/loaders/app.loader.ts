@@ -21,7 +21,11 @@ export default function loader(app: INestApplication<any>) {
 
   // CORS
   app.enableCors({
-    origin: ['https://www.stylenglitter.com', 'http://localhost:3000'],
+    origin: [
+      'https://www.stylenglitter.com',
+      'http://localhost:3000',
+      'https://www.admin.stylenglitter.com',
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
