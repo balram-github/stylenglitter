@@ -3,6 +3,7 @@ import {
   EntityManager,
   FindOneOptions,
   FindOptionsWhere,
+  LessThanOrEqual,
   Repository,
 } from 'typeorm';
 import {
@@ -29,6 +30,8 @@ import { PaymentFailedNotificationPayload } from '../notification/types/payment-
 import { PaymentRefundInitiatedNotificationPayload } from '../notification/types/payment-refund-initiated-payload';
 import { PaymentRefundFailedNotificationPayload } from '../notification/types/payment-refund-failed-payload';
 import { PaymentRefundCompletedNotificationPayload } from '../notification/types/payment-refund-complete-payload';
+import { Jobs } from '@/jobs/jobs';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class OrderService {
@@ -127,8 +130,6 @@ export class OrderService {
       });
 
       await Promise.all(promisesToRun);
-
-      await this.cartService.removeCartItems(cart.id, [], entityManager);
 
       const { paymentGatewayResponse, payment } =
         await this.paymentService.createPayment(
@@ -274,5 +275,40 @@ export class OrderService {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  // Scheduled jobs
+  @Cron(Jobs.SET_PAYMENT_PENDING_ORDERS_TO_PAYMENT_FAILED.cronTime, {
+    name: Jobs.SET_PAYMENT_PENDING_ORDERS_TO_PAYMENT_FAILED.name,
+  })
+  async setPaymentPendingOrdersToPaymentFailed() {
+    console.log(
+      'Running set payment pending orders to payment failed scheduled job',
+    );
+    const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    const pendingOrders = await this.orderRepository.find({
+      where: {
+        status: OrderStatus.PAYMENT_PENDING,
+        createdAt: LessThanOrEqual(last24Hours),
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    const promisesToRun = pendingOrders.map(async (order) => {
+      try {
+        await this.updateOrderStatus(
+          { id: order.id },
+          OrderStatus.PAYMENT_FAILED,
+        );
+      } catch (error) {
+        console.log(`Error updating order ${order.id} to payment failed`);
+        console.error(error);
+      }
+    });
+
+    await Promise.allSettled(promisesToRun);
   }
 }
