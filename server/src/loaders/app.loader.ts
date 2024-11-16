@@ -25,6 +25,7 @@ export default function loader(app: INestApplication<any>) {
       'https://www.stylenglitter.com',
       'http://localhost:3000',
       'https://www.admin.stylenglitter.com',
+      'https://main.d7bw6xdmmxtj1.amplifyapp.com/',
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
