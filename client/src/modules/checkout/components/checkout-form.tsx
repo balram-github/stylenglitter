@@ -20,7 +20,11 @@ import {
 } from "@/constants";
 import { useCartStore } from "@/stores/cart/cart.store";
 import { useQuery } from "@tanstack/react-query";
-import { getCartPurchaseCharges } from "@/services/cart/cart.service";
+import {
+  getCartPurchaseCharges,
+  getUserCart,
+  removeCartItemsFromDB,
+} from "@/services/cart/cart.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import { createOrder } from "@/services/order/order.service";
@@ -34,6 +38,7 @@ import { PaymentSuccessDialog } from "./payment-success-dialog";
 import { PaymentFailedDialog } from "./payment-failed-dialog";
 import { useState } from "react";
 import { trackEvent } from "@/services/tracking/tracking.service";
+import { useRouter } from "next/router";
 
 interface DialogState {
   isOpen: boolean;
@@ -45,6 +50,8 @@ interface DialogState {
 export function CheckoutForm() {
   const {
     cart: { cartItems },
+    setCart,
+    setLoading: setCartLoading,
   } = useCartStore();
 
   const form = useForm<CheckoutFormSchema>({
@@ -85,6 +92,24 @@ export function CheckoutForm() {
     orderNo: "",
   });
 
+  const router = useRouter();
+
+  const resetCart = async () => {
+    setCartLoading(true);
+    try {
+      await removeCartItemsFromDB(
+        cartItems.map((item) => item.productId),
+        false
+      );
+      const newCart = await getUserCart();
+      setCart(newCart);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setCartLoading(false);
+    }
+  };
+
   const onSubmit: SubmitHandler<CheckoutFormSchema> = async (
     data: CheckoutFormSchema
   ) => {
@@ -118,12 +143,16 @@ export function CheckoutForm() {
             return;
           }
 
+          router.push(`/orders/${orderNo}`);
+
           setDialogState({
             isOpen: true,
             type: "success",
             message: "Thank you for shopping with us!",
             orderNo,
           });
+
+          resetCart();
         },
         notes: {
           orderNo,
