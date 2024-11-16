@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ProductThemeService } from './product-theme.service';
@@ -13,6 +14,7 @@ import { ProductTheme } from './entities/product-theme.entity';
 import { Product } from '../product/entities/product.entity';
 import { CreateProductThemeDto } from './dtos/create-product-theme.dto';
 import { GetThemeProductsDto } from './dtos/get-theme-products.dto';
+import { AdminGuard } from '@/guards/admin.guard';
 
 @ApiTags('Product Themes')
 @Controller('product-themes')
@@ -52,6 +54,7 @@ export class ProductThemeController {
     return this.productThemeService.getProductsById(productTheme.id, query);
   }
 
+  @UseGuards(AdminGuard)
   @Post('/')
   async createProductTheme(
     @Body() body: CreateProductThemeDto,

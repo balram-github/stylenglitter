@@ -3,12 +3,14 @@ import {
   Controller,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Express } from 'express';
 import { SystemService } from './system.service';
+import { AdminGuard } from '@/guards/admin.guard';
 
 @ApiTags('System')
 @Controller('system')
@@ -18,6 +20,7 @@ export class SystemController {
   /**
    * Create products in bulk via xlsx
    */
+  @UseGuards(AdminGuard)
   @Post('products/upload')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -44,6 +47,7 @@ export class SystemController {
   /**
    * Create categories in bulk via xlsx
    */
+  @UseGuards(AdminGuard)
   @Post('categories/upload')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -70,6 +74,7 @@ export class SystemController {
   /**
    * Create product themes in bulk via xlsx
    */
+  @UseGuards(AdminGuard)
   @Post('product-themes/upload')
   @ApiConsumes('multipart/form-data')
   @ApiBody({

@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { ApiTags } from '@nestjs/swagger';
@@ -13,6 +14,7 @@ import { CreateCategoryDto } from './dtos/create-category.dto';
 import { Category } from './category.entity';
 import { Product } from '../product/entities/product.entity';
 import { GetCategoryProductsDto } from './dtos/get-category-products.dto';
+import { AdminGuard } from '@/guards/admin.guard';
 
 @ApiTags('Categories')
 @Controller('categories')
@@ -52,6 +54,7 @@ export class CategoryController {
     return this.categoryService.getProductsById(category.id, query);
   }
 
+  @UseGuards(AdminGuard)
   @Post('/')
   async createCategory(@Body() body: CreateCategoryDto): Promise<Category> {
     return this.categoryService.create(body);

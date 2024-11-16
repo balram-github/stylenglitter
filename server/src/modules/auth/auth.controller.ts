@@ -7,6 +7,7 @@ import {
   Query,
   NotFoundException,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
@@ -20,6 +21,8 @@ import { UserService } from '@modules/user/user.service';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ResetPasswordRequestDto } from './dto/reset-password-request.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ConfigService } from '@nestjs/config';
+import { AdminLoginDto } from './dto/admin-login.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -27,6 +30,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private userService: UserService,
+    private configService: ConfigService,
   ) {}
 
   @UseGuards(RefreshGuard)
@@ -97,5 +101,31 @@ export class AuthController {
     @Body() payload: ResetPasswordDto,
   ) {
     return this.authService.resetPassword(token, payload.password);
+  }
+
+  @Post('/admin/login')
+  async adminLogin(@Body() payload: AdminLoginDto) {
+    const adminEmail = this.configService.get<string>('auth.adminEmail');
+    const adminPassword = this.configService.get<string>('auth.adminPassword');
+
+    if (payload.email !== adminEmail || payload.password !== adminPassword) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const tokenPayload = {
+      userId: 'admin',
+      isAdmin: true,
+      cartId: null,
+    };
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.authService.generateAccessToken(tokenPayload),
+      this.authService.generateRefreshToken(tokenPayload),
+    ]);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }

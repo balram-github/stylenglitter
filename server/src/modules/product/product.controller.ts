@@ -7,12 +7,14 @@ import {
   Param,
   Patch,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { Product } from './entities/product.entity';
 import { EditProductDto } from './dtos/edit-product.dto';
 import { ProductService } from './product.service';
+import { AdminGuard } from '@/guards/admin.guard';
 
 @ApiTags('Products')
 @Controller('products')
@@ -50,6 +52,7 @@ export class ProductController {
   /**
    * Create a product
    */
+  @UseGuards(AdminGuard)
   @Put('/')
   async createProduct(@Body() payload: CreateProductDto): Promise<Product> {
     return this.productService.upsert(payload);
@@ -58,6 +61,7 @@ export class ProductController {
   /**
    * Edit a product
    */
+  @UseGuards(AdminGuard)
   @Patch('/:productId')
   async editProduct(
     @Param('productId') productId: number,
@@ -69,6 +73,7 @@ export class ProductController {
   /**
    * Delete a product
    */
+  @UseGuards(AdminGuard)
   @Delete('/:productId')
   async deleteProduct(@Param('productId') productId: number) {
     return this.productService.delete(productId);

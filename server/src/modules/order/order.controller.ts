@@ -15,6 +15,7 @@ import { AuthGuard } from '@guards/auth.guard';
 import { Auth } from '@decorators/auth';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { UpdateOrderStatusDto } from './dtos/update-order-status.dto';
+import { AdminGuard } from '@/guards/admin.guard';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -37,6 +38,7 @@ export class OrderController {
   /**
    * Update order status
    */
+  @UseGuards(AdminGuard)
   @Patch('/:orderId/status')
   updateOrderStatus(
     @Param('orderId') orderId: number,

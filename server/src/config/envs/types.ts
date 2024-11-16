@@ -92,4 +92,10 @@ export class EnvironmentVariables {
 
   @IsString()
   PASSWORD_RESET_SECRET: string;
+
+  @IsString()
+  ADMIN_EMAIL: string;
+
+  @IsString()
+  ADMIN_PASSWORD: string;
 }

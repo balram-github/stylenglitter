@@ -1,4 +1,5 @@
 export interface AuthTokenPayload {
-  userId: number;
-  cartId: number;
+  userId: number | string;
+  cartId: number | null;
+  isAdmin?: boolean;
 }
