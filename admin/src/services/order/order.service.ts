@@ -3,6 +3,7 @@ import {
   GetOrderResponse,
   GetOrdersParams,
   GetOrdersResponse,
+  OrderStatus,
 } from "./order.types";
 
 export const getOrders = async (params: GetOrdersParams) => {
@@ -19,4 +20,11 @@ export const getOrder = async (orderNo: string) => {
     data: { data },
   } = await request.get<GetOrderResponse>(`/orders/${orderNo}`);
   return data;
+};
+
+export const updateOrderStatus = async (
+  orderId: number,
+  status: OrderStatus
+) => {
+  await request.patch(`/orders/${orderId}/status`, { status });
 };

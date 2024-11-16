@@ -15,7 +15,7 @@ const OrderDetailsPage = () => {
 
   const orderNo = router.query.orderNo as string;
 
-  const { data, isFetching } = useQuery({
+  const { data, isFetching, refetch } = useQuery({
     queryKey: ["order", orderNo],
     queryFn: () => getOrder(orderNo),
     enabled: !!orderNo,
@@ -59,7 +59,9 @@ const OrderDetailsPage = () => {
             </h2>
             <div className="w-full">
               {isLoading && <Skeleton className="h-12 md:h-4/5 w-full" />}
-              {!isLoading && data && <OrderDetails data={data} />}
+              {!isLoading && data && (
+                <OrderDetails data={data} refetch={refetch} />
+              )}
             </div>
           </div>
         </div>
