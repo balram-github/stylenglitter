@@ -19,13 +19,13 @@ export const OrderDetails = ({ data, refetch }: OrderDetailsProps) => {
       setIsUpdateStatusDialogOpen(false);
       refetch();
       toast({
-        title: "Order status updated",
+        title: "Order status updated!",
         description: "The order status has been updated successfully",
       });
     } catch (error) {
       console.error(error);
       toast({
-        title: "Failed to update order status",
+        title: "Failed to update order status!",
         description: "Please try again later",
       });
     }
