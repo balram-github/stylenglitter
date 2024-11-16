@@ -10,9 +10,12 @@ export const OrderDetails = ({ data, refetch }: OrderDetailsProps) => {
   const [isUpdateStatusDialogOpen, setIsUpdateStatusDialogOpen] =
     useState(false);
 
-  const handleUpdateStatus = async (newStatus: OrderStatus) => {
+  const handleUpdateStatus = async (
+    newStatus: OrderStatus,
+    trackingNumber?: string
+  ) => {
     try {
-      await updateOrderStatus(data.id, newStatus);
+      await updateOrderStatus(data.id, newStatus, trackingNumber);
       setIsUpdateStatusDialogOpen(false);
       refetch();
       toast({
@@ -54,7 +57,7 @@ export const OrderDetails = ({ data, refetch }: OrderDetailsProps) => {
             <div className="flex items-center gap-4">
               <p className="text-sm text-gray-600">
                 Tracking Number:{" "}
-                <span className="font-medium">{data.trackingNo}</span>
+                <span className="font-medium">{data.trackingNo || "-"}</span>
               </p>
             </div>
           </div>
@@ -82,6 +85,7 @@ export const OrderDetails = ({ data, refetch }: OrderDetailsProps) => {
         open={isUpdateStatusDialogOpen}
         onOpenChange={setIsUpdateStatusDialogOpen}
         currentStatus={data.status}
+        currentTrackingNumber={data.trackingNo}
         onSubmit={handleUpdateStatus}
       />
     </>

@@ -24,7 +24,8 @@ export const getOrder = async (orderNo: string) => {
 
 export const updateOrderStatus = async (
   orderId: number,
-  status: OrderStatus
+  status: OrderStatus,
+  trackingNumber?: string,
 ) => {
-  await request.patch(`/orders/${orderId}/status`, { status });
+  await request.patch(`/orders/${orderId}/status`, { status, trackingNumber });
 };

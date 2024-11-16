@@ -24,9 +24,11 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { OrderStatus } from "@/services/order/order.types";
+import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
   status: z.nativeEnum(OrderStatus),
+  trackingNumber: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -35,29 +37,38 @@ interface OrderStatusDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   currentStatus: OrderStatus;
-  onSubmit: (status: OrderStatus) => void;
+  currentTrackingNumber: string | null;
+  onSubmit: (status: OrderStatus, trackingNumber?: string) => void;
 }
 
 export const OrderStatusDialog = ({
   open,
   onOpenChange,
   currentStatus,
+  currentTrackingNumber,
   onSubmit,
 }: OrderStatusDialogProps) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       status: currentStatus,
+      trackingNumber: currentTrackingNumber || "",
     },
   });
 
   const handleSubmit = (values: FormValues) => {
-    onSubmit(values.status);
+    onSubmit(values.status, values.trackingNumber);
     onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        form.reset();
+        onOpenChange(open);
+      }}
+    >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Update Order Status</DialogTitle>
@@ -93,11 +104,26 @@ export const OrderStatusDialog = ({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="trackingNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tracking Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter tracking number" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
             <div className="flex justify-end space-x-2">
               <Button
-                type="button"
+                type="reset"
                 variant="outline"
-                onClick={() => onOpenChange(false)}
+                onClick={() => {
+                  form.reset();
+                  onOpenChange(false);
+                }}
               >
                 Cancel
               </Button>

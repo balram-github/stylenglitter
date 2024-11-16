@@ -152,6 +152,7 @@ export class OrderService {
   async updateOrderStatus(
     filterExpression: FindOptionsWhere<Order>,
     status: OrderStatus,
+    trackingNumber?: string,
   ) {
     const order = await this.getOne({ where: filterExpression });
 
@@ -160,6 +161,8 @@ export class OrderService {
     }
 
     order.status = status;
+
+    order.trackingNo = trackingNumber || null;
 
     await this.orderRepository.save(order);
 

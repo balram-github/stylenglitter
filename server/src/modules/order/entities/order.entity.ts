@@ -52,7 +52,7 @@ export class Order {
   user: User;
 
   @Column({ name: 'tracking_no', type: 'varchar', nullable: true })
-  trackingNo: string;
+  trackingNo: string | null;
 
   @Column({
     name: 'status',

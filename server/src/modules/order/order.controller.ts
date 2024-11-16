@@ -99,6 +99,10 @@ export class OrderController {
     @Param('orderId') orderId: number,
     @Body() body: UpdateOrderStatusDto,
   ) {
-    return this.orderService.updateOrderStatus({ id: orderId }, body.status);
+    return this.orderService.updateOrderStatus(
+      { id: orderId },
+      body.status,
+      body.trackingNumber,
+    );
   }
 }
