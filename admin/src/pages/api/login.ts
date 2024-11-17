@@ -22,7 +22,7 @@ export default async function handler(
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        domain: process.env.NODE_ENV === "production" ? ".amplifyapp.com" : undefined,
+        domain: process.env.NODE_ENV === "production" ? ".stylenglitter.com" : undefined,
         maxAge: 15 * 60, // 15 minutes
       }),
       serialize("userLoggedIn", "true", {
@@ -30,7 +30,7 @@ export default async function handler(
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        domain: process.env.NODE_ENV === "production" ? ".amplifyapp.com" : undefined
+        domain: process.env.NODE_ENV === "production" ? ".stylenglitter.com" : undefined
       }),
     ]);
 
