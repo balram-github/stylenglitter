@@ -316,7 +316,8 @@ export function CheckoutForm() {
                       </FormControl>
                       <FormLabel className="font-normal">
                         <div>
-                          Cash on Delivery - Rs. {COD_ORDER_DELIVERY_CHARGE}
+                          Cash on Delivery - Rs. {COD_ORDER_DELIVERY_CHARGE}{" "}
+                          (non-refundable)
                         </div>
                       </FormLabel>
                     </FormItem>
