@@ -64,7 +64,7 @@ export const ProductDetails = ({
         {product.name}
       </h1>
 
-      <div className="text-rose-400 flex items-baseline md:gap-2 gap-4 mb-3">
+      <div className="text-primary flex items-baseline md:gap-2 gap-4 mb-3">
         <div className="text-xl md:text-2xl">
           Rs. {parseFloat(product.amount.price).toFixed(2)}
         </div>
@@ -80,9 +80,9 @@ export const ProductDetails = ({
         <>
           <p className="text-sm">
             Hurry up! Only{" "}
-            <span className="font-bold text-rose-400">{product.qty}</span> left.
+            <span className="font-bold text-primary">{product.qty}</span> left.
           </p>
-          <div className="w-full h-1.5 bg-rose-400 rounded-full my-4" />
+          <div className="w-full h-1.5 bg-primary rounded-full my-4" />
         </>
       )}
 
@@ -143,7 +143,7 @@ export const ProductDetails = ({
           />
           <Button
             type="submit"
-            className="w-full md:w-80 bg-rose-400 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full md:w-80 bg-primary text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
             disabled={!isProductInStock}
             isLoading={form.formState.isSubmitting}
           >

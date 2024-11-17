@@ -380,7 +380,7 @@ export function CheckoutForm() {
             type="submit"
             isLoading={form.formState.isSubmitting}
             disabled={!form.formState.isValid || isFetchingPurchaseCharges}
-            className="w-full max-w-80 bg-rose-400 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full max-w-80 bg-primary text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             Place Order
           </Button>

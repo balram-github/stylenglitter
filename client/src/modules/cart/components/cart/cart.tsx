@@ -116,7 +116,7 @@ export const Cart = () => {
         <Button variant="ghost" size="icon" className="relative">
           <ShoppingCart size={20} />
           {cart.cartItems.length > 0 && (
-            <div className="absolute top-0 right-0 bg-rose-500 text-white min-w-4 min-h-4 rounded-full flex items-center justify-center text-xs">
+            <div className="absolute top-0 right-0 bg-primary text-white min-w-4 min-h-4 rounded-full flex items-center justify-center text-xs">
               {cart.cartItems.length}
             </div>
           )}
@@ -168,7 +168,7 @@ export const Cart = () => {
                   <SheetClose asChild>
                     <Button
                       onClick={handleCheckout}
-                      className="w-full max-w-80 bg-rose-400 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      className="w-full max-w-80 bg-primary text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
                       Checkout
                     </Button>

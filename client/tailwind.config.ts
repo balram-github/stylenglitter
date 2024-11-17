@@ -27,7 +27,11 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        primary: "#EE66A6",
         rose,
+      },
+      backgroundColor: {
+        primary: "#EE66A6",
       },
       borderRadius: {
         lg: "var(--radius)",

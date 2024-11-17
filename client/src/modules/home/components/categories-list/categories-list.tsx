@@ -12,7 +12,7 @@ export const CategoriesList = ({ categories }: CategoriesListProps) => {
           <Link
             href={`/categories/${category.slug}`}
             key={category.id}
-            className="hover:text-rose-500 transition-all duration-150"
+            className="hover:text-primary transition-all duration-150"
           >
             <div className="relative overflow-hidden">
               <Image

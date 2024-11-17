@@ -180,7 +180,7 @@ const RegisterForm = () => {
               Already have an account?{" "}
               <Link
                 href={`/authentication/login?redirectTo=${redirectTo}`}
-                className="underline text-rose-500"
+                className="underline text-primary"
               >
                 Login
               </Link>

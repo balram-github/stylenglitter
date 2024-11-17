@@ -5,7 +5,7 @@ import React from "react";
 
 export const Footer = () => {
   return (
-    <footer className="bg-rose-200">
+    <footer className="bg-primary">
       <div className="container mx-auto pt-8 md:pt-10">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 px-4 pb-6 md:pb-8">
           <div className="col-span-2 md:col-span-1">
@@ -16,7 +16,7 @@ export const Footer = () => {
               Discover trendy fashion accessories and glitter products at Style
               Glitter. Shop our curated collection of stylish items.
             </p>
-            <Link href={INSTAGRAM_URL} className="text-rose-500">
+            <Link href={INSTAGRAM_URL} className="text-primary">
               <InstagramIcon />
             </Link>
           </div>

@@ -112,7 +112,7 @@ const LoginForm = () => {
             <div className="flex justify-end">
               <Link
                 href={`/authentication/request-password-reset`}
-                className="text-sm text-gray-500 hover:underline hover:text-rose-500"
+                className="text-sm text-gray-500 hover:underline hover:text-primary"
               >
                 Forgot password?
               </Link>
@@ -126,7 +126,7 @@ const LoginForm = () => {
               Don&apos;t have an account?{" "}
               <Link
                 href={`/authentication/register?redirectTo=${redirectTo}`}
-                className="underline text-rose-500"
+                className="underline text-primary"
               >
                 Register
               </Link>

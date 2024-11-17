@@ -12,7 +12,7 @@ export const ProductThemesSlider = ({
         <Link
           key={productTheme.id}
           href={`/product-themes/${productTheme.slug}`}
-          className="hover:text-rose-500 transition-all duration-150"
+          className="hover:text-primary transition-all duration-150"
         >
           <div className="relative flex justify-center items-center flex-col text-center">
             <div className="w-20 h-20 md:w-36 md:h-36 rounded-full overflow-hidden">

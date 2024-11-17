@@ -42,7 +42,7 @@ export const CategoryProductList = ({ data }: CategoryProductListProps) => {
       </Carousel>
       <div className="my-6 text-center">
         <Link href={`/categories/${data.slug}`}>
-          <Button className="uppercase rounded-full bg-rose-400 text-white w-full md:w-64">
+          <Button className="uppercase rounded-full bg-primary text-white w-full md:w-64">
             View All
           </Button>
         </Link>
