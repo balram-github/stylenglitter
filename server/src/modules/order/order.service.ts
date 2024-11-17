@@ -272,9 +272,13 @@ export class OrderService {
         );
 
         if (product) {
-          await this.productService.edit(product.id, {
-            qty: product.qty + orderItem.qty,
-          });
+          await this.productService.edit(
+            product.id,
+            {
+              qty: product.qty + orderItem.qty,
+            },
+            entityManager,
+          );
         }
       });
     });
