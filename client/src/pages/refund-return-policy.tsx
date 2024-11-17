@@ -74,8 +74,7 @@ const RefundReturnPolicy = () => {
           <p className="text-base md:text-lg mb-4 md:mb-8 leading-8">
             <strong>Style Glitter</strong> reserves the right to amend this
             Return, Refund, and Cancellation Policy at any time. Any changes
-            will be posted on this page, and customers will be notified via
-            email.
+            will be posted on this page.
           </p>
           <p className="text-base md:text-lg mb-4 md:mb-8 leading-8">
             By shopping with <strong>Style Glitter</strong>, you agree to this

@@ -39,6 +39,7 @@ import { PaymentFailedDialog } from "./payment-failed-dialog";
 import { useState } from "react";
 import { trackEvent } from "@/services/tracking/tracking.service";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 interface DialogState {
   isOpen: boolean;
@@ -364,6 +365,16 @@ export function CheckoutForm() {
             </>
           )}
         </div>
+        <p className="text-sm text-gray-500">
+          By placing an order, you agree to our{" "}
+          <Link href="/shipping-policy" className="underline">
+            Shipping Policy
+          </Link>{" "}
+          and{" "}
+          <Link href="/refund-return-policy" className="underline">
+            Refund & Return Policy
+          </Link>
+        </p>
         <div className="flex justify-center">
           <Button
             type="submit"
