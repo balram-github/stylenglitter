@@ -34,6 +34,14 @@ export class Payment {
   @Column({ name: 'amount', type: 'decimal', nullable: false })
   amount: number;
 
+  @Column({
+    name: 'pending_amount',
+    type: 'decimal',
+    nullable: false,
+    default: 0,
+  })
+  pendingAmount: number;
+
   @OneToOne(() => Order, (order) => order.payment)
   order: Order;
 

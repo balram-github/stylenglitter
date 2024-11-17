@@ -100,11 +100,12 @@ export class OrderService {
       const order = this.orderRepository.create({
         user: { id: userId },
         shippingAddress: savedShippingAddress,
+        paymentMethod,
       });
 
       const savedOrder = await entityManager.save(order);
 
-      const { payNow: totalOrderValue } =
+      const { payNow: totalOrderValue, payLater: pendingAmount } =
         await this.cartService.getCartPurchaseCharges(
           lockedCartItems,
           paymentMethod,
@@ -137,6 +138,7 @@ export class OrderService {
           savedOrder.id,
           {
             amount: totalOrderValue,
+            pendingAmount,
           },
           entityManager,
         );

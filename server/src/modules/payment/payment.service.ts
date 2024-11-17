@@ -58,6 +58,7 @@ export class PaymentService {
       referenceNo: paymentReferenceNo,
       paymentGatewayId: response.id,
       amount: payload.amount,
+      pendingAmount: payload.pendingAmount,
     });
 
     const savedPayment = await transactionEntityManager.save(payment);
