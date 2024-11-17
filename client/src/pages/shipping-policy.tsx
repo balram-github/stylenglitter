@@ -77,9 +77,9 @@ const ShippingPolicy = () => {
               Prepaid order: <strong>Rs {PREPAID_ORDER_DELIVERY_CHARGE}</strong>
             </li>
             <li>
-              COD (Cash on Delivery) mode: Customer to pay{" "}
-              <strong>Rs {COD_ORDER_DELIVERY_CHARGE}</strong> online upfront to
-              place a COD order
+              Customer to pay COD delivery charges{" "}
+              <strong>Rs {COD_ORDER_DELIVERY_CHARGE}</strong>{" "}
+              online(non-refundable) to place a COD order
             </li>
           </ul>
           <p className="text-base md:text-lg mb-4 md:mb-8 leading-8 font-bold">
