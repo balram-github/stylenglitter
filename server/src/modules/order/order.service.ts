@@ -251,6 +251,35 @@ export class OrderService {
     return { orders: orders.slice(0, limit), hasNext };
   }
 
+  private async restoreOrderedProductQty(order: Order) {
+    const promisesToRun = order.orderItems.map(async (orderItem) => {
+      return this.dataSource.manager.transaction(async (entityManager) => {
+        if (!orderItem.product) {
+          console.warn(
+            'Order item product not found while restoring product qty',
+          );
+          return;
+        }
+
+        const product = await this.productService.getOne(
+          {
+            where: { id: orderItem.product.id },
+            lock: { mode: 'pessimistic_write' },
+          },
+          entityManager,
+        );
+
+        if (product) {
+          await this.productService.edit(product.id, {
+            qty: product.qty + orderItem.qty,
+          });
+        }
+      });
+    });
+
+    await Promise.all(promisesToRun);
+  }
+
   @OnEvent(NotificationTopic.PAYMENT_PAID)
   private async handlePaymentPaidEvent(
     payload: PaymentPaidNotificationPayload,
@@ -271,7 +300,21 @@ export class OrderService {
     try {
       const { paymentId } = payload;
 
-      await this.updateOrderStatus({ paymentId }, OrderStatus.PAYMENT_FAILED);
+      const order = await this.getOne({
+        where: { paymentId },
+        relations: ['orderItems'],
+      });
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      await this.updateOrderStatus(
+        { id: order.id },
+        OrderStatus.PAYMENT_FAILED,
+      );
+
+      await this.restoreOrderedProductQty(order);
     } catch (error) {
       console.error(error);
     }
@@ -331,9 +374,7 @@ export class OrderService {
         status: OrderStatus.PAYMENT_PENDING,
         createdAt: LessThanOrEqual(last24Hours),
       },
-      select: {
-        id: true,
-      },
+      relations: ['orderItems'],
     });
 
     const promisesToRun = pendingOrders.map(async (order) => {
@@ -342,6 +383,8 @@ export class OrderService {
           { id: order.id },
           OrderStatus.PAYMENT_FAILED,
         );
+
+        await this.restoreOrderedProductQty(order);
       } catch (error) {
         console.log(`Error updating order ${order.id} to payment failed`);
         console.error(error);
