@@ -26,7 +26,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        domain: process.env.NODE_ENV === "production" ? ".d7bw6xdmmxtj1.amplifyapp.com" : undefined,
+        domain: process.env.NODE_ENV === "production" ? ".amplifyapp.com" : undefined,
         maxAge: 0
       }),
       serialize("userLoggedIn", "", {
@@ -34,7 +34,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        domain: process.env.NODE_ENV === "production" ? ".d7bw6xdmmxtj1.amplifyapp.com" : undefined,
+        domain: process.env.NODE_ENV === "production" ? ".amplifyapp.com" : undefined,
         maxAge: 0
       }),
     ]);
