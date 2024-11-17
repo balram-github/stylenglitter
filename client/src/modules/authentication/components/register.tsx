@@ -52,6 +52,11 @@ const RegisterForm = () => {
   const onSubmit: SubmitHandler<RegisterFormValues> = async (values) => {
     try {
       await register(values);
+      toast({
+        title: "Successfully registered!",
+        description: "Please login to continue.",
+      });
+      router.push(`/authentication/login`);
     } catch (error) {
       let errorMsg = (error as Error).message;
       if (isRequestError(error)) {
@@ -60,7 +65,7 @@ const RegisterForm = () => {
       }
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
+        title: "Uh oh! Something went wrong!",
         description: errorMsg,
       });
       throw error;
@@ -72,14 +77,14 @@ const RegisterForm = () => {
         <CardTitle className="text-2xl">Register</CardTitle>
         <CardDescription>Enter your details below to register</CardDescription>
       </CardHeader>
-      {form.formState.isSubmitSuccessful && (
+      {/* {form.formState.isSubmitSuccessful && (
         <CardContent className="grid gap-4">
           <p>
             Successfully registered! We are sending you an email to verify your
             account. Please check your email.
           </p>
         </CardContent>
-      )}
+      )} */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="grid gap-4">

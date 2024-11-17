@@ -113,8 +113,8 @@ export class AuthService {
       throw new BadRequestException('A user with this email already exists');
     }
 
-    const newUser = await this.userService.create(payload);
-    await this.sendVerificationEmail(newUser);
+    await this.userService.create(payload);
+    // await this.sendVerificationEmail(newUser);
 
     return true;
   }

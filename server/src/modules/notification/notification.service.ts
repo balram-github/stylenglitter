@@ -57,7 +57,9 @@ export class NotificationService {
     const template = handlebars.compile(templateSource);
     const htmlContent = template(context);
 
-    return this.sendEmail(to, subject, htmlContent);
+    console.log(htmlContent);
+
+    // return this.sendEmail(to, subject, htmlContent);
   }
 
   @OnEvent(NotificationTopic.ORDER_STATUS_UPDATED)
