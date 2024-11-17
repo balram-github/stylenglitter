@@ -40,7 +40,7 @@ export class CartController {
 
     // Remove items with quantity 0 or less
     const itemsToRemove = cart.cartItems
-      .filter((item) => item.qty <= 0)
+      .filter((item) => item.product.qty <= 0)
       .map((item) => item.product.id);
 
     if (itemsToRemove.length > 0) {
