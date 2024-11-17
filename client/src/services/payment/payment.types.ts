@@ -21,6 +21,7 @@ export enum PaymentStatus {
 export interface Payment {
   id: number;
   amount: string;
+  pendingAmount: string;
   status: PaymentStatus;
   referenceNo: string;
   createdAt: string;

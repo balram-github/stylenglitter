@@ -70,6 +70,7 @@ export interface Order {
   orderItems: OrderItem[];
   shippingAddress: ShippingAddress;
   createdAt: string;
+  paymentMethod: TypeOfPayment;
 }
 
 export interface GetOrdersParams {

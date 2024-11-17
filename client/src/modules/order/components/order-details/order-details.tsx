@@ -2,6 +2,7 @@ import React from "react";
 import { OrderDetailsProps } from "./order-details.types";
 import { OrderStatusBadge } from "../order-status-badge/order-status-badge";
 import { TRACK_ORDER_URL } from "@/constants";
+import { TypeOfPayment } from "@/services/order/order.types";
 
 export const OrderDetails = ({ data }: OrderDetailsProps) => {
   return (
@@ -54,6 +55,29 @@ export const OrderDetails = ({ data }: OrderDetailsProps) => {
           <p className="mb-1">Phone: {data.shippingAddress.phoneNumber}</p>
           {data.shippingAddress.email && (
             <p className="mb-1">Email: {data.shippingAddress.email}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Payment Details */}
+      <div className="border-t pt-4">
+        <h3 className="font-bold mb-2">Payment Details</h3>
+        <div className="text-sm text-gray-600">
+          <p className="mb-2">
+            Payment Method:{" "}
+            <span className="font-bold uppercase">{data.paymentMethod}</span>
+          </p>
+          <p className="mb-2">
+            Amount Paid:{" "}
+            <span className="font-bold">Rs. {data.payment.amount}</span>
+          </p>
+          {data.paymentMethod === TypeOfPayment.COD && (
+            <p className="mb-2">
+              Amount to pay on delivery:{" "}
+              <span className="font-bold">
+                Rs. {data.payment.pendingAmount}
+              </span>
+            </p>
           )}
         </div>
       </div>

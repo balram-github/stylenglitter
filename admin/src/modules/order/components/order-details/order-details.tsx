@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { OrderDetailsProps } from "./order-details.types";
 import { OrderStatusDialog } from "../order-status-dialog/order-status-dialog";
 import { OrderStatusBadge } from "../order-status-badge/order-status-badge";
-import { OrderStatus } from "@/services/order/order.types";
+import { OrderStatus, TypeOfPayment } from "@/services/order/order.types";
 import { updateOrderStatus } from "@/services/order/order.service";
 import { toast } from "@/hooks/use-toast";
 
@@ -77,6 +77,28 @@ export const OrderDetails = ({ data, refetch }: OrderDetailsProps) => {
             <p className="mb-1">Phone: {data.shippingAddress.phoneNumber}</p>
             {data.shippingAddress.email && (
               <p className="mb-1">Email: {data.shippingAddress.email}</p>
+            )}
+          </div>
+        </div>
+        {/* Payment Details */}
+        <div className="border-t pt-4">
+          <h3 className="font-bold mb-2">Payment Details</h3>
+          <div className="text-sm text-gray-600">
+            <p className="mb-2">
+              Payment Method:{" "}
+              <span className="font-bold uppercase">{data.paymentMethod}</span>
+            </p>
+            <p className="mb-2">
+              Amount Paid:{" "}
+              <span className="font-bold">Rs. {data.payment.amount}</span>
+            </p>
+            {data.paymentMethod === TypeOfPayment.COD && (
+              <p className="mb-2">
+                Amount to pay on delivery:{" "}
+                <span className="font-bold">
+                  Rs. {data.payment.pendingAmount}
+                </span>
+              </p>
             )}
           </div>
         </div>
