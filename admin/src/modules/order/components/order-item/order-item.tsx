@@ -23,7 +23,6 @@ export const OrderItem = ({ data }: OrderItemProps) => {
           <div className="flex items-center gap-2">
             <span className="text-sm">Qty {data.qty}</span>
           </div>
-          <p className="text-sm text-gray-500">Rs. {Number(data.totalPrice)}</p>
         </div>
       </div>
     </div>
