@@ -307,6 +307,14 @@ function OrdersTable() {
 
 export const getColumns = (): ColumnDef<Order>[] => [
   {
+    accessorFn: (row) => row.createdAt,
+    header: "Placed on",
+    cell: (info) => {
+      const date = new Date(info.getValue() as string);
+      return date.toLocaleDateString();
+    },
+  },
+  {
     accessorFn: (row) => row.orderNo,
     header: "Order No",
     cell: (info) => info.getValue(),

@@ -19,6 +19,9 @@ export const OrderItem = ({ data }: OrderItemProps) => {
         <div className="flex justify-between items-center">
           <p className="font-bold">{data.product.name}</p>
         </div>
+        <div className="flex justify-between items-center mt-2">
+          <span className="text-sm">Code: {data.product.code}</span>
+        </div>
         <div className="flex justify-between mt-auto items-center">
           <div className="flex items-center gap-2">
             <span className="text-sm">Qty {data.qty}</span>
