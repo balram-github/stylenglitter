@@ -6,7 +6,7 @@ export const Jobs = {
     name: 'removeExpiredTokens',
   },
   SET_PAYMENT_PENDING_ORDERS_TO_PAYMENT_FAILED: {
-    cronTime: CronExpression.EVERY_DAY_AT_MIDNIGHT,
+    cronTime: CronExpression.EVERY_HOUR,
     name: 'setPaymentPendingOrdersToPaymentFailed',
   },
 };

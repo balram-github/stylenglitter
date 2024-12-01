@@ -373,12 +373,12 @@ export class OrderService {
     console.log(
       'Running set payment pending orders to payment failed scheduled job',
     );
-    const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const last12Hours = new Date(Date.now() - 12 * 60 * 60 * 1000);
 
     const pendingOrders = await this.orderRepository.find({
       where: {
         status: OrderStatus.PAYMENT_PENDING,
-        createdAt: LessThanOrEqual(last24Hours),
+        createdAt: LessThanOrEqual(last12Hours),
       },
       relations: ['orderItems'],
     });
