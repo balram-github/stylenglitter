@@ -183,7 +183,9 @@ export const ProductDetails = ({
           </li>
           <li className="py-2">COD available</li>
           <li className="py-2">
-            Pay flat Rs. {COD_ORDER_DELIVERY_CHARGE} upfront for COD orders.
+            Customer to pay COD delivery charges{" "}
+            <strong>Rs {COD_ORDER_DELIVERY_CHARGE}</strong> online
+            (non-refundable) to place a COD order
           </li>
           <li className="py-2">
             Delivery time: 5-9 days (India). Please note that the delivery time
