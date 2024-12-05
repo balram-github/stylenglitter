@@ -142,6 +142,13 @@ export class PaymentService {
       throw new NotFoundException('Payment not found');
     }
 
+    if (paymentEntity.status === PaymentStatus.SUCCESSFUL) {
+      console.log(
+        `Payment ${paymentEntity.id} already marked as successful, skipping`,
+      );
+      return;
+    }
+
     paymentEntity.status = PaymentStatus.FAILED;
 
     await this.paymentRepository.save(paymentEntity);
