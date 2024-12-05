@@ -26,6 +26,7 @@ import { register } from "@/services/auth/auth.service";
 import Link from "next/link";
 import { PHONE_NUMBER_REGEX } from "../constants";
 import { useRouter } from "next/router";
+import { trackEvent } from "@/services/tracking/tracking.service";
 
 const RegisterForm = () => {
   const { toast } = useToast();
@@ -51,6 +52,10 @@ const RegisterForm = () => {
 
   const onSubmit: SubmitHandler<RegisterFormValues> = async (values) => {
     try {
+      trackEvent("register", {
+        email: values.email,
+      });
+
       await register(values);
       toast({
         title: "Successfully registered!",

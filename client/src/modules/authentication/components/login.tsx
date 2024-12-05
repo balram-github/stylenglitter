@@ -26,6 +26,7 @@ import { useRouter } from "next/router";
 import { login } from "@/services/auth/auth.service";
 import { queryClient } from "@/lib/query";
 import Link from "next/link";
+import { trackEvent } from "@/services/tracking/tracking.service";
 
 const LoginForm = () => {
   const { toast } = useToast();
@@ -47,6 +48,10 @@ const LoginForm = () => {
 
   const onSubmit: SubmitHandler<LoginFormValues> = async (values) => {
     try {
+      trackEvent("login", {
+        email: values.email,
+      });
+
       await login(values);
       toast({
         description: "Successfully logged in!",
@@ -109,14 +114,14 @@ const LoginForm = () => {
                 </FormItem>
               )}
             />
-            <div className="flex justify-end">
+            {/* <div className="flex justify-end">
               <Link
                 href={`/authentication/request-password-reset`}
                 className="text-sm text-gray-500 hover:underline hover:text-primary"
               >
                 Forgot password?
               </Link>
-            </div>
+            </div> */}
           </CardContent>
           <CardFooter className="flex flex-col items-center gap-4">
             <Button className="w-full max-w-72" isLoading={isSubmitting}>
@@ -142,8 +147,8 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Email must be valid",
   }),
-  password: z.string().min(8, {
-    message: "Password must be valid",
+  password: z.string().min(6, {
+    message: "Password must be atleast 6 characters long",
   }),
 });
 
