@@ -200,11 +200,11 @@ const formSchema = z
     email: z.string().email({
       message: "Email must be valid",
     }),
-    password: z.string().min(8, {
-      message: "Password must be valid",
+    password: z.string().min(6, {
+      message: "Password must be atleast 6 characters long",
     }),
-    confirmPassword: z.string().min(8, {
-      message: "Password must be valid",
+    confirmPassword: z.string().min(6, {
+      message: "Password must be atleast 6 characters long",
     }),
     phoneNumber: z.string().regex(PHONE_NUMBER_REGEX, {
       message: "Please enter a valid Indian phone number",
