@@ -41,7 +41,7 @@ export const OrderDetails = ({ data, refetch }: OrderDetailsProps) => {
               Order #<span className="font-bold">{data.orderNo}</span>
             </h2>
             <p className="text-sm text-gray-500">
-              Placed on {new Date(data.createdAt).toLocaleDateString()}
+              Placed on {new Date(data.createdAt).toLocaleString()}
             </p>
           </div>
           <OrderStatusBadge
