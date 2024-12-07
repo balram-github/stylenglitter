@@ -315,6 +315,11 @@ export const getColumns = (): ColumnDef<Order>[] => [
     },
   },
   {
+    accessorFn: (row) => row.shippingAddress?.name || "-",
+    header: "Customer Name",
+    cell: (info) => info.getValue(),
+  },
+  {
     accessorFn: (row) => row.orderNo,
     header: "Order No",
     cell: (info) => info.getValue(),
