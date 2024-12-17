@@ -21,7 +21,7 @@ import {
 } from '../order/constants';
 import { TypeOfPayment } from '../order/types/payment-method';
 import { PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY } from '../order/constants';
-import { GetCartPurchaseProductDto } from './dtos/get-cart-purchase-charges.dto';
+import { GetCartPurchaseChargesPayload } from './types/get-cart-purchase-charges-payload';
 
 @Injectable()
 export class CartService {
@@ -151,21 +151,12 @@ export class CartService {
     await this.cartItemRepository.delete(criteria);
   }
 
-  async getCartPurchaseCharges(
-    products: GetCartPurchaseProductDto[],
-    paymentMethod: TypeOfPayment,
-  ) {
-    const populatedProducts = await this.productService.get({
-      where: {
-        id: In(products.map((product) => product.productId)),
-      },
-    });
-
-    const totalValue = populatedProducts.reduce(
-      (acc, item) =>
-        acc +
-        item.amount.price *
-          (products.find((p) => p.productId === item.id)?.qty || 0),
+  async getCartPurchaseCharges({
+    products,
+    paymentMethod,
+  }: GetCartPurchaseChargesPayload) {
+    const totalValue = products.reduce(
+      (acc, item) => acc + item.product.amount.price * item.qty,
       0,
     );
 

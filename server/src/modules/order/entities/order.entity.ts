@@ -40,16 +40,16 @@ export class Order {
   @Index('idx_payment_id')
   paymentId: number;
 
-  @Column({ name: 'user_id', type: 'int', nullable: false })
+  @Column({ name: 'user_id', type: 'int', nullable: true })
   @Index('idx_user_id')
-  userId: number;
+  userId: number | null;
 
   @Column({ name: 'shipping_address_id', type: 'int', nullable: false })
   shippingAddressId: number;
 
   @ManyToOne(() => User, (user) => user.orders)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: User | null;
 
   @Column({ name: 'tracking_no', type: 'varchar', nullable: true })
   trackingNo: string | null;
