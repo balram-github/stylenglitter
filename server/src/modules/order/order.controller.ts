@@ -18,6 +18,8 @@ import { UpdateOrderStatusDto } from './dtos/update-order-status.dto';
 import { AdminGuard } from '@/guards/admin.guard';
 import { GetOrderListDto } from './dtos/get-order-list.dto';
 import { JwtGuard } from '@/guards/jwt.guard';
+import { FindOptionsWhere } from 'typeorm';
+import { Order } from './entities/order.entity';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -57,18 +59,30 @@ export class OrderController {
   /**
    * Get order by orderNo
    */
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtGuard)
   @Get('/:orderNo')
-  async getOrder(@Param('orderNo') orderNo: string, @Auth() auth) {
+  async getOrder(
+    @Param('orderNo') orderNo: string,
+    @Auth() auth,
+    @Query('email') email?: string,
+    @Query('phone_number') phoneNumber?: string,
+  ) {
     let order;
 
     if (auth.isAdmin) {
       order = await this.orderService.getOrder({ orderNo });
     } else {
-      order = await this.orderService.getOrder({
-        orderNo,
-        user: { id: auth.userId },
-      });
+      const filterExpression: FindOptionsWhere<Order> = { orderNo };
+
+      if (auth) {
+        filterExpression.userId = auth.userId;
+      } else if (email) {
+        filterExpression.shippingAddress = { email };
+      } else if (phoneNumber) {
+        filterExpression.shippingAddress = { phoneNumber };
+      }
+
+      order = await this.orderService.getOrder(filterExpression);
     }
 
     if (!order) {
