@@ -21,6 +21,7 @@ import {
 } from '../order/constants';
 import { TypeOfPayment } from '../order/types/payment-method';
 import { PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY } from '../order/constants';
+import { GetCartPurchaseProductDto } from './dtos/get-cart-purchase-charges.dto';
 
 @Injectable()
 export class CartService {
@@ -151,11 +152,20 @@ export class CartService {
   }
 
   async getCartPurchaseCharges(
-    lockedCartItems: LockedCartItem[],
+    products: GetCartPurchaseProductDto[],
     paymentMethod: TypeOfPayment,
   ) {
-    const totalValue = lockedCartItems.reduce(
-      (acc, item) => acc + item.totalPrice,
+    const populatedProducts = await this.productService.get({
+      where: {
+        id: In(products.map((product) => product.productId)),
+      },
+    });
+
+    const totalValue = populatedProducts.reduce(
+      (acc, item) =>
+        acc +
+        item.amount.price *
+          (products.find((p) => p.productId === item.id)?.qty || 0),
       0,
     );
 
@@ -186,30 +196,5 @@ export class CartService {
         return charges;
       }
     }
-  }
-
-  async getAllCartPurchaseCharges(
-    cartId: number,
-    paymentMethod: TypeOfPayment,
-  ) {
-    return this.dataSource.manager.transaction(async (entityManager) => {
-      const cart = await this.getCart({ where: { id: cartId } }, entityManager);
-
-      if (!cart) {
-        throw new NotFoundException('Cart not found');
-      }
-
-      const lockedCartItems = await this.getLockedCartItems(
-        cartId,
-        entityManager,
-      );
-
-      const purchaseCharges = await this.getCartPurchaseCharges(
-        lockedCartItems,
-        paymentMethod,
-      );
-
-      return purchaseCharges;
-    });
   }
 }

@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 import Head from "next/head";
 import Script from "next/script";
 import { useCartStore } from "@/stores/cart/cart.store";
-import { useProtectedRoute } from "@/hooks/use-protected-route";
 import { CartItem } from "@/modules/cart/components/cart-item/cart-item";
 import { CheckoutForm } from "@/modules/checkout/components/checkout-form";
 import { useRouter } from "next/router";
@@ -13,11 +12,10 @@ const CheckoutPage = () => {
     isLoading: isCartLoading,
     cart: { cartItems },
   } = useCartStore();
-  const { isLoading: isProtectedRouteLoading } = useProtectedRoute();
 
   const router = useRouter();
 
-  const isLoading = isProtectedRouteLoading || isCartLoading;
+  const isLoading = isCartLoading;
 
   useEffect(() => {
     if (cartItems.length === 0) {
