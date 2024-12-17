@@ -22,7 +22,7 @@ import { useCartStore } from "@/stores/cart/cart.store";
 import { useQuery } from "@tanstack/react-query";
 import {
   getCartPurchaseCharges,
-  getUserCart,
+  getGuestCart,
   removeCartItemsFromDB,
 } from "@/services/cart/cart.service";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -100,9 +100,9 @@ export function CheckoutForm() {
     try {
       await removeCartItemsFromDB(
         cartItems.map((item) => item.productId),
-        false
+        true
       );
-      const newCart = await getUserCart();
+      const newCart = await getGuestCart();
       setCart(newCart);
     } catch (error) {
       console.error(error);

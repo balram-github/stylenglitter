@@ -78,15 +78,14 @@ export class OrderController {
   }
 
   /**
-   * Create order from user's cart
+   * Create order
    */
-  @UseGuards(AuthGuard)
   @Post()
-  createOrder(@Body() body: CreateOrderDto, @Auth() auth) {
+  createOrder(@Body() body: CreateOrderDto) {
     return this.orderService.createOrder(
-      auth.userId,
       body.shippingAddress,
       body.paymentMethod,
+      body.productsToPurchase,
     );
   }
 

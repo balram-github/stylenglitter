@@ -21,6 +21,7 @@ import {
 } from '../order/constants';
 import { TypeOfPayment } from '../order/types/payment-method';
 import { PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY } from '../order/constants';
+import { GetCartPurchaseChargesPayload } from './types/get-cart-purchase-charges-payload';
 
 @Injectable()
 export class CartService {
@@ -150,12 +151,12 @@ export class CartService {
     await this.cartItemRepository.delete(criteria);
   }
 
-  async getCartPurchaseCharges(
-    lockedCartItems: LockedCartItem[],
-    paymentMethod: TypeOfPayment,
-  ) {
-    const totalValue = lockedCartItems.reduce(
-      (acc, item) => acc + item.totalPrice,
+  async getCartPurchaseCharges({
+    products,
+    paymentMethod,
+  }: GetCartPurchaseChargesPayload) {
+    const totalValue = products.reduce(
+      (acc, item) => acc + item.product.amount.price * item.qty,
       0,
     );
 
@@ -186,30 +187,5 @@ export class CartService {
         return charges;
       }
     }
-  }
-
-  async getAllCartPurchaseCharges(
-    cartId: number,
-    paymentMethod: TypeOfPayment,
-  ) {
-    return this.dataSource.manager.transaction(async (entityManager) => {
-      const cart = await this.getCart({ where: { id: cartId } }, entityManager);
-
-      if (!cart) {
-        throw new NotFoundException('Cart not found');
-      }
-
-      const lockedCartItems = await this.getLockedCartItems(
-        cartId,
-        entityManager,
-      );
-
-      const purchaseCharges = await this.getCartPurchaseCharges(
-        lockedCartItems,
-        paymentMethod,
-      );
-
-      return purchaseCharges;
-    });
   }
 }

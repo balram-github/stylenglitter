@@ -1,4 +1,5 @@
 import {
+  IsEmail,
   IsNotEmpty,
   IsPhoneNumber,
   IsPostalCode,
@@ -7,6 +8,14 @@ import {
 } from 'class-validator';
 
 export class CreateShippingAddressDto {
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(100)
+  name: string;
+
+  @IsEmail()
+  email: string;
+
   @IsPhoneNumber('IN')
   phoneNumber: string;
 
