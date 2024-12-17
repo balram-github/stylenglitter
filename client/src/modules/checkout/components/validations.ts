@@ -2,8 +2,13 @@ import { z } from "zod";
 import { PHONE_NUMBER_REGEX } from "@/modules/authentication/constants";
 import { TypeOfPayment } from "@/services/order/order.types";
 
-
 const shippingAddressSchema = z.object({
+  name: z.string().min(1, {
+    message: "Name is required",
+  }),
+  email: z.string().email({
+    message: "Email must be valid",
+  }),
   addressLine: z
     .string()
     .min(1, "Address is required")
@@ -25,8 +30,6 @@ const shippingAddressSchema = z.object({
     .min(1, "Phone number is required")
     .regex(PHONE_NUMBER_REGEX, "Invalid Indian phone number"),
 });
-
-
 
 export const checkoutFormSchema = z.object({
   shippingAddress: shippingAddressSchema,

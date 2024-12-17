@@ -52,7 +52,7 @@ interface DialogState {
 }
 
 export function CheckoutForm() {
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn, user } = useUser();
   const {
     cart: { cartItems },
     setCart,
@@ -63,6 +63,8 @@ export function CheckoutForm() {
     resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
       shippingAddress: {
+        name: user?.name,
+        email: user?.email,
         addressLine: "",
         city: "",
         state: "",
@@ -212,6 +214,38 @@ export function CheckoutForm() {
             Shipping Address
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="shippingAddress.name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="shippingAddress.email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className="md:col-span-2">
               <FormField
                 control={form.control}

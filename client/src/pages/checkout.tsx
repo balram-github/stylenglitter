@@ -6,8 +6,10 @@ import { useCartStore } from "@/stores/cart/cart.store";
 import { CartItem } from "@/modules/cart/components/cart-item/cart-item";
 import { CheckoutForm } from "@/modules/checkout/components/checkout-form";
 import { useRouter } from "next/router";
+import { useUser } from "@/hooks/use-user";
 
 const CheckoutPage = () => {
+  const { isLoading: isUserLoading } = useUser();
   const {
     isLoading: isCartLoading,
     cart: { cartItems },
@@ -15,7 +17,7 @@ const CheckoutPage = () => {
 
   const router = useRouter();
 
-  const isLoading = isCartLoading;
+  const isLoading = isCartLoading || isUserLoading;
 
   useEffect(() => {
     if (cartItems.length === 0) {
