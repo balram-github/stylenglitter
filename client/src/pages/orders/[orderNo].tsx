@@ -1,4 +1,3 @@
-import { useProtectedRoute } from "@/hooks/use-protected-route";
 import { getOrder } from "@/services/order/order.service";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
@@ -9,23 +8,21 @@ import { OrderItem } from "@/modules/order/components/order-item/order-item";
 import { OrderDetails } from "@/modules/order/components/order-details/order-details";
 
 const OrderDetailsPage = () => {
-  const { isLoading: isProtectedRouteLoading } = useProtectedRoute();
-
   const router = useRouter();
 
   const orderNo = router.query.orderNo as string;
+  const email = router.query.email as string;
+  const phoneNumber = router.query.phoneNumber as string;
 
   const { data, isFetching } = useQuery({
-    queryKey: ["order", orderNo],
-    queryFn: () => getOrder(orderNo),
+    queryKey: ["order", orderNo, email, phoneNumber],
+    queryFn: () => getOrder(orderNo, { email, phoneNumber }),
     enabled: !!orderNo,
     refetchOnWindowFocus: false,
     staleTime: 0,
   });
 
-  const isLoading = isProtectedRouteLoading || isFetching;
-
-  if (!data && !isLoading)
+  if (!data && !isFetching)
     return <div className="text-center text-2xl py-8">Order not found</div>;
 
   return (
@@ -41,11 +38,11 @@ const OrderDetailsPage = () => {
               Ordered Products
             </h2>
             <div className="grid grid-cols-1 gap-8">
-              {isLoading &&
+              {isFetching &&
                 Array.from({ length: 3 }).map((_, index) => (
                   <Skeleton key={index} className="h-52 w-full" />
                 ))}
-              {!isLoading &&
+              {!isFetching &&
                 data?.orderItems.map((item) => (
                   <OrderItem key={item.id} data={item} />
                 ))}
@@ -58,8 +55,8 @@ const OrderDetailsPage = () => {
               Order Details
             </h2>
             <div className="w-full">
-              {isLoading && <Skeleton className="h-12 md:h-4/5 w-full" />}
-              {!isLoading && data && <OrderDetails data={data} />}
+              {isFetching && <Skeleton className="h-12 md:h-4/5 w-full" />}
+              {!isFetching && data && <OrderDetails data={data} />}
             </div>
           </div>
         </div>
