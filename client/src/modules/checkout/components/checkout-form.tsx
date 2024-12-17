@@ -22,6 +22,7 @@ import { useCartStore } from "@/stores/cart/cart.store";
 import { useQuery } from "@tanstack/react-query";
 import {
   getCartPurchaseCharges,
+  getUserCart,
   getGuestCart,
   removeCartItemsFromDB,
 } from "@/services/cart/cart.service";
@@ -40,6 +41,8 @@ import { useState } from "react";
 import { trackEvent } from "@/services/tracking/tracking.service";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { useUser } from "@/hooks/use-user";
+import { Cart } from "@/services/cart/cart.types";
 
 interface DialogState {
   isOpen: boolean;
@@ -49,6 +52,7 @@ interface DialogState {
 }
 
 export function CheckoutForm() {
+  const { isLoggedIn } = useUser();
   const {
     cart: { cartItems },
     setCart,
@@ -100,9 +104,14 @@ export function CheckoutForm() {
     try {
       await removeCartItemsFromDB(
         cartItems.map((item) => item.productId),
-        true
+        !isLoggedIn
       );
-      const newCart = await getGuestCart();
+      let newCart: Cart;
+      if (isLoggedIn) {
+        newCart = await getUserCart();
+      } else {
+        newCart = await getGuestCart();
+      }
       setCart(newCart);
     } catch (error) {
       console.error(error);

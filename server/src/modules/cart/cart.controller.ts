@@ -15,6 +15,7 @@ import { RemoveCartItemsDto } from './dtos/remove-cart-items.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { GetCartPurchaseChargesDto } from './dtos/get-cart-purchase-charges.dto';
 import { ProductService } from '../product/product.service';
+import { In } from 'typeorm';
 
 @ApiTags('Cart')
 @Controller('cart')
@@ -98,10 +99,19 @@ export class CartController {
   async getCartPurchaseAmount(@Body() payload: GetCartPurchaseChargesDto) {
     const { paymentMethod, products } = payload;
 
-    const response = await this.cartService.getCartPurchaseCharges(
-      products,
+    const populatedProducts = await this.productService.get({
+      where: {
+        id: In(products.map((product) => product.productId)),
+      },
+    });
+
+    const response = await this.cartService.getCartPurchaseCharges({
+      products: populatedProducts.map((product) => ({
+        product,
+        qty: products.find((p) => p.productId === product.id)?.qty || 0,
+      })),
       paymentMethod,
-    );
+    });
 
     return response;
   }

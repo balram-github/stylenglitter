@@ -17,6 +17,7 @@ import { CreateOrderDto } from './dtos/create-order.dto';
 import { UpdateOrderStatusDto } from './dtos/update-order-status.dto';
 import { AdminGuard } from '@/guards/admin.guard';
 import { GetOrderListDto } from './dtos/get-order-list.dto';
+import { JwtGuard } from '@/guards/jwt.guard';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -78,15 +79,16 @@ export class OrderController {
   }
 
   /**
-   * Create order from user's cart
+   * Create order
    */
-  @UseGuards(AuthGuard)
   @Post()
+  @UseGuards(JwtGuard)
   createOrder(@Body() body: CreateOrderDto, @Auth() auth) {
     return this.orderService.createOrder(
-      auth.userId,
       body.shippingAddress,
       body.paymentMethod,
+      body.productsToPurchase,
+      auth?.userId,
     );
   }
 
