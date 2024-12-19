@@ -282,7 +282,7 @@ export class OrderService {
           await this.productService.edit(
             product.id,
             {
-              qty: product.qty - orderItem.qty,
+              qty: Math.max(product.qty - orderItem.qty, 0),
             },
             entityManager,
           );
