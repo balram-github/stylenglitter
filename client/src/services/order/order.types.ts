@@ -14,9 +14,15 @@ export interface ShippingAddressPayload {
   phoneNumber: string;
 }
 
+export interface ProductToPurchase {
+  productId: number;
+  qty: number;
+}
+
 export interface CreateOrderPayload {
   paymentMethod: TypeOfPayment;
   shippingAddress: ShippingAddressPayload;
+  productsToPurchase: ProductToPurchase[];
 }
 
 export interface PaymentGatewayResponse {

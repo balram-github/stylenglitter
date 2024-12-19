@@ -10,11 +10,13 @@ import { useEffect, useState } from "react";
 interface PaymentSuccessDialogProps {
   open: boolean;
   orderNo: string;
+  onTimeout: () => void;
 }
 
 export function PaymentSuccessDialog({
   open,
   orderNo,
+  onTimeout,
 }: PaymentSuccessDialogProps) {
   const [timeLeft, setTimeLeft] = useState(5);
 
@@ -25,7 +27,7 @@ export function PaymentSuccessDialog({
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          window.location.href = "/";
+          onTimeout();
           return 0;
         }
         return prev - 1;
@@ -33,7 +35,7 @@ export function PaymentSuccessDialog({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [open]);
+  }, [open, onTimeout]);
 
   return (
     <Dialog open={open}>

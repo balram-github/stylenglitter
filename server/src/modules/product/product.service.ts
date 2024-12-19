@@ -25,7 +25,9 @@ export class ProductService {
     @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
-  get(findOptions: FindManyOptions<Product>) {
+  get(findOptions: FindManyOptions<Product>, entityManager?: EntityManager) {
+    if (entityManager) return entityManager.find(Product, findOptions);
+
     return this.productRepository.find(findOptions);
   }
 

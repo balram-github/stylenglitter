@@ -69,17 +69,15 @@ export class OrderController {
   ) {
     let order;
 
-    if (auth.isAdmin) {
+    if (auth?.isAdmin) {
       order = await this.orderService.getOrder({ orderNo });
     } else {
       const filterExpression: FindOptionsWhere<Order> = { orderNo };
 
       if (auth) {
         filterExpression.userId = auth.userId;
-      } else if (email) {
-        filterExpression.shippingAddress = { email };
-      } else if (phoneNumber) {
-        filterExpression.shippingAddress = { phoneNumber };
+      } else {
+        filterExpression.shippingAddress = { email, phoneNumber };
       }
 
       order = await this.orderService.getOrder(filterExpression);

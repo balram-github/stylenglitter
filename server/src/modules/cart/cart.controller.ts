@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   NotFoundException,
+  Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
@@ -95,7 +96,7 @@ export class CartController {
   /**
    * Get cart purchase charges
    */
-  @Get('/purchase-charges')
+  @Post('/purchase-charges')
   async getCartPurchaseAmount(@Body() payload: GetCartPurchaseChargesDto) {
     const { paymentMethod, products } = payload;
 

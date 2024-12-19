@@ -11,4 +11,4 @@ export const INSTAGRAM_URL = "https://www.instagram.com/style_glitter__";
 
 export const ADDRESS = "Sai Kunj, New Palam vihar phase 3, Gurgaon, 122017, Haryana";
 
-export const TRACK_ORDER_URL = "https://www.delhivery.com/tracking";
+export const TRACK_DELIVERY_URL = "https://www.delhivery.com/tracking";

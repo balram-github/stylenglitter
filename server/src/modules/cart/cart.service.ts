@@ -66,25 +66,21 @@ export class CartService {
       where: { product: { id: productId }, cart: { id: cartId } },
     });
 
-    const newRequestedQty = cartItem
-      ? cartItem.qty + requestedQty
-      : requestedQty;
-
-    if (newRequestedQty <= 0) {
+    if (requestedQty <= 0) {
       return this.removeCartItems(cartId, [productId]);
     }
 
-    if (product.qty < newRequestedQty) {
+    if (product.qty < requestedQty) {
       throw new BadRequestException('Not enough quantity available');
     }
 
     if (cartItem) {
-      cartItem.qty = newRequestedQty;
+      cartItem.qty = requestedQty;
     } else {
       cartItem = this.cartItemRepository.create({
         cart,
         product,
-        qty: newRequestedQty,
+        qty: requestedQty,
       });
     }
 

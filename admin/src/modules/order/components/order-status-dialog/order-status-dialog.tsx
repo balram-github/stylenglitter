@@ -109,7 +109,7 @@ export const OrderStatusDialog = ({
               name="trackingNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tracking Number</FormLabel>
+                  <FormLabel>AWB Number</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Enter tracking number" />
                   </FormControl>

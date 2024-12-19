@@ -20,10 +20,10 @@ const CheckoutPage = () => {
   const isLoading = isCartLoading || isUserLoading;
 
   useEffect(() => {
-    if (cartItems.length === 0) {
+    if (cartItems.length === 0 && !isLoading) {
       router.replace("/");
     }
-  }, [cartItems]);
+  }, [cartItems, isLoading, router]);
 
   return (
     <>

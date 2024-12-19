@@ -1,3 +1,4 @@
+import { TypeOfPayment } from "../order/order.types";
 import { Product } from "../products/products.types";
 
 export interface Cart {
@@ -27,4 +28,12 @@ export interface GetCartPurchaseChargesResponse {
     payNow: number;
     payLater: number;
   };
+}
+
+export interface GetCartPurchaseChargesRequest {
+  paymentMethod: TypeOfPayment;
+  products: {
+    productId: number;
+    qty: number;
+  }[];
 }

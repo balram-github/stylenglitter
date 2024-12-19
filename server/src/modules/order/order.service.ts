@@ -86,12 +86,15 @@ export class OrderService {
     userId: number | null,
   ) {
     return this.dataSource.manager.transaction(async (entityManager) => {
-      const productsWithDetails = await this.productService.get({
-        where: {
-          id: In(productsToPurchase.map((product) => product.productId)),
+      const productsWithDetails = await this.productService.get(
+        {
+          where: {
+            id: In(productsToPurchase.map((product) => product.productId)),
+          },
+          lock: { mode: 'pessimistic_write' },
         },
-        lock: { mode: 'pessimistic_write' },
-      });
+        entityManager,
+      );
 
       const productsToPurchaseWithDetails = productsToPurchase.map(
         (product) => ({

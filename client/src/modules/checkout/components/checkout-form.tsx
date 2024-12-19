@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { isAxiosError } from "axios";
 import {
   Form,
   FormControl,
@@ -37,12 +38,13 @@ import {
 import { verifyPayment } from "@/services/payment/payment.service";
 import { PaymentSuccessDialog } from "./payment-success-dialog";
 import { PaymentFailedDialog } from "./payment-failed-dialog";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { trackEvent } from "@/services/tracking/tracking.service";
-import { useRouter } from "next/router";
 import Link from "next/link";
 import { useUser } from "@/hooks/use-user";
 import { Cart } from "@/services/cart/cart.types";
+import { useRouter } from "next/router";
+import { wait } from "@/utils/utils";
 
 interface DialogState {
   isOpen: boolean;
@@ -52,12 +54,20 @@ interface DialogState {
 }
 
 export function CheckoutForm() {
+  const router = useRouter();
   const { isLoggedIn, user } = useUser();
   const {
     cart: { cartItems },
     setCart,
     setLoading: setCartLoading,
   } = useCartStore();
+
+  const [dialogState, setDialogState] = useState<DialogState>({
+    isOpen: false,
+    type: null,
+    message: "",
+    orderNo: "",
+  });
 
   const form = useForm<CheckoutFormSchema>({
     resolver: zodResolver(checkoutFormSchema),
@@ -75,6 +85,15 @@ export function CheckoutForm() {
     },
   });
 
+  const productsToPurchase = useMemo(
+    () =>
+      cartItems.map((item) => ({
+        productId: item.productId,
+        qty: item.qty,
+      })),
+    [cartItems]
+  );
+
   const paymentMethod = form.watch("paymentMethod");
 
   const { data, isLoading: isFetchingPurchaseCharges } = useQuery({
@@ -82,24 +101,19 @@ export function CheckoutForm() {
       "cart",
       "purchase-charges",
       paymentMethod,
-      cartItems.map((item) => `${item.productId}-${item.qty}`),
+      productsToPurchase.map((item) => `${item.productId}-${item.qty}`),
     ],
-    queryFn: () => getCartPurchaseCharges(paymentMethod),
+    queryFn: () =>
+      getCartPurchaseCharges({
+        paymentMethod,
+        products: productsToPurchase,
+      }),
     gcTime: 0,
     staleTime: 0,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
-
-  const [dialogState, setDialogState] = useState<DialogState>({
-    isOpen: false,
-    type: null,
-    message: "",
-    orderNo: "",
-  });
-
-  const router = useRouter();
 
   const resetCart = async () => {
     setCartLoading(true);
@@ -130,7 +144,10 @@ export function CheckoutForm() {
         paymentMethod: data.paymentMethod,
       });
 
-      const { orderNo, paymentGatewayResponse } = await createOrder(data);
+      const { orderNo, paymentGatewayResponse } = await createOrder({
+        ...data,
+        productsToPurchase,
+      });
 
       const options: RazorpayOptions = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
@@ -155,16 +172,12 @@ export function CheckoutForm() {
             return;
           }
 
-          router.push(`/orders/${orderNo}`);
-
           setDialogState({
             isOpen: true,
             type: "success",
             message: "Thank you for shopping with us!",
             orderNo,
           });
-
-          resetCart();
         },
         notes: {
           orderNo,
@@ -181,8 +194,6 @@ export function CheckoutForm() {
       const rzp = new window.Razorpay(options);
 
       rzp.on("payment.failed", function (response: RazorpayErrorResponse) {
-        console.log(response);
-
         setDialogState({
           isOpen: true,
           type: "error",
@@ -194,13 +205,32 @@ export function CheckoutForm() {
     } catch (error) {
       console.error(error);
 
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "We are looking into it. Please try again later",
-      });
+      if (isAxiosError(error)) {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description:
+            error.response?.data?.error ||
+            "We are looking into it. Please try again later",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "We are looking into it. Please try again later",
+        });
+      }
     }
   };
+
+  const onTimeout = useCallback(async () => {
+    const { shippingAddress } = form.getValues();
+    router.push(
+      `/orders/${dialogState.orderNo}?email=${shippingAddress.email}&phoneNumber=${shippingAddress.phoneNumber}`
+    );
+    await wait(2000);
+    resetCart();
+  }, [router, form, dialogState.orderNo]);
 
   return (
     <Form {...form}>
@@ -422,7 +452,7 @@ export function CheckoutForm() {
           <Button
             type="submit"
             isLoading={form.formState.isSubmitting}
-            disabled={!form.formState.isValid || isFetchingPurchaseCharges}
+            disabled={!form.formState.isValid || !data}
             className="w-full max-w-80 bg-primary text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             Place Order
@@ -432,6 +462,7 @@ export function CheckoutForm() {
       <PaymentSuccessDialog
         open={dialogState.type === "success" && dialogState.isOpen}
         orderNo={dialogState.orderNo ?? ""}
+        onTimeout={onTimeout}
       />
       <PaymentFailedDialog
         open={dialogState.type === "error" && dialogState.isOpen}
