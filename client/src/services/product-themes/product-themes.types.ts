@@ -19,6 +19,11 @@ export interface GetProductThemesResponse {
   data: ProductTheme[];
 }
 
+export interface GetProductThemeBySlugResponse {
+  success: boolean;
+  data: ProductTheme;
+}
+
 export interface GetProductsOfProductThemeResponse {
   success: boolean;
   data: {
