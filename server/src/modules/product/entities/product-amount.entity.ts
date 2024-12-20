@@ -10,16 +10,27 @@ import {
 } from 'typeorm';
 import { Product } from './product.entity';
 import { OrderItem } from '@/modules/order/entities/order-item.entity';
+import { DecimalColumn } from '@/decorators/decimal-column.decorator';
 
 @Entity('product_amounts')
 export class ProductAmount {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'price', type: 'decimal', nullable: false })
+  @DecimalColumn({
+    name: 'price',
+    precision: 10,
+    scale: 2,
+    nullable: false,
+  })
   price: number;
 
-  @Column({ name: 'base_price', type: 'decimal', nullable: false })
+  @DecimalColumn({
+    name: 'base_price',
+    nullable: false,
+    precision: 10,
+    scale: 2,
+  })
   basePrice: number;
 
   @Column({ name: 'product_id', type: 'int', nullable: false })

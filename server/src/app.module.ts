@@ -22,6 +22,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './modules/notification/notification.module';
 import { ProductThemeModule } from './modules/product-theme/product-theme.module';
 import { SystemModule } from './modules/system/system.module';
+import { DiscountModule } from './modules/discount/discount.module';
 
 @Module({
   imports: [
@@ -83,6 +84,7 @@ import { SystemModule } from './modules/system/system.module';
     NotificationModule,
     ProductThemeModule,
     SystemModule,
+    DiscountModule,
   ],
   controllers: [],
   providers: [],

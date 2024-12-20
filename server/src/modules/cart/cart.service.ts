@@ -3,15 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Cart } from './entities/cart.entity';
-import {
-  DataSource,
-  EntityManager,
-  FindOneOptions,
-  In,
-  Repository,
-} from 'typeorm';
+import { EntityManager, FindOneOptions, In, Repository } from 'typeorm';
 import { CartItem } from './entities/cart-item.entity';
 import { ProductService } from '@modules/product/product.service';
 import { LockedCartItem } from './types/locked-cart-item';
@@ -22,6 +16,8 @@ import {
 import { TypeOfPayment } from '../order/types/payment-method';
 import { PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY } from '../order/constants';
 import { GetCartPurchaseChargesPayload } from './types/get-cart-purchase-charges-payload';
+import { DiscountService } from '../discount/discount.service';
+import { GetCartPurchaseChargesResponseDto } from './dtos/get-cart-purchase-charges-response.dto';
 
 @Injectable()
 export class CartService {
@@ -31,7 +27,7 @@ export class CartService {
     @InjectRepository(CartItem)
     private cartItemRepository: Repository<CartItem>,
     private productService: ProductService,
-    @InjectDataSource() private readonly dataSource: DataSource,
+    private discountService: DiscountService,
   ) {}
 
   async getCart(
@@ -150,18 +146,33 @@ export class CartService {
   async getCartPurchaseCharges({
     products,
     paymentMethod,
+    autoApplyApplicableDiscounts = true,
   }: GetCartPurchaseChargesPayload) {
-    const totalValue = products.reduce(
+    let totalValue = products.reduce(
       (acc, item) => acc + item.product.amount.price * item.qty,
       0,
     );
 
-    const charges = {
+    const charges: GetCartPurchaseChargesResponseDto = {
       subTotal: totalValue,
       deliveryCharge: 0,
       payNow: 0,
       payLater: 0,
+      appliedDiscounts: [],
     };
+
+    if (autoApplyApplicableDiscounts) {
+      const applicableDiscounts =
+        await this.discountService.getApplicableDiscounts(products);
+
+      const discountedTotal = await this.discountService.applyDiscounts(
+        applicableDiscounts,
+        products,
+      );
+
+      charges.appliedDiscounts = applicableDiscounts;
+      totalValue = discountedTotal;
+    }
 
     switch (paymentMethod) {
       case TypeOfPayment.PREPAID: {

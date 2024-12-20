@@ -16,8 +16,8 @@ export const Footer = () => {
               Discover trendy fashion accessories and glitter products at Style
               Glitter. Shop our curated collection of stylish items.
             </p>
-            <Link href={INSTAGRAM_URL} className="text-primary">
-              <InstagramIcon />
+            <Link href={INSTAGRAM_URL}>
+              <InstagramIcon size={24} color="#fff" />
             </Link>
           </div>
           <div>

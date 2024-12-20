@@ -7,6 +7,7 @@ import { CartItem } from "@/modules/cart/components/cart-item/cart-item";
 import { CheckoutForm } from "@/modules/checkout/components/checkout-form";
 import { useRouter } from "next/router";
 import { useUser } from "@/hooks/use-user";
+import Link from "next/link";
 
 const CheckoutPage = () => {
   const { isLoading: isUserLoading } = useUser();
@@ -46,7 +47,12 @@ const CheckoutPage = () => {
                 ))}
               {!isLoading &&
                 cartItems.map((item) => (
-                  <CartItem key={item.productId} data={item} readonly />
+                  <Link
+                    href={`/products/${item.product?.slug}`}
+                    key={item.productId}
+                  >
+                    <CartItem data={item} readonly />
+                  </Link>
                 ))}
             </div>
           </div>

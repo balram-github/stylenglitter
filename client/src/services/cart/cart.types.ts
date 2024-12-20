@@ -27,7 +27,31 @@ export interface GetCartPurchaseChargesResponse {
     deliveryCharge: number;
     payNow: number;
     payLater: number;
+    appliedDiscounts: Discount[];
   };
+}
+
+export interface Discount {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  type: DiscountType;
+  entityType: DiscountEntityType;
+  entitySlug: string;
+  minQty: number;
+  flatPrice: number;
+  percentage: number;
+}
+
+export enum DiscountEntityType {
+  CATEGORY = "category",
+  PRODUCT_THEME = "product_theme",
+}
+
+export enum DiscountType {
+  FLAT_PRICE = "flat_price",
+  PERCENTAGE = "percentage",
 }
 
 export interface GetCartPurchaseChargesRequest {

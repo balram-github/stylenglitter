@@ -45,6 +45,7 @@ import { useUser } from "@/hooks/use-user";
 import { Cart } from "@/services/cart/cart.types";
 import { useRouter } from "next/router";
 import { wait } from "@/utils/utils";
+import { TicketIcon } from "lucide-react";
 
 interface DialogState {
   isOpen: boolean;
@@ -413,21 +414,42 @@ export function CheckoutForm() {
           )}
           {!isFetchingPurchaseCharges && data && (
             <>
-              <div className="flex justify-between border-t pt-4 pb-4 text-sm">
+              <div className="flex justify-between border-t py-4 text-sm">
                 <p className="font-bold">Sub total</p>
                 <p>Rs. {data.subTotal}</p>
               </div>
-              <div className="flex justify-between border-t pt-4 pb-4 text-sm">
+              {data.appliedDiscounts.length > 0 && (
+                <div className="py-4 border-t flex flex-col gap-4 md:flex-row md:items-center">
+                  <p className="font-bold flex-1">Applied Discounts</p>
+                  <div className="flex flex-col gap-2 items-end">
+                    {data.appliedDiscounts.map((discount) => (
+                      <div
+                        key={discount.slug}
+                        className="flex gap-2 font-bold text-green-800"
+                      >
+                        <TicketIcon className="mt-0.5" size={16} color="#166534" />{" "}
+                        <div className="md:text-right">
+                          <div className="text-sm">{discount.name}</div>
+                          <div className="text-xs text-gray-500">
+                            {discount.slug}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="flex justify-between border-t py-4 text-sm">
                 <p className="font-bold">Delivery charge</p>
                 <p>Rs. {data.deliveryCharge}</p>
               </div>
               {paymentMethod === TypeOfPayment.COD && (
-                <div className="flex justify-between border-t pt-4 pb-4">
+                <div className="flex justify-between border-t py-4">
                   <p className="font-bold">Pay on delivery</p>
                   <p>Rs. {data.payLater}</p>
                 </div>
               )}
-              <div className="flex justify-between border-t border-b pt-4 pb-4">
+              <div className="flex justify-between border-t border-b py-4">
                 <p className="font-bold">
                   {paymentMethod === TypeOfPayment.PREPAID
                     ? "Total"
