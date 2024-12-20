@@ -23,7 +23,7 @@ export class ProductThemeController {
 
   @Get('/')
   async getProductThemes() {
-    return this.productThemeService.get();
+    return this.productThemeService.get({ order: { createdAt: 'DESC' } });
   }
 
   @Get('/:slug')
