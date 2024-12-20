@@ -21,7 +21,7 @@ export const ProductImageCarousel = ({
     <Carousel
       opts={{
         align: "start",
-        dragFree: true,
+        dragFree: false,
       }}
     >
       <CarouselContent>

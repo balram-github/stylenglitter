@@ -25,6 +25,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cookie": "^1.0.1",
+    "embla-carousel-autoplay": "^8.5.1",
+    "embla-carousel-fade": "^8.5.1",
     "embla-carousel-react": "^8.3.0",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.452.0",
