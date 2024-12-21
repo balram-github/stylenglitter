@@ -140,13 +140,24 @@ export class ProductService {
 
   async upsert(payload: CreateProductDto) {
     return this.dataSource.manager.transaction(async (entityManager) => {
+      // Find existing product without eager loading
       const existing = await entityManager.findOne(Product, {
         where: { code: payload.code },
+        select: [
+          'id',
+          'code',
+          'name',
+          'description',
+          'qty',
+          'categoryId',
+          'productThemeId',
+        ],
       });
 
       if (existing) {
-        // Update existing product first
-        Object.assign(existing, {
+        // First update the base product without eager relations
+        const updatedProduct = await entityManager.save(Product, {
+          id: existing.id, // Important: include the ID
           name: payload.name,
           code: payload.code,
           description: payload.description,
@@ -155,43 +166,40 @@ export class ProductService {
           productThemeId: payload.productThemeId,
         });
 
-        // Save the updated product
-        const savedProduct = await entityManager.save(existing);
-
-        // Update amount
+        // Handle product amount
         const productAmount = await entityManager.findOne(ProductAmount, {
-          where: { productId: savedProduct.id },
+          where: { productId: updatedProduct.id },
         });
 
         if (productAmount) {
-          Object.assign(productAmount, {
+          await entityManager.save(ProductAmount, {
+            ...productAmount,
             price: payload.amount,
             basePrice: payload.baseAmount,
           });
-          await entityManager.save(productAmount);
         }
 
-        // Delete existing images
+        // Handle images
         await entityManager.delete(ProductImage, {
-          productId: savedProduct.id,
+          productId: updatedProduct.id,
         });
 
-        // Create new images after product is saved
-        const imagePromises = payload.productImages.map((imageUrl) => {
-          const image = this.productImageRepository.create({
+        const imagePromises = payload.productImages.map((imageUrl) =>
+          entityManager.save(ProductImage, {
             url: imageUrl,
-            productId: savedProduct.id,
-            product: savedProduct,
-          });
-          return entityManager.save(image);
-        });
+            productId: updatedProduct.id,
+          }),
+        );
 
         await Promise.all(imagePromises);
 
-        return savedProduct;
+        // Fetch the final product with all relations
+        return await entityManager.findOne(Product, {
+          where: { id: updatedProduct.id },
+          relations: ['category', 'productTheme', 'amount', 'images'],
+        });
       }
 
-      // Create new product using existing create method
       return this.create(payload, entityManager);
     });
   }
