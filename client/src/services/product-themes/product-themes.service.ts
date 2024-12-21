@@ -3,7 +3,7 @@ import {
   GetProductThemesResponse,
   GetProductsOfProductThemeParams,
   GetProductsOfProductThemeResponse,
-  ProductTheme,
+  GetProductThemeBySlugResponse,
 } from "./product-themes.types";
 
 export const getProductsOfProductTheme = async (
@@ -23,7 +23,11 @@ export const getProductsOfProductTheme = async (
 };
 
 export const getProductThemeBySlug = async (slug: string) => {
-  const { data } = await request.get<ProductTheme>(`/product-themes/${slug}`);
+  const {
+    data: { data },
+  } = await request.get<GetProductThemeBySlugResponse>(
+    `/product-themes/${slug}`
+  );
 
   return data;
 };

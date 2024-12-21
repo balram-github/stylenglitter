@@ -3,27 +3,28 @@ import React, { useEffect } from "react";
 import Head from "next/head";
 import Script from "next/script";
 import { useCartStore } from "@/stores/cart/cart.store";
-import { useProtectedRoute } from "@/hooks/use-protected-route";
 import { CartItem } from "@/modules/cart/components/cart-item/cart-item";
 import { CheckoutForm } from "@/modules/checkout/components/checkout-form";
 import { useRouter } from "next/router";
+import { useUser } from "@/hooks/use-user";
+import Link from "next/link";
 
 const CheckoutPage = () => {
+  const { isLoading: isUserLoading } = useUser();
   const {
     isLoading: isCartLoading,
     cart: { cartItems },
   } = useCartStore();
-  const { isLoading: isProtectedRouteLoading } = useProtectedRoute();
 
   const router = useRouter();
 
-  const isLoading = isProtectedRouteLoading || isCartLoading;
+  const isLoading = isCartLoading || isUserLoading;
 
   useEffect(() => {
-    if (cartItems.length === 0) {
+    if (cartItems.length === 0 && !isLoading) {
       router.replace("/");
     }
-  }, [cartItems]);
+  }, [cartItems, isLoading, router]);
 
   return (
     <>
@@ -46,7 +47,12 @@ const CheckoutPage = () => {
                 ))}
               {!isLoading &&
                 cartItems.map((item) => (
-                  <CartItem key={item.productId} data={item} readonly />
+                  <Link
+                    href={`/products/${item.product?.slug}`}
+                    key={item.productId}
+                  >
+                    <CartItem data={item} readonly />
+                  </Link>
                 ))}
             </div>
           </div>

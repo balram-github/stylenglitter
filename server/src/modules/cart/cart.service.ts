@@ -3,15 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Cart } from './entities/cart.entity';
-import {
-  DataSource,
-  EntityManager,
-  FindOneOptions,
-  In,
-  Repository,
-} from 'typeorm';
+import { EntityManager, FindOneOptions, In, Repository } from 'typeorm';
 import { CartItem } from './entities/cart-item.entity';
 import { ProductService } from '@modules/product/product.service';
 import { LockedCartItem } from './types/locked-cart-item';
@@ -21,6 +15,9 @@ import {
 } from '../order/constants';
 import { TypeOfPayment } from '../order/types/payment-method';
 import { PREPAID_ORDER_THRESHOLD_FOR_FREE_DELIVERY } from '../order/constants';
+import { GetCartPurchaseChargesPayload } from './types/get-cart-purchase-charges-payload';
+import { DiscountService } from '../discount/discount.service';
+import { GetCartPurchaseChargesResponseDto } from './dtos/get-cart-purchase-charges-response.dto';
 
 @Injectable()
 export class CartService {
@@ -30,7 +27,7 @@ export class CartService {
     @InjectRepository(CartItem)
     private cartItemRepository: Repository<CartItem>,
     private productService: ProductService,
-    @InjectDataSource() private readonly dataSource: DataSource,
+    private discountService: DiscountService,
   ) {}
 
   async getCart(
@@ -65,25 +62,21 @@ export class CartService {
       where: { product: { id: productId }, cart: { id: cartId } },
     });
 
-    const newRequestedQty = cartItem
-      ? cartItem.qty + requestedQty
-      : requestedQty;
-
-    if (newRequestedQty <= 0) {
+    if (requestedQty <= 0) {
       return this.removeCartItems(cartId, [productId]);
     }
 
-    if (product.qty < newRequestedQty) {
+    if (product.qty < requestedQty) {
       throw new BadRequestException('Not enough quantity available');
     }
 
     if (cartItem) {
-      cartItem.qty = newRequestedQty;
+      cartItem.qty = requestedQty;
     } else {
       cartItem = this.cartItemRepository.create({
         cart,
         product,
-        qty: newRequestedQty,
+        qty: requestedQty,
       });
     }
 
@@ -150,21 +143,36 @@ export class CartService {
     await this.cartItemRepository.delete(criteria);
   }
 
-  async getCartPurchaseCharges(
-    lockedCartItems: LockedCartItem[],
-    paymentMethod: TypeOfPayment,
-  ) {
-    const totalValue = lockedCartItems.reduce(
-      (acc, item) => acc + item.totalPrice,
+  async getCartPurchaseCharges({
+    products,
+    paymentMethod,
+    autoApplyApplicableDiscounts = true,
+  }: GetCartPurchaseChargesPayload) {
+    let totalValue = products.reduce(
+      (acc, item) => acc + item.product.amount.price * item.qty,
       0,
     );
 
-    const charges = {
+    const charges: GetCartPurchaseChargesResponseDto = {
       subTotal: totalValue,
       deliveryCharge: 0,
       payNow: 0,
       payLater: 0,
+      appliedDiscounts: [],
     };
+
+    if (autoApplyApplicableDiscounts) {
+      const applicableDiscounts =
+        await this.discountService.getApplicableDiscounts(products);
+
+      const discountedTotal = await this.discountService.applyDiscounts(
+        applicableDiscounts,
+        products,
+      );
+
+      charges.appliedDiscounts = applicableDiscounts;
+      totalValue = discountedTotal;
+    }
 
     switch (paymentMethod) {
       case TypeOfPayment.PREPAID: {
@@ -186,30 +194,5 @@ export class CartService {
         return charges;
       }
     }
-  }
-
-  async getAllCartPurchaseCharges(
-    cartId: number,
-    paymentMethod: TypeOfPayment,
-  ) {
-    return this.dataSource.manager.transaction(async (entityManager) => {
-      const cart = await this.getCart({ where: { id: cartId } }, entityManager);
-
-      if (!cart) {
-        throw new NotFoundException('Cart not found');
-      }
-
-      const lockedCartItems = await this.getLockedCartItems(
-        cartId,
-        entityManager,
-      );
-
-      const purchaseCharges = await this.getCartPurchaseCharges(
-        lockedCartItems,
-        paymentMethod,
-      );
-
-      return purchaseCharges;
-    });
   }
 }

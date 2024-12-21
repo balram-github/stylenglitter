@@ -9,7 +9,6 @@ import { Button } from "../ui/button";
 import { Bus, Contact, LogOut, Menu, Package, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "@/hooks/use-user";
-import { TRACK_ORDER_URL } from "@/constants";
 import { cn } from "@/lib/utils";
 
 export const MobileDrawer = () => {
@@ -47,8 +46,7 @@ export const MobileDrawer = () => {
           )}
           <SheetClose asChild>
             <Link
-              href={TRACK_ORDER_URL}
-              target="_blank"
+              href="/orders/track"
               className="flex items-center gap-2 font-bold text-sm uppercase border-b-2 py-4"
             >
               <Bus size={20} />

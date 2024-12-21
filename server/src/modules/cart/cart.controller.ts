@@ -4,8 +4,8 @@ import {
   Delete,
   Get,
   NotFoundException,
+  Post,
   Put,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
@@ -14,12 +14,17 @@ import { Auth } from '@decorators/auth';
 import { UpsertCartItemsDto } from './dtos/upsert-cart-items.dto';
 import { RemoveCartItemsDto } from './dtos/remove-cart-items.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { TypeOfPayment } from '../order/types/payment-method';
+import { GetCartPurchaseChargesDto } from './dtos/get-cart-purchase-charges.dto';
+import { ProductService } from '../product/product.service';
+import { In } from 'typeorm';
 
 @ApiTags('Cart')
 @Controller('cart')
 export class CartController {
-  constructor(private cartService: CartService) {}
+  constructor(
+    private cartService: CartService,
+    private productService: ProductService,
+  ) {}
 
   /**
    * Get cart with all the products
@@ -91,16 +96,23 @@ export class CartController {
   /**
    * Get cart purchase charges
    */
-  @UseGuards(AuthGuard)
-  @Get('/purchase-charges')
-  async getCartPurchaseAmount(
-    @Query('paymentMethod') paymentMethod: TypeOfPayment,
-    @Auth() auth,
-  ) {
-    const response = await this.cartService.getAllCartPurchaseCharges(
-      auth.cartId,
+  @Post('/purchase-charges')
+  async getCartPurchaseAmount(@Body() payload: GetCartPurchaseChargesDto) {
+    const { paymentMethod, products } = payload;
+
+    const populatedProducts = await this.productService.get({
+      where: {
+        id: In(products.map((product) => product.productId)),
+      },
+    });
+
+    const response = await this.cartService.getCartPurchaseCharges({
+      products: populatedProducts.map((product) => ({
+        product,
+        qty: products.find((p) => p.productId === product.id)?.qty || 0,
+      })),
       paymentMethod,
-    );
+    });
 
     return response;
   }

@@ -7,7 +7,7 @@ export const ProductThemesSlider = ({
   productThemes,
 }: ProductThemesSliderProps) => {
   return (
-    <div className="w-full overflow-x-scroll flex justify-center items-center gap-4 px-4 pb-4 md:gap-8">
+    <div className="w-full overflow-x-scroll flex md:justify-center items-center gap-4 px-4 pb-4 md:gap-8">
       {productThemes.map((productTheme) => (
         <Link
           key={productTheme.id}

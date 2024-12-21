@@ -56,7 +56,7 @@ export const OrderDetails = ({ data, refetch }: OrderDetailsProps) => {
             <h3 className="font-bold mb-2">Tracking Information</h3>
             <div className="flex items-center gap-4">
               <p className="text-sm text-gray-600">
-                Tracking Number:{" "}
+                AWB Number:{" "}
                 <span className="font-medium">{data.trackingNo || "-"}</span>
               </p>
             </div>

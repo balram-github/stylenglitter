@@ -17,6 +17,9 @@ import { CreateOrderDto } from './dtos/create-order.dto';
 import { UpdateOrderStatusDto } from './dtos/update-order-status.dto';
 import { AdminGuard } from '@/guards/admin.guard';
 import { GetOrderListDto } from './dtos/get-order-list.dto';
+import { JwtGuard } from '@/guards/jwt.guard';
+import { FindOptionsWhere } from 'typeorm';
+import { Order } from './entities/order.entity';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -56,18 +59,28 @@ export class OrderController {
   /**
    * Get order by orderNo
    */
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtGuard)
   @Get('/:orderNo')
-  async getOrder(@Param('orderNo') orderNo: string, @Auth() auth) {
+  async getOrder(
+    @Param('orderNo') orderNo: string,
+    @Auth() auth,
+    @Query('email') email?: string,
+    @Query('phone_number') phoneNumber?: string,
+  ) {
     let order;
 
-    if (auth.isAdmin) {
+    if (auth?.isAdmin) {
       order = await this.orderService.getOrder({ orderNo });
     } else {
-      order = await this.orderService.getOrder({
-        orderNo,
-        user: { id: auth.userId },
-      });
+      const filterExpression: FindOptionsWhere<Order> = { orderNo };
+
+      if (auth) {
+        filterExpression.userId = auth.userId;
+      } else {
+        filterExpression.shippingAddress = { email, phoneNumber };
+      }
+
+      order = await this.orderService.getOrder(filterExpression);
     }
 
     if (!order) {
@@ -78,15 +91,16 @@ export class OrderController {
   }
 
   /**
-   * Create order from user's cart
+   * Create order
    */
-  @UseGuards(AuthGuard)
   @Post()
+  @UseGuards(JwtGuard)
   createOrder(@Body() body: CreateOrderDto, @Auth() auth) {
     return this.orderService.createOrder(
-      auth.userId,
       body.shippingAddress,
       body.paymentMethod,
+      body.productsToPurchase,
+      auth?.userId,
     );
   }
 

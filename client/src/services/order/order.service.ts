@@ -23,9 +23,14 @@ export const getOrders = async (params: GetOrdersParams) => {
   return data;
 };
 
-export const getOrder = async (orderNo: string) => {
+export const getOrder = async (
+  orderNo: string,
+  params?: { email?: string; phoneNumber?: string }
+) => {
   const {
     data: { data },
-  } = await request.get<GetOrderResponse>(`/orders/${orderNo}`);
+  } = await request.get<GetOrderResponse>(`/orders/${orderNo}`, {
+    params,
+  });
   return data;
 };

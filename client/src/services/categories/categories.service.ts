@@ -2,6 +2,7 @@ import { request } from "@/lib/request";
 import {
   Category,
   GetCategoriesResponse,
+  GetCategoryBySlugResponse,
   GetProductsOfCategoryParams,
   GetProductsOfCategoryResponse,
 } from "./categories.types";
@@ -24,8 +25,9 @@ export const getProductsOfCategory = async (
 };
 
 export const getCategoryBySlug = async (slug: string) => {
-  const { data } = await request.get<Category>(`/categories/${slug}`);
-
+  const {
+    data: { data },
+  } = await request.get<GetCategoryBySlugResponse>(`/categories/${slug}`);
   return data;
 };
 

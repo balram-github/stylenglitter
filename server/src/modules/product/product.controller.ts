@@ -54,7 +54,9 @@ export class ProductController {
    */
   @UseGuards(AdminGuard)
   @Put('/')
-  async createProduct(@Body() payload: CreateProductDto): Promise<Product> {
+  async createProduct(
+    @Body() payload: CreateProductDto,
+  ): Promise<Product | null> {
     return this.productService.upsert(payload);
   }
 

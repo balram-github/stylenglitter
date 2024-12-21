@@ -92,13 +92,7 @@ export const Cart = () => {
   const handleCheckout = () => {
     trackEvent("checkout", {});
 
-    if (!isLoggedIn) {
-      router.push(
-        `/authentication/login?redirectTo=${encodeURIComponent("/checkout")}`
-      );
-    } else {
-      router.push("/checkout");
-    }
+    router.push("/checkout");
   };
 
   const totalCartValue = useMemo(() => {

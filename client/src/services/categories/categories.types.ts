@@ -15,6 +15,11 @@ export interface GetCategoriesResponse {
   data: Category[];
 }
 
+export interface GetCategoryBySlugResponse {
+  success: boolean;
+  data: Category;
+}
+
 export interface GetProductsOfCategoryResponse {
   success: boolean;
   data: {

@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { isAxiosError } from "axios";
 import {
   Form,
   FormControl,
@@ -23,6 +24,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   getCartPurchaseCharges,
   getUserCart,
+  getGuestCart,
   removeCartItemsFromDB,
 } from "@/services/cart/cart.service";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,10 +38,14 @@ import {
 import { verifyPayment } from "@/services/payment/payment.service";
 import { PaymentSuccessDialog } from "./payment-success-dialog";
 import { PaymentFailedDialog } from "./payment-failed-dialog";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { trackEvent } from "@/services/tracking/tracking.service";
-import { useRouter } from "next/router";
 import Link from "next/link";
+import { useUser } from "@/hooks/use-user";
+import { Cart } from "@/services/cart/cart.types";
+import { useRouter } from "next/router";
+import { wait } from "@/utils/utils";
+import { TicketIcon } from "lucide-react";
 
 interface DialogState {
   isOpen: boolean;
@@ -49,16 +55,27 @@ interface DialogState {
 }
 
 export function CheckoutForm() {
+  const router = useRouter();
+  const { isLoggedIn, user } = useUser();
   const {
     cart: { cartItems },
     setCart,
     setLoading: setCartLoading,
   } = useCartStore();
 
+  const [dialogState, setDialogState] = useState<DialogState>({
+    isOpen: false,
+    type: null,
+    message: "",
+    orderNo: "",
+  });
+
   const form = useForm<CheckoutFormSchema>({
     resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
       shippingAddress: {
+        name: user?.name,
+        email: user?.email,
         addressLine: "",
         city: "",
         state: "",
@@ -69,6 +86,15 @@ export function CheckoutForm() {
     },
   });
 
+  const productsToPurchase = useMemo(
+    () =>
+      cartItems.map((item) => ({
+        productId: item.productId,
+        qty: item.qty,
+      })),
+    [cartItems]
+  );
+
   const paymentMethod = form.watch("paymentMethod");
 
   const { data, isLoading: isFetchingPurchaseCharges } = useQuery({
@@ -76,9 +102,13 @@ export function CheckoutForm() {
       "cart",
       "purchase-charges",
       paymentMethod,
-      cartItems.map((item) => `${item.productId}-${item.qty}`),
+      productsToPurchase.map((item) => `${item.productId}-${item.qty}`),
     ],
-    queryFn: () => getCartPurchaseCharges(paymentMethod),
+    queryFn: () =>
+      getCartPurchaseCharges({
+        paymentMethod,
+        products: productsToPurchase,
+      }),
     gcTime: 0,
     staleTime: 0,
     refetchOnMount: true,
@@ -86,23 +116,19 @@ export function CheckoutForm() {
     refetchOnReconnect: true,
   });
 
-  const [dialogState, setDialogState] = useState<DialogState>({
-    isOpen: false,
-    type: null,
-    message: "",
-    orderNo: "",
-  });
-
-  const router = useRouter();
-
   const resetCart = async () => {
     setCartLoading(true);
     try {
       await removeCartItemsFromDB(
         cartItems.map((item) => item.productId),
-        false
+        !isLoggedIn
       );
-      const newCart = await getUserCart();
+      let newCart: Cart;
+      if (isLoggedIn) {
+        newCart = await getUserCart();
+      } else {
+        newCart = await getGuestCart();
+      }
       setCart(newCart);
     } catch (error) {
       console.error(error);
@@ -119,7 +145,10 @@ export function CheckoutForm() {
         paymentMethod: data.paymentMethod,
       });
 
-      const { orderNo, paymentGatewayResponse } = await createOrder(data);
+      const { orderNo, paymentGatewayResponse } = await createOrder({
+        ...data,
+        productsToPurchase,
+      });
 
       const options: RazorpayOptions = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
@@ -144,16 +173,12 @@ export function CheckoutForm() {
             return;
           }
 
-          router.push(`/orders/${orderNo}`);
-
           setDialogState({
             isOpen: true,
             type: "success",
             message: "Thank you for shopping with us!",
             orderNo,
           });
-
-          resetCart();
         },
         notes: {
           orderNo,
@@ -170,8 +195,6 @@ export function CheckoutForm() {
       const rzp = new window.Razorpay(options);
 
       rzp.on("payment.failed", function (response: RazorpayErrorResponse) {
-        console.log(response);
-
         setDialogState({
           isOpen: true,
           type: "error",
@@ -183,13 +206,32 @@ export function CheckoutForm() {
     } catch (error) {
       console.error(error);
 
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "We are looking into it. Please try again later",
-      });
+      if (isAxiosError(error)) {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description:
+            error.response?.data?.error ||
+            "We are looking into it. Please try again later",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "We are looking into it. Please try again later",
+        });
+      }
     }
   };
+
+  const onTimeout = useCallback(async () => {
+    const { shippingAddress } = form.getValues();
+    router.push(
+      `/orders/${dialogState.orderNo}?email=${shippingAddress.email}&phoneNumber=${shippingAddress.phoneNumber}`
+    );
+    await wait(2000);
+    resetCart();
+  }, [router, form, dialogState.orderNo]);
 
   return (
     <Form {...form}>
@@ -203,6 +245,38 @@ export function CheckoutForm() {
             Shipping Address
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="shippingAddress.name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="shippingAddress.email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className="md:col-span-2">
               <FormField
                 control={form.control}
@@ -340,21 +414,42 @@ export function CheckoutForm() {
           )}
           {!isFetchingPurchaseCharges && data && (
             <>
-              <div className="flex justify-between border-t pt-4 pb-4 text-sm">
+              <div className="flex justify-between border-t py-4 text-sm">
                 <p className="font-bold">Sub total</p>
                 <p>Rs. {data.subTotal}</p>
               </div>
-              <div className="flex justify-between border-t pt-4 pb-4 text-sm">
+              {data.appliedDiscounts.length > 0 && (
+                <div className="py-4 border-t flex flex-col gap-4 md:flex-row md:items-center">
+                  <p className="font-bold flex-1">Applied Discounts</p>
+                  <div className="flex flex-col gap-2 md:items-end">
+                    {data.appliedDiscounts.map((discount) => (
+                      <div
+                        key={discount.slug}
+                        className="flex gap-2 font-bold text-green-800"
+                      >
+                        <TicketIcon className="mt-0.5" size={16} color="#166534" />{" "}
+                        <div className="md:text-right">
+                          <div className="text-sm">{discount.name}</div>
+                          <div className="text-xs text-gray-500">
+                            {discount.slug}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="flex justify-between border-t py-4 text-sm">
                 <p className="font-bold">Delivery charge</p>
                 <p>Rs. {data.deliveryCharge}</p>
               </div>
               {paymentMethod === TypeOfPayment.COD && (
-                <div className="flex justify-between border-t pt-4 pb-4">
+                <div className="flex justify-between border-t py-4">
                   <p className="font-bold">Pay on delivery</p>
                   <p>Rs. {data.payLater}</p>
                 </div>
               )}
-              <div className="flex justify-between border-t border-b pt-4 pb-4">
+              <div className="flex justify-between border-t border-b py-4">
                 <p className="font-bold">
                   {paymentMethod === TypeOfPayment.PREPAID
                     ? "Total"
@@ -379,7 +474,7 @@ export function CheckoutForm() {
           <Button
             type="submit"
             isLoading={form.formState.isSubmitting}
-            disabled={!form.formState.isValid || isFetchingPurchaseCharges}
+            disabled={!form.formState.isValid || !data}
             className="w-full max-w-80 bg-primary text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             Place Order
@@ -389,6 +484,7 @@ export function CheckoutForm() {
       <PaymentSuccessDialog
         open={dialogState.type === "success" && dialogState.isOpen}
         orderNo={dialogState.orderNo ?? ""}
+        onTimeout={onTimeout}
       />
       <PaymentFailedDialog
         open={dialogState.type === "error" && dialogState.isOpen}

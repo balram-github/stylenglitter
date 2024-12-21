@@ -1,4 +1,4 @@
-import { INSTAGRAM_URL, TRACK_ORDER_URL } from "@/constants";
+import { INSTAGRAM_URL } from "@/constants";
 import { InstagramIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -16,8 +16,8 @@ export const Footer = () => {
               Discover trendy fashion accessories and glitter products at Style
               Glitter. Shop our curated collection of stylish items.
             </p>
-            <Link href={INSTAGRAM_URL} className="text-primary">
-              <InstagramIcon />
+            <Link href={INSTAGRAM_URL}>
+              <InstagramIcon size={24} color="#fff" />
             </Link>
           </div>
           <div>
@@ -25,9 +25,7 @@ export const Footer = () => {
             <div className="flex flex-col gap-4 text-sm">
               <Link href="/about-us">About Us</Link>
               <Link href="/contact-us">Contact Us</Link>
-              <Link href={TRACK_ORDER_URL} target="_blank">
-                Track Order
-              </Link>
+              <Link href="/orders/track">Track Order</Link>
             </div>
           </div>
           <div>

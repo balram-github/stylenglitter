@@ -3,13 +3,13 @@ import {
   EntityManager,
   FindOneOptions,
   FindOptionsWhere,
+  In,
   LessThanOrEqual,
   Repository,
 } from 'typeorm';
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { ProductService } from '@modules/product/product.service';
@@ -33,6 +33,8 @@ import { PaymentRefundCompletedNotificationPayload } from '../notification/types
 import { Jobs } from '@/jobs/jobs';
 import { Cron } from '@nestjs/schedule';
 import { GetOrderListDto } from './dtos/get-order-list.dto';
+import { ProductsToPurchaseDto } from './dtos/create-order.dto';
+import { Product } from '../product/entities/product.entity';
 
 @Injectable()
 export class OrderService {
@@ -57,48 +59,58 @@ export class OrderService {
     return this.orderRepository.findOne(findOptions);
   }
 
+  private async validateProductsToPurchase(
+    productsToPurchase: { product: Product; qty: number }[],
+  ) {
+    for (const { product, qty: qtyToPurchase } of productsToPurchase) {
+      if (!product) {
+        throw new BadRequestException(
+          'One of the products in your cart do not exist',
+        );
+      }
+
+      if (qtyToPurchase > product.qty) {
+        throw new BadRequestException(
+          `Product "${product.name}" does not have the requested quantity available. Please reduce the quantity or remove the product from your cart.`,
+        );
+      }
+    }
+
+    return true;
+  }
+
   async createOrder(
-    userId: number,
     shippingAddress: CreateShippingAddressDto,
     paymentMethod: TypeOfPayment,
+    productsToPurchase: ProductsToPurchaseDto[],
+    userId: number | null,
   ) {
     return this.dataSource.manager.transaction(async (entityManager) => {
-      const user = await this.userService.getOne({
-        where: { id: userId },
-      });
-
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-
-      const cart = await this.cartService.getCart(
-        { where: { userId } },
+      const productsWithDetails = await this.productService.get(
+        {
+          where: {
+            id: In(productsToPurchase.map((product) => product.productId)),
+          },
+          lock: { mode: 'pessimistic_write' },
+        },
         entityManager,
       );
 
-      if (!cart) {
-        throw new InternalServerErrorException('Cart not found');
-      }
-
-      const lockedCartItems = await this.cartService.getLockedCartItems(
-        cart.id,
-        entityManager,
+      const productsToPurchaseWithDetails = productsToPurchase.map(
+        (product) => ({
+          product: productsWithDetails.find((p) => p.id === product.productId)!,
+          qty: product.qty,
+        }),
       );
 
-      if (lockedCartItems.length === 0) {
-        throw new BadRequestException('Cart is empty');
-      }
+      await this.validateProductsToPurchase(productsToPurchaseWithDetails);
 
-      const address = this.shippingAddressRepository.create({
-        ...shippingAddress,
-        name: user.name,
-        email: user.email,
-      });
+      const address = this.shippingAddressRepository.create(shippingAddress);
 
       const savedShippingAddress = await entityManager.save(address);
 
       const order = this.orderRepository.create({
-        user: { id: userId },
+        user: userId ? { id: userId } : null,
         shippingAddress: savedShippingAddress,
         paymentMethod,
       });
@@ -106,30 +118,25 @@ export class OrderService {
       const savedOrder = await entityManager.save(order);
 
       const { payNow: totalOrderValue, payLater: pendingAmount } =
-        await this.cartService.getCartPurchaseCharges(
-          lockedCartItems,
+        await this.cartService.getCartPurchaseCharges({
+          products: productsToPurchaseWithDetails,
           paymentMethod,
-        );
-
-      const promisesToRun = lockedCartItems.map(async (cartItem) => {
-        const orderItem = this.orderItemRepository.create({
-          order: savedOrder,
-          product: cartItem.product,
-          productAmount: cartItem.product.amount,
-          qty: cartItem.qty,
-          totalPrice: cartItem.totalPrice,
         });
 
-        await entityManager.save(orderItem);
+      const promisesToRun = productsToPurchaseWithDetails.map(
+        async (productToPurchase) => {
+          const orderItem = this.orderItemRepository.create({
+            order: savedOrder,
+            product: productToPurchase.product,
+            productAmount: productToPurchase.product.amount,
+            qty: productToPurchase.qty,
+            totalPrice:
+              productToPurchase.product.amount.price * productToPurchase.qty,
+          });
 
-        await this.productService.edit(
-          cartItem.product.id,
-          {
-            qty: cartItem.product.qty - cartItem.qty,
-          },
-          entityManager,
-        );
-      });
+          await entityManager.save(orderItem);
+        },
+      );
 
       await Promise.all(promisesToRun);
 
@@ -253,12 +260,12 @@ export class OrderService {
     return { orders: orders.slice(0, limit), hasNext };
   }
 
-  private async restoreOrderedProductQty(order: Order) {
+  private async consumeProductInventory(order: Order) {
     const promisesToRun = order.orderItems.map(async (orderItem) => {
       return this.dataSource.manager.transaction(async (entityManager) => {
         if (!orderItem.product) {
           console.warn(
-            'Order item product not found while restoring product qty',
+            'Order item product not found while consuming product qty',
           );
           return;
         }
@@ -275,7 +282,7 @@ export class OrderService {
           await this.productService.edit(
             product.id,
             {
-              qty: product.qty + orderItem.qty,
+              qty: Math.max(product.qty - orderItem.qty, 0),
             },
             entityManager,
           );
@@ -293,7 +300,18 @@ export class OrderService {
     try {
       const { paymentId } = payload;
 
-      await this.updateOrderStatus({ paymentId }, OrderStatus.PLACED);
+      const order = await this.getOne({
+        where: { paymentId },
+        relations: ['orderItems'],
+      });
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      await this.updateOrderStatus({ id: order.id }, OrderStatus.PLACED);
+
+      await this.consumeProductInventory(order);
     } catch (error) {
       console.error(error);
     }
@@ -306,21 +324,7 @@ export class OrderService {
     try {
       const { paymentId } = payload;
 
-      const order = await this.getOne({
-        where: { paymentId },
-        relations: ['orderItems'],
-      });
-
-      if (!order) {
-        throw new NotFoundException('Order not found');
-      }
-
-      await this.updateOrderStatus(
-        { id: order.id },
-        OrderStatus.PAYMENT_FAILED,
-      );
-
-      await this.restoreOrderedProductQty(order);
+      await this.updateOrderStatus({ paymentId }, OrderStatus.PAYMENT_FAILED);
     } catch (error) {
       console.error(error);
     }
@@ -389,8 +393,6 @@ export class OrderService {
           { id: order.id },
           OrderStatus.PAYMENT_FAILED,
         );
-
-        await this.restoreOrderedProductQty(order);
       } catch (error) {
         console.log(`Error updating order ${order.id} to payment failed`);
         console.error(error);

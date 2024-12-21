@@ -76,18 +76,10 @@ export class NotificationService {
         throw new NotFoundException('Order not found');
       }
 
-      const user = await this.userService.getOne({
-        where: { id: order.userId },
-      });
-
-      if (!user) {
-        throw new NotFoundException('Order creator not found');
-      }
-
       switch (payload.status) {
         case OrderStatus.PLACED: {
           return this.sendEmailTemplate(
-            user.email,
+            order.shippingAddress.email,
             'Order placed successfully!',
             'order-created.html',
             {

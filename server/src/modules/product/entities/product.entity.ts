@@ -62,7 +62,7 @@ export class Product {
   @Column({ name: 'product_theme_id', type: 'int', nullable: true })
   productThemeId?: number;
 
-  @ManyToOne(() => ProductTheme, (theme) => theme.products)
+  @ManyToOne(() => ProductTheme, (theme) => theme.products, { eager: true })
   @JoinColumn({ name: 'product_theme_id' })
   productTheme: ProductTheme;
 

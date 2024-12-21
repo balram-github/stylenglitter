@@ -1,7 +1,7 @@
 import React from "react";
 import { OrderDetailsProps } from "./order-details.types";
 import { OrderStatusBadge } from "../order-status-badge/order-status-badge";
-import { TRACK_ORDER_URL } from "@/constants";
+import { TRACK_DELIVERY_URL } from "@/constants";
 import { TypeOfPayment } from "@/services/order/order.types";
 
 export const OrderDetails = ({ data }: OrderDetailsProps) => {
@@ -24,18 +24,18 @@ export const OrderDetails = ({ data }: OrderDetailsProps) => {
       {data.trackingNo && (
         <div className="border-t pt-4">
           <h3 className="font-bold mb-2">Tracking Information</h3>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4 md:justify-between">
             <p className="text-sm text-gray-600">
-              Tracking Number:{" "}
+              AWB Number:{" "}
               <span className="font-medium">{data.trackingNo}</span>
             </p>
             <a
-              href={TRACK_ORDER_URL}
+              href={TRACK_DELIVERY_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline"
             >
-              Track Order →
+              Track Delivery →
             </a>
           </div>
         </div>
