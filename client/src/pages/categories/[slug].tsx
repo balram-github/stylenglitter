@@ -79,7 +79,10 @@ export default function CategoryPage({
       <CategoriesSeo category={category} />
       <main>
         <div className="py-6 md:py-10">
-          <div className="container mx-auto px-4 py-8">
+          <div className="container mx-auto px-4 pb-8">
+            <h1 className="text-2xl font-bold pb-6 px-4 text-center md:text-4xl">
+              {category.name}
+            </h1>
             <div className="flex items-center justify-between px-4 mb-4">
               <ProductFilterSheet
                 filters={filters}

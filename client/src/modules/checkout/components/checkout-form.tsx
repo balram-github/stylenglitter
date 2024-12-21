@@ -421,7 +421,7 @@ export function CheckoutForm() {
               {data.appliedDiscounts.length > 0 && (
                 <div className="py-4 border-t flex flex-col gap-4 md:flex-row md:items-center">
                   <p className="font-bold flex-1">Applied Discounts</p>
-                  <div className="flex flex-col gap-2 items-end">
+                  <div className="flex flex-col gap-2 md:items-end">
                     {data.appliedDiscounts.map((discount) => (
                       <div
                         key={discount.slug}

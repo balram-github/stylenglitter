@@ -17,7 +17,7 @@ export const Banners = () => {
         plugins={[
           // @ts-expect-error - Embla carousel types mismatch between packages
           Autoplay({
-            delay: 8000,
+            delay: 5000,
           }),
           // @ts-expect-error - Embla carousel types mismatch between packages
           Fade(),
