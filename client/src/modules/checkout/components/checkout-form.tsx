@@ -84,6 +84,7 @@ export function CheckoutForm() {
       },
       paymentMethod: TypeOfPayment.PREPAID,
     },
+    reValidateMode: "onChange",
   });
 
   const productsToPurchase = useMemo(
@@ -250,7 +251,7 @@ export function CheckoutForm() {
               name="shippingAddress.name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Name*</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter your name" {...field} />
                   </FormControl>
@@ -264,7 +265,7 @@ export function CheckoutForm() {
               name="shippingAddress.email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Email*</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -283,7 +284,7 @@ export function CheckoutForm() {
                 name="shippingAddress.addressLine"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel>Address*</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter your address" {...field} />
                     </FormControl>
@@ -298,7 +299,7 @@ export function CheckoutForm() {
               name="shippingAddress.city"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>City</FormLabel>
+                  <FormLabel>City*</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter your city" {...field} />
                   </FormControl>
@@ -312,7 +313,7 @@ export function CheckoutForm() {
               name="shippingAddress.state"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>State</FormLabel>
+                  <FormLabel>State*</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter your state" {...field} />
                   </FormControl>
@@ -326,7 +327,7 @@ export function CheckoutForm() {
               name="shippingAddress.pinCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>PIN Code</FormLabel>
+                  <FormLabel>PIN Code*</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter PIN code" {...field} />
                   </FormControl>
@@ -340,7 +341,7 @@ export function CheckoutForm() {
               name="shippingAddress.phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel>Phone Number*</FormLabel>
                   <FormControl>
                     <div className="flex">
                       <div className="flex items-center px-3 border rounded-l bg-muted text-muted-foreground border-input">
@@ -427,7 +428,11 @@ export function CheckoutForm() {
                         key={discount.slug}
                         className="flex gap-2 font-bold text-green-800"
                       >
-                        <TicketIcon className="mt-0.5" size={16} color="#166534" />{" "}
+                        <TicketIcon
+                          className="mt-0.5"
+                          size={16}
+                          color="#166534"
+                        />{" "}
                         <div className="md:text-right">
                           <div className="text-sm">{discount.name}</div>
                           <div className="text-xs text-gray-500">
@@ -474,12 +479,17 @@ export function CheckoutForm() {
           <Button
             type="submit"
             isLoading={form.formState.isSubmitting}
-            disabled={!form.formState.isValid || !data}
+            disabled={!data}
             className="w-full max-w-80 bg-primary text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             Place Order
           </Button>
         </div>
+        {!form.formState.isValid && (
+          <p className="text-sm font-medium text-red-500 dark:text-red-900 text-center">
+            Please fill in all required fields.
+          </p>
+        )}
       </form>
       <PaymentSuccessDialog
         open={dialogState.type === "success" && dialogState.isOpen}
