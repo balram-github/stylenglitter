@@ -26,6 +26,9 @@ export class DiscountService {
 
   async getList() {
     const discounts = await this.discountRepository.find({
+      where: {
+        isActive: true,
+      },
       select: ['name', 'slug', 'entityType', 'entityId'],
       order: {
         createdAt: 'DESC',
