@@ -27,6 +27,9 @@ export class DiscountService {
   async getList() {
     const discounts = await this.discountRepository.find({
       select: ['name', 'slug', 'entityType', 'entityId'],
+      order: {
+        createdAt: 'DESC',
+      },
     });
 
     const populatedDiscounts = await Promise.all(

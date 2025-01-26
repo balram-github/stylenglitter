@@ -245,13 +245,20 @@ export function CheckoutForm() {
           <h2 className="text-2xl font-semibold tracking-tight">
             Shipping Address
           </h2>
+          {!form.formState.isValid && (
+            <p className="text-xs font-medium text-red-500">
+              Please fill in all required fields.
+            </p>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="shippingAddress.name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name*</FormLabel>
+                  <FormLabel>
+                    Name<span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="Enter your name" {...field} />
                   </FormControl>
@@ -265,7 +272,9 @@ export function CheckoutForm() {
               name="shippingAddress.email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email*</FormLabel>
+                  <FormLabel>
+                    Email<span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -284,7 +293,9 @@ export function CheckoutForm() {
                 name="shippingAddress.addressLine"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address*</FormLabel>
+                    <FormLabel>
+                      Address<span className="text-red-500">*</span>
+                    </FormLabel>
                     <FormControl>
                       <Input placeholder="Enter your address" {...field} />
                     </FormControl>
@@ -299,7 +310,9 @@ export function CheckoutForm() {
               name="shippingAddress.city"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>City*</FormLabel>
+                  <FormLabel>
+                    City<span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="Enter your city" {...field} />
                   </FormControl>
@@ -313,7 +326,9 @@ export function CheckoutForm() {
               name="shippingAddress.state"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>State*</FormLabel>
+                  <FormLabel>
+                    State<span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="Enter your state" {...field} />
                   </FormControl>
@@ -327,7 +342,9 @@ export function CheckoutForm() {
               name="shippingAddress.pinCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>PIN Code*</FormLabel>
+                  <FormLabel>
+                    PIN Code<span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="Enter PIN code" {...field} />
                   </FormControl>
@@ -341,7 +358,9 @@ export function CheckoutForm() {
               name="shippingAddress.phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number*</FormLabel>
+                  <FormLabel>
+                    Phone Number<span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
                     <div className="flex">
                       <div className="flex items-center px-3 border rounded-l bg-muted text-muted-foreground border-input">
@@ -361,7 +380,6 @@ export function CheckoutForm() {
             />
           </div>
         </div>
-
         {/* Payment Type Section */}
         <div className="space-y-6">
           <h2 className="text-2xl font-semibold tracking-tight">
@@ -404,7 +422,6 @@ export function CheckoutForm() {
             )}
           />
         </div>
-
         <div className="flex flex-col">
           {isFetchingPurchaseCharges && (
             <>
@@ -485,11 +502,6 @@ export function CheckoutForm() {
             Place Order
           </Button>
         </div>
-        {!form.formState.isValid && (
-          <p className="text-sm font-medium text-red-500 dark:text-red-900 text-center">
-            Please fill in all required fields.
-          </p>
-        )}
       </form>
       <PaymentSuccessDialog
         open={dialogState.type === "success" && dialogState.isOpen}
