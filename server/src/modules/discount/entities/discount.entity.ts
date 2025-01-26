@@ -40,6 +40,9 @@ export class Discount {
   @Column({ name: 'min_qty', type: 'int' })
   minQty: number;
 
+  @Column({ name: 'free_qty', type: 'int' })
+  freeQty: number;
+
   @DecimalColumn({ name: 'flat_price', precision: 10, scale: 2 })
   flatPrice: number;
 
