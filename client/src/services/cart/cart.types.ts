@@ -1,3 +1,4 @@
+import { Discount } from "../discount/discount.types";
 import { TypeOfPayment } from "../order/order.types";
 import { Product } from "../products/products.types";
 
@@ -29,29 +30,6 @@ export interface GetCartPurchaseChargesResponse {
     payLater: number;
     appliedDiscounts: Discount[];
   };
-}
-
-export interface Discount {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  type: DiscountType;
-  entityType: DiscountEntityType;
-  entitySlug: string;
-  minQty: number;
-  flatPrice: number;
-  percentage: number;
-}
-
-export enum DiscountEntityType {
-  CATEGORY = "category",
-  PRODUCT_THEME = "product_theme",
-}
-
-export enum DiscountType {
-  FLAT_PRICE = "flat_price",
-  PERCENTAGE = "percentage",
 }
 
 export interface GetCartPurchaseChargesRequest {

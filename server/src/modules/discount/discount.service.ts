@@ -5,19 +5,60 @@ import { Discount } from './entities/discount.entity';
 import { Product } from '../product/entities/product.entity';
 import { DiscountEntityType } from './types/discount-entity-type';
 import { DiscountType } from './types/discount-type';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { Category } from '../category/category.entity';
+import { ProductTheme } from '../product-theme/entities/product-theme.entity';
 
 @Injectable()
 export class DiscountService {
   constructor(
     @InjectRepository(Discount)
     private readonly discountRepository: Repository<Discount>,
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager,
   ) {}
 
   async create(dto: CreateDiscountDto) {
     const discount = this.discountRepository.create(dto);
 
     return this.discountRepository.save(discount);
+  }
+
+  async getList() {
+    const discounts = await this.discountRepository.find({
+      where: {
+        isActive: true,
+      },
+      select: ['name', 'slug', 'entityType', 'entityId'],
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+
+    const populatedDiscounts = await Promise.all(
+      discounts.map(async (discount) => {
+        let entity;
+
+        if (discount.entityType === DiscountEntityType.CATEGORY) {
+          entity = await this.entityManager.findOne(Category, {
+            where: { id: discount.entityId },
+            select: ['name', 'slug'],
+          });
+        } else if (discount.entityType === DiscountEntityType.PRODUCT_THEME) {
+          entity = await this.entityManager.findOne(ProductTheme, {
+            where: { id: discount.entityId },
+            select: ['name', 'slug'],
+          });
+        }
+
+        return {
+          ...discount,
+          entity,
+        };
+      }),
+    );
+
+    return populatedDiscounts;
   }
 
   isDiscountApplicable(discount: Discount, products: Product[]) {
@@ -201,6 +242,18 @@ export class DiscountService {
           totalValue += Math.min(
             eligibleProductsTotalValue,
             discount.flatPrice,
+          );
+          break;
+        }
+        case DiscountType.BOGO: {
+          const productsToBePaid = eligibleProducts.slice(
+            discount.freeQty,
+            eligibleProducts.length,
+          );
+
+          totalValue += productsToBePaid.reduce(
+            (acc, item) => acc + item.amount.price,
+            0,
           );
           break;
         }

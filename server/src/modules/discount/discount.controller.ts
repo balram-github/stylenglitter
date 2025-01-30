@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { DiscountService } from './discount.service';
 import { AdminGuard } from '@/guards/admin.guard';
@@ -13,5 +13,10 @@ export class DiscountController {
   @UseGuards(AdminGuard)
   async createDiscount(@Body() body: CreateDiscountDto) {
     return this.discountService.create(body);
+  }
+
+  @Get('/')
+  async getDiscounts() {
+    return this.discountService.getList();
   }
 }

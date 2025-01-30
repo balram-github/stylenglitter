@@ -33,6 +33,10 @@ export class CreateDiscountDto {
 
   @IsNotEmpty()
   @IsNumber()
+  freeQty: number;
+
+  @IsNotEmpty()
+  @IsNumber()
   flatPrice: number;
 
   @IsNotEmpty()
