@@ -92,7 +92,7 @@ export class ProductService {
       throw new NotFoundException('Product not found');
     }
 
-    const { amount, ...fields } = payload;
+    const { amount, baseAmount, ...fields } = payload;
 
     Object.assign(product, fields);
 
@@ -101,6 +101,7 @@ export class ProductService {
 
       const newProductAmount = this.productAmountRepository.create({
         price: amount,
+        basePrice: baseAmount,
         product,
       });
 

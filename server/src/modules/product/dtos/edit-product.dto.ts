@@ -33,4 +33,9 @@ export class EditProductDto {
   @IsNumber({}, { message: 'Field "$property" must be a number.' })
   @Min(0, { message: 'Field "$property" must be greater than $constraint1' })
   amount?: number;
+
+  @IsOptional()
+  @IsNumber({}, { message: 'Field "$property" must be a number.' })
+  @Min(0, { message: 'Field "$property" must be greater than $constraint1' })
+  baseAmount?: number;
 }
